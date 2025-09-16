@@ -13,6 +13,9 @@ const MediaManager = ({ authState }) => {
   const [pendingHotspot, setPendingHotspot] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showHotspotContextMenu, setShowHotspotContextMenu] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [selectedHotspotIndex, setSelectedHotspotIndex] = useState(null);
 
   useEffect(() => {
     loadPanoramas();
@@ -96,30 +99,55 @@ const MediaManager = ({ authState }) => {
   const saveHotspot = async (destination) => {
     if (!pendingHotspot) return;
     
-    const newHotspot = { 
-      x: pendingHotspot.x, 
-      y: pendingHotspot.y, 
-      destination: destination 
-    };
-    const updatedHotspots = [...hotspots, newHotspot];
-    setHotspots(updatedHotspots);
-    
-    try {
-      await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/hotspots', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authState.accessToken}`,
-        },
-        body: JSON.stringify({
-          photoId: selectedPanorama.id,
-          x: pendingHotspot.x,
-          y: pendingHotspot.y,
-          destination: destination
-        }),
-      });
-    } catch (error) {
-      console.error('Error saving hotspot:', error);
+    if (pendingHotspot.editIndex !== undefined) {
+      // Edit existing hotspot
+      const updatedHotspots = [...hotspots];
+      updatedHotspots[pendingHotspot.editIndex] = {
+        ...updatedHotspots[pendingHotspot.editIndex],
+        destination: destination
+      };
+      setHotspots(updatedHotspots);
+      
+      // Update in backend
+      try {
+        await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/hotspots/${selectedPanorama.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authState.accessToken}`,
+          },
+          body: JSON.stringify({ hotspots: updatedHotspots }),
+        });
+      } catch (error) {
+        console.error('Error updating hotspot:', error);
+      }
+    } else {
+      // Add new hotspot
+      const newHotspot = { 
+        x: pendingHotspot.x, 
+        y: pendingHotspot.y, 
+        destination: destination 
+      };
+      const updatedHotspots = [...hotspots, newHotspot];
+      setHotspots(updatedHotspots);
+      
+      try {
+        await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/hotspots', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authState.accessToken}`,
+          },
+          body: JSON.stringify({
+            photoId: selectedPanorama.id,
+            x: pendingHotspot.x,
+            y: pendingHotspot.y,
+            destination: destination
+          }),
+        });
+      } catch (error) {
+        console.error('Error saving hotspot:', error);
+      }
     }
     
     setShowHotspotModal(false);
@@ -210,6 +238,21 @@ const MediaManager = ({ authState }) => {
     } else {
       alert('Foto tujuan tidak ditemukan');
     }
+  };
+
+  const handleEditHotspot = async (index) => {
+    const hotspot = hotspots[index];
+    setPendingHotspot({ x: hotspot.x, y: hotspot.y, editIndex: index });
+    loadAvailableCategories();
+    setShowHotspotModal(true);
+    setShowHotspotContextMenu(false);
+  };
+
+  const handleDeleteHotspot = async (index) => {
+    if (confirm('Yakin ingin menghapus hotspot ini?')) {
+      await handleRemoveHotspot(index);
+    }
+    setShowHotspotContextMenu(false);
   };
 
   return (
@@ -394,6 +437,14 @@ const MediaManager = ({ authState }) => {
                       className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white cursor-pointer transform -translate-x-2 -translate-y-2 hover:bg-red-600 animate-pulse"
                       style={{ left: hotspot.x, top: hotspot.y }}
                       onClick={() => isAddingHotspot ? handleRemoveHotspot(index) : navigateToDestination(hotspot.destination)}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        if (!isAddingHotspot) {
+                          setSelectedHotspotIndex(index);
+                          setContextMenuPosition({ x: e.clientX, y: e.clientY });
+                          setShowHotspotContextMenu(true);
+                        }
+                      }}
                       title={isAddingHotspot ? `Hotspot ${index + 1} - Klik untuk hapus` : `Ke ${String(hotspot.destination || 'Unknown').replace('_', ' ')}`}
                     />
                   ))}
@@ -436,7 +487,9 @@ const MediaManager = ({ authState }) => {
       {showHotspotModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Pilih Tujuan Hotspot</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              {pendingHotspot?.editIndex !== undefined ? 'Edit' : 'Pilih'} Tujuan Hotspot
+            </h3>
             <p className="text-sm text-gray-600 mb-4">
               Koordinat: x={pendingHotspot?.x}px, y={pendingHotspot?.y}px
             </p>
@@ -471,6 +524,33 @@ const MediaManager = ({ authState }) => {
             </div>
           </div>
         </div>
+      )}
+      
+      {/* Context Menu */}
+      {showHotspotContextMenu && (
+        <>
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setShowHotspotContextMenu(false)}
+          />
+          <div 
+            className="fixed bg-white border rounded-lg shadow-lg py-2 z-50"
+            style={{ left: contextMenuPosition.x, top: contextMenuPosition.y }}
+          >
+            <button
+              onClick={() => handleEditHotspot(selectedHotspotIndex)}
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+            >
+              Edit Tujuan
+            </button>
+            <button
+              onClick={() => handleDeleteHotspot(selectedHotspotIndex)}
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-600"
+            >
+              Hapus Hotspot
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
