@@ -54,7 +54,7 @@ const FALLBACK_IMAGES = {
   kamar: `${import.meta.env.BASE_URL}panorama/kamar.png`
 };
 
-export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: string; selectedArea?: string } = {}) => {
+export const Tour360 = ({ selectedTower, selectedArea, onUnitsLoaded }: { selectedTower?: string; selectedArea?: string; onUnitsLoaded?: (units: any[]) => void } = {}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -81,6 +81,10 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
         const result = await response.json();
         if (result.success) {
           setUnits(result.data);
+          // Pass units data to parent component
+          if (onUnitsLoaded) {
+            onUnitsLoaded(result.data);
+          }
         }
       } catch (error) {
         console.error('Error loading units:', error);
