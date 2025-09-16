@@ -165,7 +165,27 @@ app.delete('/master-unit/:id', authenticateToken, async (req, res) => {
 // MASTER HARGA ENDPOINTS
 app.post('/master-harga', authenticateToken, async (req, res) => {
   try {
-    await createHarga(req.body);
+    const hargaData = {
+      unitId: req.body.unitId,
+      hargaJual: req.body.hargaJual,
+      hargaSewa: req.body.hargaSewa || null,
+      dpMinimum: req.body.dpMinimum || 0,
+      bungaTahunan: req.body.bungaTahunan || 5,
+      cicilan5th: req.body.cicilan5th || null,
+      cicilan7th: req.body.cicilan7th || null,
+      cicilan10th: req.body.cicilan10th || null,
+      cicilan11th: req.body.cicilan11th || null,
+      cicilan15th: req.body.cicilan15th || null,
+      cicilan20th: req.body.cicilan20th || null,
+      cicilan25th: req.body.cicilan25th || null,
+      cicilan30th: req.body.cicilan30th || null,
+      diskon: req.body.diskon || 0,
+      tanggalMulai: req.body.tanggalMulai ? new Date(req.body.tanggalMulai) : null,
+      tanggalBerakhir: req.body.tanggalBerakhir ? new Date(req.body.tanggalBerakhir) : null,
+      keterangan: req.body.keterangan || null,
+      status: req.body.status || 'Aktif'
+    };
+    await createHarga(hargaData);
     res.json({ success: true, message: 'Harga created successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -185,7 +205,27 @@ app.get('/master-harga', authenticateToken, async (req, res) => {
 app.put('/master-harga/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    await updateHarga(id, req.body);
+    const hargaData = {
+      unitId: req.body.unitId,
+      hargaJual: req.body.hargaJual,
+      hargaSewa: req.body.hargaSewa || null,
+      dpMinimum: req.body.dpMinimum || 0,
+      bungaTahunan: req.body.bungaTahunan || 5,
+      cicilan5th: req.body.cicilan5th || null,
+      cicilan7th: req.body.cicilan7th || null,
+      cicilan10th: req.body.cicilan10th || null,
+      cicilan11th: req.body.cicilan11th || null,
+      cicilan15th: req.body.cicilan15th || null,
+      cicilan20th: req.body.cicilan20th || null,
+      cicilan25th: req.body.cicilan25th || null,
+      cicilan30th: req.body.cicilan30th || null,
+      diskon: req.body.diskon || 0,
+      tanggalMulai: req.body.tanggalMulai ? new Date(req.body.tanggalMulai) : null,
+      tanggalBerakhir: req.body.tanggalBerakhir ? new Date(req.body.tanggalBerakhir) : null,
+      keterangan: req.body.keterangan || null,
+      status: req.body.status || 'Aktif'
+    };
+    await updateHarga(id, hargaData);
     res.json({ success: true, message: 'Harga updated successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
