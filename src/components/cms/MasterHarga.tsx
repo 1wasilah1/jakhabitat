@@ -636,7 +636,7 @@ export const MasterHarga = () => {
                   { tenor: 20, cicilan: selectedHarga.cicilan20th },
                   { tenor: 25, cicilan: selectedHarga.cicilan25th },
                   { tenor: 30, cicilan: selectedHarga.cicilan30th }
-                ].filter(item => item.cicilan > 0).map(item => {
+                ].filter(item => item.cicilan && item.cicilan > 0).map(item => {
                   const totalBayar = item.cicilan * item.tenor * 12;
                   const totalBunga = totalBayar - selectedHarga.hargaJual;
                   
