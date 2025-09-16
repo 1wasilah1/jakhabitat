@@ -9,6 +9,9 @@ const MediaManager = ({ authState }) => {
   const [selectedPanorama, setSelectedPanorama] = useState(null);
   const [hotspots, setHotspots] = useState([]);
   const [isAddingHotspot, setIsAddingHotspot] = useState(false);
+  const [showHotspotModal, setShowHotspotModal] = useState(false);
+  const [pendingHotspot, setPendingHotspot] = useState(null);
+  const [availableCategories, setAvailableCategories] = useState([]);
 
   useEffect(() => {
     loadPanoramas();
@@ -79,12 +82,24 @@ const MediaManager = ({ authState }) => {
     }
   };
 
-  const handleAddHotspot = async (e) => {
+  const handleAddHotspot = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = Math.round(e.clientX - rect.left);
     const y = Math.round(e.clientY - rect.top);
     
-    const newHotspot = { x, y };
+    setPendingHotspot({ x, y });
+    loadAvailableCategories();
+    setShowHotspotModal(true);
+  };
+
+  const saveHotspot = async (destination) => {
+    if (!pendingHotspot) return;
+    
+    const newHotspot = { 
+      x: pendingHotspot.x, 
+      y: pendingHotspot.y, 
+      destination: destination 
+    };
     const updatedHotspots = [...hotspots, newHotspot];
     setHotspots(updatedHotspots);
     
@@ -97,12 +112,40 @@ const MediaManager = ({ authState }) => {
         },
         body: JSON.stringify({
           photoId: selectedPanorama.id,
-          x: x,
-          y: y
+          x: pendingHotspot.x,
+          y: pendingHotspot.y,
+          destination: destination
         }),
       });
     } catch (error) {
       console.error('Error saving hotspot:', error);
+    }
+    
+    setShowHotspotModal(false);
+    setPendingHotspot(null);
+  };
+
+  const loadAvailableCategories = async () => {
+    try {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/panoramas`, {
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        // Filter categories from same unit
+        const unitCategories = result.photos
+          .filter(photo => photo.unitId === selectedPanorama.unitId && photo.id !== selectedPanorama.id)
+          .map(photo => ({
+            id: photo.id,
+            category: photo.roomCategory,
+            filename: photo.filename
+          }));
+        setAvailableCategories(unitCategories);
+      }
+    } catch (error) {
+      console.error('Error loading categories:', error);
     }
   };
 
@@ -325,7 +368,7 @@ const MediaManager = ({ authState }) => {
                     <div className="space-y-1 max-h-20 overflow-y-auto">
                       {hotspots.map((hotspot, index) => (
                         <div key={index} className="text-xs text-gray-600 flex justify-between">
-                          <span>Hotspot {index + 1}: x={hotspot.x}px, y={hotspot.y}px</span>
+                          <span>Hotspot {index + 1}: {hotspot.destination ? String(hotspot.destination).replace('_', ' ') : 'No destination'} (x={hotspot.x}px, y={hotspot.y}px)</span>
                           <button 
                             onClick={() => handleRemoveHotspot(index)}
                             className="text-red-500 hover:text-red-700"
@@ -346,6 +389,47 @@ const MediaManager = ({ authState }) => {
                 className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
               >
                 Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Hotspot Destination Modal */}
+      {showHotspotModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Pilih Tujuan Hotspot</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Koordinat: x={pendingHotspot?.x}px, y={pendingHotspot?.y}px
+            </p>
+            
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {availableCategories.length === 0 ? (
+                <p className="text-gray-500 text-sm">Tidak ada kategori lain di unit ini</p>
+              ) : (
+                availableCategories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => saveHotspot(cat.category)}
+                    className="w-full text-left p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="font-medium">{String(cat.category || 'N/A').replace('_', ' ')}</div>
+                    <div className="text-xs text-gray-500">{cat.filename}</div>
+                  </button>
+                ))
+              )}
+            </div>
+            
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => {
+                  setShowHotspotModal(false);
+                  setPendingHotspot(null);
+                }}
+                className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+              >
+                Batal
               </button>
             </div>
           </div>
