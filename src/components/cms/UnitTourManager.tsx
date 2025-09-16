@@ -296,7 +296,9 @@ const UnitTourManager = ({ authState, units }) => {
               <div className="border rounded-lg p-4">
                 <h4 className="font-medium mb-2">Preview:</h4>
                 <img 
-                  src={`/images/360/${selectedPanorama.filePath.split('/').slice(-4).join('/')}`}
+                  src={selectedPanorama.filePath && selectedPanorama.filePath.includes('/jakhabitat/') 
+                    ? `/images/${selectedPanorama.filePath.split('/jakhabitat/')[1]}` 
+                    : `/images/360/${selectedPanorama.filename}`}
                   alt={selectedPanorama.originalName}
                   className="w-full h-64 object-cover rounded"
                   onError={(e) => {
