@@ -56,20 +56,24 @@ export async function initMasterTables() {
     
     // Check and create WEBSITE_JAKHABITAT_MASTER_UNIT table
     const unitResult = await connection.execute(
-      `SELECT COUNT(*) as count FROM user_tables WHERE table_name = 'WEBSITE_JAKHABITAT_MASTER_UNIT'`
+      `SELECT COUNT(*) as count FROM user_tables WHERE table_name = 'WEBSITE_JAKHABITAT_MASTER_UNIT'`,
+      {},
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    if (unitResult.rows[0][0] === 0) {
+    if (unitResult.rows[0].COUNT === 0) {
       await connection.execute(createTablesSQL.masterUnit);
       console.log('Table WEBSITE_JAKHABITAT_MASTER_UNIT created successfully');
     }
     
     // Check and create WEBSITE_JAKHABITAT_MASTER_HARGA table
     const hargaResult = await connection.execute(
-      `SELECT COUNT(*) as count FROM user_tables WHERE table_name = 'WEBSITE_JAKHABITAT_MASTER_HARGA'`
+      `SELECT COUNT(*) as count FROM user_tables WHERE table_name = 'WEBSITE_JAKHABITAT_MASTER_HARGA'`,
+      {},
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    if (hargaResult.rows[0][0] === 0) {
+    if (hargaResult.rows[0].COUNT === 0) {
       await connection.execute(createTablesSQL.masterHarga);
       console.log('Table WEBSITE_JAKHABITAT_MASTER_HARGA created successfully');
     }

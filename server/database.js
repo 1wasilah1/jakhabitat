@@ -28,10 +28,12 @@ export async function initDatabase() {
     
     // Check if table exists
     const result = await connection.execute(
-      `SELECT COUNT(*) as count FROM user_tables WHERE table_name = 'WEBSITE_JAKHABITAT_FOTO'`
+      `SELECT COUNT(*) as count FROM user_tables WHERE table_name = 'WEBSITE_JAKHABITAT_FOTO'`,
+      {},
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    if (result.rows[0][0] === 0) {
+    if (result.rows[0].COUNT === 0) {
       await connection.execute(createTableSQL);
       console.log('Table WEBSITE_JAKHABITAT_FOTO created successfully');
     }
@@ -61,7 +63,7 @@ export async function insertPhoto(photoData) {
         mimeType: photoData.mimeType,
         category: photoData.category || 'panorama'
       },
-      { autoCommit: true }
+      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     return result;
@@ -84,18 +86,19 @@ export async function getPhotos(category = 'panorama') {
        FROM WEBSITE_JAKHABITAT_FOTO 
        WHERE CATEGORY = :category 
        ORDER BY CREATED_AT DESC`,
-      { category }
+      { category },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     return result.rows.map(row => ({
-      id: row[0],
-      filename: row[1],
-      originalName: row[2],
-      filePath: row[3],
-      fileSize: row[4],
-      mimeType: row[5],
-      category: row[6],
-      createdAt: row[7]
+      id: row.ID,
+      filename: row.FILENAME,
+      originalName: row.ORIGINAL_NAME,
+      filePath: row.FILE_PATH,
+      fileSize: row.FILE_SIZE,
+      mimeType: row.MIME_TYPE,
+      category: row.CATEGORY,
+      createdAt: row.CREATED_AT
     }));
   } catch (error) {
     throw error;
@@ -114,7 +117,7 @@ export async function deletePhoto(id) {
     const result = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_FOTO WHERE ID = :id`,
       { id },
-      { autoCommit: true }
+      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     return result;
