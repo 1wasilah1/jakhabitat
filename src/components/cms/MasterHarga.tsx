@@ -8,6 +8,7 @@ export const MasterHarga = () => {
   const [showPriceForm, setShowPriceForm] = useState(false);
   const [editingPrice, setEditingPrice] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [manualCicilan, setManualCicilan] = useState(false);
   const [priceForm, setPriceForm] = useState({
     unitId: '',
     hargaJual: '',
@@ -30,6 +31,33 @@ export const MasterHarga = () => {
   });
   
   const { authState } = useAuth();
+
+  // Calculate cicilan automatically based on harga jual, DP, and bunga
+  const calculateCicilan = () => {
+    const hargaJual = parseFloat(priceForm.hargaJual) || 0;
+    const bungaTahunan = parseFloat(priceForm.bungaTahunan) || 5;
+    
+    if (hargaJual <= 0) return;
+    
+    const P = hargaJual; // DP = 0, so P = harga unit
+    const i = bungaTahunan / 100 / 12; // Monthly interest rate
+    
+    const tenors = [5, 7, 10, 11, 15, 20, 25, 30];
+    const cicilanFields = ['cicilan5th', 'cicilan7th', 'cicilan10th', 'cicilan11th', 'cicilan15th', 'cicilan20th', 'cicilan25th', 'cicilan30th'];
+    
+    const newCicilan = {};
+    
+    tenors.forEach((tahun, index) => {
+      const n = tahun * 12; // Total months
+      // Formula: Angsuran = (P × i) / (1 - (1 + i)^(-n))
+      const numerator = P * i;
+      const denominator = 1 - Math.pow(1 + i, -n);
+      const cicilan = numerator / denominator;
+      newCicilan[cicilanFields[index]] = Math.round(cicilan);
+    });
+    
+    setPriceForm(prev => ({ ...prev, ...newCicilan }));
+  };
 
   useEffect(() => {
     loadUnits();
@@ -252,13 +280,12 @@ export const MasterHarga = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">DP Minimum (%)</label>
                       <input 
                         type="number" 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md" 
-                        placeholder="20" 
-                        min="0" 
-                        max="100"
-                        value={priceForm.dpMinimum}
-                        onChange={(e) => setPriceForm({...priceForm, dpMinimum: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100" 
+                        placeholder="0" 
+                        value="0"
+                        disabled
                       />
+                      <p className="text-xs text-gray-500 mt-1">DP = Rp 0 (sesuai rumus)</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Bunga Tahunan (%)</label>
@@ -266,7 +293,7 @@ export const MasterHarga = () => {
                         type="number" 
                         step="0.1" 
                         className="w-full px-3 py-2 border border-gray-300 rounded-md" 
-                        placeholder="12"
+                        placeholder="5"
                         value={priceForm.bungaTahunan}
                         onChange={(e) => setPriceForm({...priceForm, bungaTahunan: e.target.value})}
                       />
@@ -274,86 +301,110 @@ export const MasterHarga = () => {
                   </div>
                   
                   <div className="space-y-3">
-                    <h5 className="font-medium text-gray-800">Cicilan per Tenor:</h5>
+                    <div className="flex items-center justify-between">
+                      <h5 className="font-medium text-gray-800">Cicilan per Tenor:</h5>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={manualCicilan}
+                          onChange={(e) => {
+                            setManualCicilan(e.target.checked);
+                            if (!e.target.checked) {
+                              setTimeout(() => calculateCicilan(), 100);
+                            }
+                          }}
+                          className="rounded"
+                        />
+                        <span className="text-sm text-gray-600">Input Manual</span>
+                      </label>
+                    </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">5 Tahun</label>
                         <input 
                           type="number" 
-                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded" 
+                          className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
                           placeholder="4504186"
                           value={priceForm.cicilan5th}
                           onChange={(e) => setPriceForm({...priceForm, cicilan5th: e.target.value})}
+                          disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">7 Tahun</label>
                         <input 
                           type="number" 
-                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded" 
+                          className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
                           placeholder="3373481"
                           value={priceForm.cicilan7th}
                           onChange={(e) => setPriceForm({...priceForm, cicilan7th: e.target.value})}
+                          disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">10 Tahun</label>
                         <input 
                           type="number" 
-                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded" 
+                          className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
                           placeholder="2531572"
                           value={priceForm.cicilan10th}
                           onChange={(e) => setPriceForm({...priceForm, cicilan10th: e.target.value})}
+                          disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">11 Tahun</label>
                         <input 
                           type="number" 
-                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded" 
+                          className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
                           placeholder="2354456"
                           value={priceForm.cicilan11th}
                           onChange={(e) => setPriceForm({...priceForm, cicilan11th: e.target.value})}
+                          disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">15 Tahun</label>
                         <input 
                           type="number" 
-                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded" 
+                          className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
                           placeholder="1875000"
                           value={priceForm.cicilan15th}
                           onChange={(e) => setPriceForm({...priceForm, cicilan15th: e.target.value})}
+                          disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">20 Tahun</label>
                         <input 
                           type="number" 
-                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded" 
+                          className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
                           placeholder="1575182"
                           value={priceForm.cicilan20th}
                           onChange={(e) => setPriceForm({...priceForm, cicilan20th: e.target.value})}
+                          disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">25 Tahun</label>
                         <input 
                           type="number" 
-                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded" 
+                          className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
                           placeholder="1350000"
                           value={priceForm.cicilan25th}
                           onChange={(e) => setPriceForm({...priceForm, cicilan25th: e.target.value})}
+                          disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">30 Tahun</label>
                         <input 
                           type="number" 
-                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded" 
+                          className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
                           placeholder="1200000"
                           value={priceForm.cicilan30th}
                           onChange={(e) => setPriceForm({...priceForm, cicilan30th: e.target.value})}
+                          disabled={!manualCicilan}
                         />
                       </div>
                     </div>
@@ -436,6 +487,7 @@ export const MasterHarga = () => {
                     keterangan: '',
                     status: 'Aktif'
                   });
+                  setManualCicilan(false);
                 }}
                 className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
               >
