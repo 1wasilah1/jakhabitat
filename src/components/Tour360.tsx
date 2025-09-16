@@ -362,7 +362,7 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
         <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-6 py-3 rounded-lg text-center max-w-md animate-fade-in">
           <h4 className="font-semibold text-lg">{currentRoom.name}</h4>
           <p className="text-sm text-gray-300 mt-1">{currentRoom.description}</p>
-        {isAutoPlay && (
+          {isAutoPlay && (
             <div className="mt-2">
               <div className="w-full bg-gray-600 rounded-full h-1">
                 <div 
@@ -374,8 +374,9 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
               </div>
               <p className="text-xs text-gray-400 mt-1">Auto review mode</p>
             </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Room Features Panel */}
       {currentRoom && (
