@@ -7,10 +7,28 @@ const UnitTourManager = ({ authState, units }) => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedPanorama, setSelectedPanorama] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [allUnits, setAllUnits] = useState([]);
 
   useEffect(() => {
     loadPanoramas();
+    loadUnits();
   }, []);
+
+  const loadUnits = async () => {
+    try {
+      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/master-unit', {
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        setAllUnits(result.data);
+      }
+    } catch (error) {
+      console.error('Error loading units:', error);
+    }
+  };
 
   const loadPanoramas = async () => {
     try {
@@ -109,12 +127,32 @@ const UnitTourManager = ({ authState, units }) => {
                 required
               >
                 <option value="">Pilih Unit</option>
-                {units.map((unit) => (
+                {allUnits.map((unit) => (
                   <option key={unit.id} value={unit.id}>
-                    {unit.namaUnit} - {unit.tipeUnit} ({unit.luas} m²)
+                    {unit.namaUnit} - {unit.tipeUnit} - {unit.tipe} ({unit.luas} m²) - {unit.lokasi}
                   </option>
                 ))}
               </select>
+              {selectedUnit && (
+                <div className="mt-2 p-3 bg-blue-50 rounded-md">
+                  {(() => {
+                    const unit = allUnits.find(u => u.id == selectedUnit);
+                    return unit ? (
+                      <div className="text-sm">
+                        <div className="font-medium text-blue-900">{unit.namaUnit}</div>
+                        <div className="text-blue-700 mt-1">
+                          <span className="inline-block mr-4">Tipe: {unit.tipeUnit}</span>
+                          <span className="inline-block mr-4">Kategori: {unit.tipe}</span>
+                          <span className="inline-block mr-4">Luas: {unit.luas} m²</span>
+                        </div>
+                        <div className="text-blue-600 mt-1">Lokasi: {unit.lokasi}</div>
+                        {unit.deskripsi && <div className="text-blue-600 mt-1 text-xs">{unit.deskripsi}</div>}
+                      </div>
+                    ) : null;
+                  })()
+                  )}
+                </div>
+              )}
             </div>
           </div>
           
