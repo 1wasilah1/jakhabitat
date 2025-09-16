@@ -89,6 +89,19 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
           }));
           setTowers(towerData);
           
+          // Get unique unit types for tabs
+          const uniqueTypes = [...new Set(result.data.map(unit => unit.tipeUnit))].filter(Boolean);
+          const areaData = uniqueTypes.map(type => ({
+            name: type,
+            description: `Unit ${type} dengan fasilitas modern`
+          }));
+          setUnitAreas(areaData);
+          
+          // Set first area as default
+          if (areaData.length > 0 && !selectedArea) {
+            setSelectedArea(areaData[0].name);
+          }
+          
           // Load panorama photos for first tower
           if (result.data.length > 0) {
             loadPanoramaPhotos(result.data[0].id);
