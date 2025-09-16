@@ -129,7 +129,7 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
     }
   };
   
-  // Initialize with selectedTower if provided
+  // Initialize with selectedTower if provided (only once)
   useEffect(() => {
     if (selectedTower && units.length > 0 && !selectedUnit) {
       const unit = units.find(u => u.namaUnit === selectedTower);
@@ -139,16 +139,15 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
         loadPanoramas(unit.id);
       }
     }
-  }, [selectedTower, units.length]);
+  }, [selectedTower]);
 
-  // Don't render if rooms not loaded yet and no selectedTower
-  if (!rooms.length && !selectedTower) {
-    return <div className="flex justify-center items-center h-96">Loading panoramas...</div>;
+  // Show loading when no rooms available
+  if (!rooms.length && selectedUnit) {
+    return <div className="flex justify-center items-center h-96">Loading {selectedUnit.namaUnit} panoramas...</div>;
   }
   
-  // Show loading for selected tower
-  if (selectedTower && !rooms.length) {
-    return <div className="flex justify-center items-center h-96">Loading {selectedTower} panoramas...</div>;
+  if (!rooms.length && !selectedTower) {
+    return <div className="flex justify-center items-center h-96">Loading panoramas...</div>;
   }
 
   // Group rooms by type for better organization
