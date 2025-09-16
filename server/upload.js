@@ -109,6 +109,27 @@ app.get('/panoramas', authenticateToken, async (req, res) => {
   }
 });
 
+// Serve individual image
+app.get('/image/:filename', (req, res) => {
+  try {
+    const { filename } = req.params;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    
+    const imagePath = `/home/wasilah/migration/images/jakhabitat/360/${year}/${month}/${day}/${filename}`;
+    
+    if (fs.existsSync(imagePath)) {
+      res.sendFile(imagePath);
+    } else {
+      res.status(404).json({ error: 'Image not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Delete panorama
 app.delete('/panoramas/:id', authenticateToken, async (req, res) => {
   try {
