@@ -82,61 +82,59 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
     loadUnits();
   }, []);
   
-  // Auto-select unit when selectedTower changes
+  // Load panoramas function
+  const loadPanoramas = async (unitId) => {
+    try {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/panoramas/${unitId}`);
+      const result = await response.json();
+      if (result.success && result.photos.length > 0) {
+        const photosByCategory = result.photos.reduce((acc, photo) => {
+          acc[photo.roomCategory] = photo;
+          return acc;
+        }, {});
+        
+        const dynamicRooms = [];
+        
+        // Show only lorong category first
+        const lorongPhoto = photosByCategory['lorong'];
+        if (lorongPhoto) {
+          dynamicRooms.push({
+            id: 'lorong',
+            name: 'Lorong',
+            description: `Lorong ${selectedUnit?.namaUnit || selectedTower || ''}`,
+            features: ['360° View', 'High Resolution', 'Interactive'],
+            image: `https://dprkp.jakarta.go.id/api/jakhabitat/image/${lorongPhoto.filename}`,
+            type: 'lorong'
+          });
+        }
+        
+        setRooms(dynamicRooms);
+      } else {
+        setRooms([{
+          id: 'hallway',
+          name: 'Lorong',
+          description: `Lorong ${selectedUnit?.namaUnit || selectedTower || ''}`,
+          features: ['Pencahayaan LED', 'Lantai marmer'],
+          image: FALLBACK_IMAGES.lorong,
+          type: 'corridor'
+        }]);
+      }
+    } catch (error) {
+      console.error('Error loading panoramas:', error);
+    }
+  };
+  
+  // Auto-select and load when selectedTower is provided
   useEffect(() => {
-    if (selectedTower && units.length > 0 && !selectedUnit) {
+    if (selectedTower && units.length > 0) {
       const unit = units.find(u => u.namaUnit === selectedTower);
-      if (unit) {
+      if (unit && !selectedUnit) {
         setSelectedUnit(unit);
         setShowRoomSelector(false);
+        loadPanoramas(unit.id);
       }
     }
-  }, [selectedTower, units, selectedUnit]);
-  
-  // Load panoramas when unit is selected
-  useEffect(() => {
-    if (!selectedUnit) return;
-    
-    const loadPanoramas = async () => {
-      try {
-        const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/panoramas/${selectedUnit.id}`);
-        const result = await response.json();
-        if (result.success && result.photos.length > 0) {
-          const photosByCategory = result.photos.reduce((acc, photo) => {
-            acc[photo.roomCategory] = photo;
-            return acc;
-          }, {});
-          
-          const dynamicRooms = [];
-          Object.entries(photosByCategory).forEach(([category, photo]) => {
-            dynamicRooms.push({
-              id: category,
-              name: String(category).replace('_', ' '),
-              description: `${String(category).replace('_', ' ')} ${selectedUnit.namaUnit}`,
-              features: ['360° View', 'High Resolution', 'Interactive'],
-              image: `https://dprkp.jakarta.go.id/api/jakhabitat/image/${photo.filename}`,
-              type: category
-            });
-          });
-          
-          setRooms(dynamicRooms);
-        } else {
-          setRooms([{
-            id: 'hallway',
-            name: 'Lorong',
-            description: `Lorong ${selectedUnit.namaUnit}`,
-            features: ['Pencahayaan LED', 'Lantai marmer'],
-            image: FALLBACK_IMAGES.lorong,
-            type: 'corridor'
-          }]);
-        }
-      } catch (error) {
-        console.error('Error loading panoramas:', error);
-      }
-    };
-    
-    loadPanoramas();
-  }, [selectedUnit?.id]);
+  }, [selectedTower, units]);
 
   // Don't render if rooms not loaded yet and no selectedTower
   if (!rooms.length && !selectedTower) {
@@ -249,7 +247,7 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
                     if (e.target.value) {
                       const unit = units.find(u => u.id == e.target.value);
                       setSelectedUnit(unit);
-                      // Will be loaded by useEffect
+                      loadPanoramas(unit.id);
                     }
                   }}
                   defaultValue=""
