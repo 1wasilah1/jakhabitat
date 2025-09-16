@@ -175,14 +175,23 @@ export const CMSDashboard = () => {
                                         method: 'POST',
                                         body: formData,
                                       })
-                                      .then(response => response.json())
+                                      .then(response => {
+                                        if (!response.ok) {
+                                          throw new Error(`HTTP error! status: ${response.status}`);
+                                        }
+                                        return response.json();
+                                      })
                                       .then(data => {
                                         console.log('Upload success:', data);
                                         alert('Panorama berhasil diupload!');
                                       })
                                       .catch(error => {
                                         console.error('Upload error:', error);
-                                        alert('Upload gagal!');
+                                        if (error.message.includes('Failed to fetch')) {
+                                          alert('Server tidak dapat diakses. Pastikan server backend berjalan di port 6000.');
+                                        } else {
+                                          alert(`Upload gagal: ${error.message}`);
+                                        }
                                       });
                                     });
                                   }
