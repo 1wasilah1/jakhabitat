@@ -296,15 +296,7 @@ const UnitTourManager = ({ authState, units }) => {
               <div className="border rounded-lg p-4">
                 <h4 className="font-medium mb-2">Preview:</h4>
                 <img 
-                  src={selectedPanorama.filePath && selectedPanorama.filePath.includes('/jakhabitat/') 
-                    ? `/images/${selectedPanorama.filePath.split('/jakhabitat/')[1]}` 
-                    : (() => {
-                        const now = new Date();
-                        const year = now.getFullYear();
-                        const month = String(now.getMonth() + 1).padStart(2, '0');
-                        const day = String(now.getDate()).padStart(2, '0');
-                        return `/images/360/${year}/${month}/${day}/${selectedPanorama.filename}`;
-                      })()}
+                  src={`/images/360/2024/12/27/${selectedPanorama.filename}`}
                   alt={selectedPanorama.originalName}
                   className="w-full h-64 object-cover rounded"
                   onError={(e) => {
