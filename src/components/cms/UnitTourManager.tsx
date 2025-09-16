@@ -192,25 +192,24 @@ const UnitTourManager = ({ authState, units }) => {
           </div>
           
           {selectedUnit && (
-                <div className="mt-2 p-3 bg-blue-50 rounded-md">
-                  {(() => {
-                    const unit = allUnits.find(u => u.id == selectedUnit);
-                    return unit ? (
-                      <div className="text-sm">
-                        <div className="font-medium text-blue-900">{String(unit.namaUnit || '')}</div>
-                        <div className="text-blue-700 mt-1">
-                          <span className="inline-block mr-4">Tipe: {String(unit.tipeUnit || '')}</span>
-                          <span className="inline-block mr-4">Kategori: {String(unit.tipe || '')}</span>
-                          <span className="inline-block mr-4">Luas: {String(unit.luas || '')} m²</span>
-                        </div>
-                        <div className="text-blue-600 mt-1">Lokasi: {String(unit.lokasi || '')}</div>
-                        {unit.deskripsi && <div className="text-blue-600 mt-1 text-xs">{String(unit.deskripsi)}</div>}
-                      </div>
-                    ) : null;
-                  })()}
-                </div>
-              )}
-          </div>
+            <div className="mt-2 p-3 bg-blue-50 rounded-md">
+              {(() => {
+                const unit = allUnits.find(u => u.id == selectedUnit);
+                return unit ? (
+                  <div className="text-sm">
+                    <div className="font-medium text-blue-900">{String(unit.namaUnit || '')}</div>
+                    <div className="text-blue-700 mt-1">
+                      <span className="inline-block mr-4">Tipe: {String(unit.tipeUnit || '')}</span>
+                      <span className="inline-block mr-4">Kategori: {String(unit.tipe || '')}</span>
+                      <span className="inline-block mr-4">Luas: {String(unit.luas || '')} m²</span>
+                    </div>
+                    <div className="text-blue-600 mt-1">Lokasi: {String(unit.lokasi || '')}</div>
+                    {unit.deskripsi && <div className="text-blue-600 mt-1 text-xs">{String(unit.deskripsi)}</div>}
+                  </div>
+                ) : null;
+              })()}
+            </div>
+          )}
           
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
             <div className="text-center">
