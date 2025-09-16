@@ -15,16 +15,20 @@ function PanoramaSphere({ roomImage, hotspots, onHotspotClick }: {
   
   // Convert 2D coordinates to 3D sphere positions
   const convertTo3D = (x: number, y: number, radius = 25) => {
-    // Convert percentage to radians
-    // X: 0-100% maps to 0-360 degrees (longitude)
-    // Y: 0-100% maps to 0-180 degrees (latitude)
-    const longitude = (x / 100) * Math.PI * 2 - Math.PI; // -π to π
-    const latitude = (y / 100) * Math.PI - Math.PI / 2; // -π/2 to π/2
+    // Parse percentage values
+    const xPercent = parseFloat(x.toString().replace('%', '')) / 100;
+    const yPercent = parseFloat(y.toString().replace('%', '')) / 100;
+    
+    // Convert to spherical coordinates
+    // X: 0-100% maps to 0-2π (longitude)
+    // Y: 0-100% maps to 0-π (latitude, inverted)
+    const phi = xPercent * Math.PI * 2; // 0 to 2π
+    const theta = (1 - yPercent) * Math.PI; // π to 0 (inverted Y)
     
     return [
-      radius * Math.cos(latitude) * Math.sin(longitude),
-      radius * Math.sin(latitude),
-      radius * Math.cos(latitude) * Math.cos(longitude)
+      -radius * Math.sin(theta) * Math.cos(phi), // Negative X for correct orientation
+      radius * Math.cos(theta),
+      radius * Math.sin(theta) * Math.sin(phi)
     ];
   };
   
