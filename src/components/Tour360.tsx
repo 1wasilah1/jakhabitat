@@ -8,8 +8,8 @@ import buildingExterior from '@/assets/building-exterior.jpg';
 
 // Tower Kanaya panorama images
 const TOWER_KANAYA_IMAGES = {
-  lorong: '/panorama/lorong.png',
-  kamar: '/panorama/kamar.png'
+  lorong: `${import.meta.env.BASE_URL}panorama/lorong.png`,
+  kamar: `${import.meta.env.BASE_URL}panorama/kamar.png`
 };
 
 function PanoramaSphere({ currentRoom, roomImage, doors, onDoorClick }: { 
