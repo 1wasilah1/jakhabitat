@@ -16,6 +16,7 @@ CREATE TABLE WEBSITE_JAKHABITAT_FOTO (
   FILE_SIZE NUMBER,
   MIME_TYPE VARCHAR2(100),
   CATEGORY VARCHAR2(50) DEFAULT 'panorama',
+  UNIT_ID NUMBER,
   CREATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UPDATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
@@ -53,15 +54,16 @@ export async function insertPhoto(photoData) {
     
     const result = await connection.execute(
       `INSERT INTO WEBSITE_JAKHABITAT_FOTO 
-       (FILENAME, ORIGINAL_NAME, FILE_PATH, FILE_SIZE, MIME_TYPE, CATEGORY) 
-       VALUES (:filename, :originalName, :filePath, :fileSize, :mimeType, :category)`,
+       (FILENAME, ORIGINAL_NAME, FILE_PATH, FILE_SIZE, MIME_TYPE, CATEGORY, UNIT_ID) 
+       VALUES (:filename, :originalName, :filePath, :fileSize, :mimeType, :category, :unitId)`,
       {
         filename: photoData.filename,
         originalName: photoData.originalName,
         filePath: photoData.filePath,
         fileSize: photoData.fileSize,
         mimeType: photoData.mimeType,
-        category: photoData.category || 'panorama'
+        category: photoData.category || 'panorama',
+        unitId: photoData.unitId
       },
       { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -82,10 +84,12 @@ export async function getPhotos(category = 'panorama') {
     connection = await oracledb.getConnection(dbConfig);
     
     const result = await connection.execute(
-      `SELECT ID, FILENAME, ORIGINAL_NAME, FILE_PATH, FILE_SIZE, MIME_TYPE, CATEGORY, CREATED_AT 
-       FROM WEBSITE_JAKHABITAT_FOTO 
-       WHERE CATEGORY = :category 
-       ORDER BY CREATED_AT DESC`,
+      `SELECT f.ID, f.FILENAME, f.ORIGINAL_NAME, f.FILE_PATH, f.FILE_SIZE, f.MIME_TYPE, f.CATEGORY, f.UNIT_ID, f.CREATED_AT,
+              u.NAMA_UNIT as UNIT_NAME
+       FROM WEBSITE_JAKHABITAT_FOTO f
+       LEFT JOIN WEBSITE_JAKHABITAT_MASTER_UNIT u ON f.UNIT_ID = u.ID
+       WHERE f.CATEGORY = :category 
+       ORDER BY f.CREATED_AT DESC`,
       { category },
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -98,6 +102,8 @@ export async function getPhotos(category = 'panorama') {
       fileSize: row.FILE_SIZE,
       mimeType: row.MIME_TYPE,
       category: row.CATEGORY,
+      unitId: row.UNIT_ID,
+      unitName: row.UNIT_NAME,
       createdAt: row.CREATED_AT
     }));
   } catch (error) {

@@ -3,14 +3,9 @@ import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { ChevronLeft, ChevronRight, Maximize, Minimize, Play, Pause, Home, Eye } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import roomInterior from '@/assets/room-interior.jpg';
 import buildingExterior from '@/assets/building-exterior.jpg';
-
-// Tower Kanaya panorama images
-const TOWER_KANAYA_IMAGES = {
-  lorong: `${import.meta.env.BASE_URL}panorama/lorong.png`,
-  kamar: `${import.meta.env.BASE_URL}panorama/kamar.png`
-};
 
 function PanoramaSphere({ currentRoom, roomImage, doors, onDoorClick }: { 
   currentRoom: string; 
@@ -45,31 +40,11 @@ function PanoramaSphere({ currentRoom, roomImage, doors, onDoorClick }: {
   );
 }
 
-const rooms = [
-  { 
-    id: 'hallway', 
-    name: 'Lorong', 
-    description: 'Lorong utama apartemen dengan akses ke semua ruangan',
-    features: ['Pencahayaan LED', 'Lantai marmer', 'Storage cabinet', 'Cermin dinding'],
-    image: TOWER_KANAYA_IMAGES.lorong,
-    type: 'corridor',
-    doors: [
-      { to: 'bedroom', position: { x: '59.5%', y: '64.1%' }, label: 'Masuk Kamar 360°' }
-    ]
-  },
-  { 
-    id: 'bedroom', 
-    name: 'Kamar Tidur', 
-    description: 'Kamar tidur utama Tower Kanaya',
-    features: ['King size bed', 'Walk in closet', 'AC', 'Pemandangan kota'],
-    image: TOWER_KANAYA_IMAGES.kamar,
-    type: 'bedroom',
-    doors: [
-      { to: 'hallway', position: { x: '35%', y: '60%' }, label: 'Kembali ke Lorong' }
-    ]
-  },
-
-];
+// Default fallback images
+const FALLBACK_IMAGES = {
+  lorong: `${import.meta.env.BASE_URL}panorama/lorong.png`,
+  kamar: `${import.meta.env.BASE_URL}panorama/kamar.png`
+};
 
 export const Tour360 = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -80,8 +55,89 @@ export const Tour360 = () => {
   const [showRoomSelector, setShowRoomSelector] = useState(true);
   const [debugMode, setDebugMode] = useState(false);
   const [clickCoordinates, setClickCoordinates] = useState<{x: string, y: string} | null>(null);
+  const [uploadedPhotos, setUploadedPhotos] = useState([]);
+  const [rooms, setRooms] = useState([]);
+  const { authState } = useAuth();
   
   const currentRoom = rooms[currentRoomIndex];
+
+  // Load uploaded panorama photos
+  useEffect(() => {
+    const loadPanoramas = async () => {
+      try {
+        const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/panoramas', {
+          headers: {
+            'Authorization': `Bearer ${authState.accessToken}`,
+          },
+        });
+        const result = await response.json();
+        if (result.success) {
+          setUploadedPhotos(result.photos);
+          
+          // Create rooms from uploaded photos or use fallback
+          const dynamicRooms = [];
+          
+          // Try to find uploaded panoramas
+          const lorongPhoto = result.photos.find(p => p.originalName.toLowerCase().includes('lorong'));
+          const kamarPhoto = result.photos.find(p => p.originalName.toLowerCase().includes('kamar'));
+          
+          dynamicRooms.push({
+            id: 'hallway',
+            name: 'Lorong',
+            description: 'Lorong utama apartemen dengan akses ke semua ruangan',
+            features: ['Pencahayaan LED', 'Lantai marmer', 'Storage cabinet', 'Cermin dinding'],
+            image: lorongPhoto ? `https://dprkp.jakarta.go.id/images/${lorongPhoto.filename}` : FALLBACK_IMAGES.lorong,
+            type: 'corridor',
+            doors: [{ to: 'bedroom', position: { x: '59.5%', y: '64.1%' }, label: 'Masuk Kamar 360°' }]
+          });
+          
+          dynamicRooms.push({
+            id: 'bedroom',
+            name: 'Kamar Tidur',
+            description: 'Kamar tidur utama Tower Kanaya',
+            features: ['King size bed', 'Walk in closet', 'AC', 'Pemandangan kota'],
+            image: kamarPhoto ? `https://dprkp.jakarta.go.id/images/${kamarPhoto.filename}` : FALLBACK_IMAGES.kamar,
+            type: 'bedroom',
+            doors: [{ to: 'hallway', position: { x: '35%', y: '60%' }, label: 'Kembali ke Lorong' }]
+          });
+          
+          setRooms(dynamicRooms);
+        }
+      } catch (error) {
+        console.error('Error loading panoramas:', error);
+        // Use fallback rooms if API fails
+        setRooms([
+          {
+            id: 'hallway',
+            name: 'Lorong',
+            description: 'Lorong utama apartemen dengan akses ke semua ruangan',
+            features: ['Pencahayaan LED', 'Lantai marmer', 'Storage cabinet', 'Cermin dinding'],
+            image: FALLBACK_IMAGES.lorong,
+            type: 'corridor',
+            doors: [{ to: 'bedroom', position: { x: '59.5%', y: '64.1%' }, label: 'Masuk Kamar 360°' }]
+          },
+          {
+            id: 'bedroom',
+            name: 'Kamar Tidur',
+            description: 'Kamar tidur utama Tower Kanaya',
+            features: ['King size bed', 'Walk in closet', 'AC', 'Pemandangan kota'],
+            image: FALLBACK_IMAGES.kamar,
+            type: 'bedroom',
+            doors: [{ to: 'hallway', position: { x: '35%', y: '60%' }, label: 'Kembali ke Lorong' }]
+          }
+        ]);
+      }
+    };
+    
+    if (authState.accessToken) {
+      loadPanoramas();
+    }
+  }, [authState.accessToken]);
+
+  // Don't render if rooms not loaded yet
+  if (!rooms.length) {
+    return <div className="flex justify-center items-center h-96">Loading panoramas...</div>;
+  }
 
   // Group rooms by type for better organization
   const roomTypes = {

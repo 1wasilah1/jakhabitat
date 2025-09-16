@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { LogOut, Settings, FileText, Image, Users, BarChart3, ChevronDown, ChevronRight, Building, Heart, HelpCircle, Phone, MapPin, MessageSquare, ClipboardList } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { MasterHarga } from './MasterHarga';
+import UnitTourManager from './UnitTourManager';
 
 const menuItems = [
   { id: 'content', label: 'Konten', icon: FileText },
@@ -284,92 +285,7 @@ export const CMSDashboard = () => {
                       Pilih submenu di sidebar untuk mengelola konten spesifik.
                     </p>
                   ) : activeSubmenu === 'unit-tour' ? (
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4">Upload Panorama 360°</h3>
-                      <div className="space-y-6">
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
-                          <div className="text-center">
-                            <Image className="mx-auto h-12 w-12 text-gray-400" />
-                            <div className="mt-4">
-                              <label htmlFor="panorama-upload" className="cursor-pointer">
-                                <span className="mt-2 block text-sm font-medium text-gray-900">
-                                  Upload gambar panorama 360°
-                                </span>
-                                <span className="mt-1 block text-sm text-gray-500">
-                                  PNG, JPG hingga 10MB
-                                </span>
-                              </label>
-                              <input
-                                id="panorama-upload"
-                                name="panorama-upload"
-                                type="file"
-                                accept="image/*"
-                                multiple
-                                className="sr-only"
-                                onChange={(e) => {
-                                  const files = e.target.files;
-                                  if (files) {
-                                    Array.from(files).forEach(file => {
-                                      const formData = new FormData();
-                                      formData.append('panorama', file);
-                                      
-                                      fetch('https://dprkp.jakarta.go.id/api/jakhabitat/upload/panorama', {
-                                        method: 'POST',
-                                        headers: {
-                                          'Authorization': `Bearer ${authState.accessToken}`,
-                                        },
-                                        body: formData,
-                                      })
-                                      .then(response => {
-                                        if (!response.ok) {
-                                          throw new Error(`HTTP error! status: ${response.status}`);
-                                        }
-                                        const contentType = response.headers.get('content-type');
-                                        if (!contentType || !contentType.includes('application/json')) {
-                                          throw new Error('Server tidak mengembalikan JSON response. Endpoint mungkin belum tersedia.');
-                                        }
-                                        return response.json();
-                                      })
-                                      .then(data => {
-                                        console.log('Upload success:', data);
-                                        alert('Panorama berhasil diupload!');
-                                      })
-                                      .catch(error => {
-                                        console.error('Upload error:', error);
-                                        if (error.message.includes('Failed to fetch')) {
-                                          alert('Server tidak dapat diakses. Pastikan server backend berjalan di port 6000.');
-                                        } else {
-                                          alert(`Upload gagal: ${error.message}`);
-                                        }
-                                      });
-                                    });
-                                  }
-                                }}
-                              />
-                            </div>
-                            <div className="mt-4">
-                              <button
-                                type="button"
-                                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
-                                onClick={() => document.getElementById('panorama-upload')?.click()}
-                              >
-                                Pilih File
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <h4 className="text-md font-medium mb-3">Panorama yang sudah diupload:</h4>
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            {/* Photos will be loaded from database */}
-                            <div className="text-gray-500 text-sm col-span-full text-center py-4">
-                              Memuat foto dari database...
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <UnitTourManager authState={authState} units={units} />
                   ) : (
                     <div>
                       <p className="text-gray-600 mb-4">

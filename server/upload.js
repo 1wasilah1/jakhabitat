@@ -43,6 +43,9 @@ const upload = multer({
 
 app.use(express.json());
 
+// Serve uploaded images
+app.use('/images', express.static('/home/wasilah/migration/images'));
+
 // Debug middleware
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} - Headers:`, req.headers.authorization ? 'Token present' : 'No token');
@@ -68,14 +71,15 @@ app.post('/upload/panorama', authenticateToken, upload.single('panorama'), async
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // Save to database
+    // Save to database with unit association
     await insertPhoto({
       filename: req.file.filename,
       originalName: req.file.originalname,
       filePath: req.file.path,
       fileSize: req.file.size,
       mimeType: req.file.mimetype,
-      category: 'panorama'
+      category: 'panorama',
+      unitId: req.body.unitId || null
     });
 
     res.json({
