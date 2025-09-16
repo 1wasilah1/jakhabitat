@@ -38,7 +38,7 @@ export const MasterHarga = () => {
 
   const loadUnits = async () => {
     try {
-      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/master-unit', {
+      const response = await fetch('http://localhost:6000/master-unit', {
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
         },
@@ -54,7 +54,7 @@ export const MasterHarga = () => {
 
   const loadHarga = async () => {
     try {
-      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/master-harga', {
+      const response = await fetch('http://localhost:6000/master-harga', {
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
         },
@@ -74,8 +74,8 @@ export const MasterHarga = () => {
     
     try {
       const url = editingPrice 
-        ? `https://dprkp.jakarta.go.id/api/jakhabitat/master-harga/${editingPrice.id}`
-        : 'https://dprkp.jakarta.go.id/api/jakhabitat/master-harga';
+        ? `http://localhost:6000/master-harga/${editingPrice.id}`
+        : 'http://localhost:6000/master-harga';
       
       const method = editingPrice ? 'PUT' : 'POST';
       
@@ -155,7 +155,7 @@ export const MasterHarga = () => {
     if (!confirm('Yakin ingin menghapus harga ini?')) return;
     
     try {
-      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/master-harga/${id}`, {
+      const response = await fetch(`http://localhost:6000/master-harga/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
