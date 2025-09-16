@@ -129,16 +129,18 @@ export async function getUnits() {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    return result.rows.map(row => ({
-      id: row.ID,
-      namaUnit: row.NAMA_UNIT,
-      lokasi: row.LOKASI,
-      tipeUnit: row.TIPE_UNIT,
-      tipe: row.TIPE,
-      luas: row.LUAS,
-      deskripsi: row.DESKRIPSI,
-      createdAt: row.CREATED_AT
-    }));
+    return result.rows.map(row => {
+      return {
+        id: Number(row.ID),
+        namaUnit: String(row.NAMA_UNIT || ''),
+        lokasi: String(row.LOKASI || ''),
+        tipeUnit: String(row.TIPE_UNIT || ''),
+        tipe: String(row.TIPE || ''),
+        luas: Number(row.LUAS || 0),
+        deskripsi: String(row.DESKRIPSI || ''),
+        createdAt: row.CREATED_AT ? new Date(row.CREATED_AT).toISOString() : null
+      };
+    });
   } catch (error) {
     throw error;
   } finally {
@@ -249,29 +251,31 @@ export async function getHarga() {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    return result.rows.map(row => ({
-      id: row.ID,
-      unitId: row.UNIT_ID,
-      namaUnit: row.NAMA_UNIT,
-      lokasi: row.LOKASI,
-      tipeUnit: row.TIPE_UNIT,
-      luas: row.LUAS,
-      hargaJual: row.HARGA_JUAL,
-      hargaSewa: row.HARGA_SEWA,
-      dpMinimum: row.DP_MINIMUM,
-      bungaTahunan: row.BUNGA_TAHUNAN,
-      cicilan5th: row.CICILAN_5TH,
-      cicilan7th: row.CICILAN_7TH,
-      cicilan10th: row.CICILAN_10TH,
-      cicilan11th: row.CICILAN_11TH,
-      cicilan15th: row.CICILAN_15TH,
-      cicilan20th: row.CICILAN_20TH,
-      cicilan25th: row.CICILAN_25TH,
-      cicilan30th: row.CICILAN_30TH,
-      diskon: row.DISKON,
-      status: row.STATUS,
-      createdAt: row.CREATED_AT
-    }));
+    return result.rows.map(row => {
+      return {
+        id: Number(row.ID),
+        unitId: Number(row.UNIT_ID),
+        namaUnit: String(row.NAMA_UNIT || ''),
+        lokasi: String(row.LOKASI || ''),
+        tipeUnit: String(row.TIPE_UNIT || ''),
+        luas: Number(row.LUAS || 0),
+        hargaJual: Number(row.HARGA_JUAL || 0),
+        hargaSewa: Number(row.HARGA_SEWA || 0),
+        dpMinimum: Number(row.DP_MINIMUM || 0),
+        bungaTahunan: Number(row.BUNGA_TAHUNAN || 0),
+        cicilan5th: Number(row.CICILAN_5TH || 0),
+        cicilan7th: Number(row.CICILAN_7TH || 0),
+        cicilan10th: Number(row.CICILAN_10TH || 0),
+        cicilan11th: Number(row.CICILAN_11TH || 0),
+        cicilan15th: Number(row.CICILAN_15TH || 0),
+        cicilan20th: Number(row.CICILAN_20TH || 0),
+        cicilan25th: Number(row.CICILAN_25TH || 0),
+        cicilan30th: Number(row.CICILAN_30TH || 0),
+        diskon: Number(row.DISKON || 0),
+        status: String(row.STATUS || 'Aktif'),
+        createdAt: row.CREATED_AT ? new Date(row.CREATED_AT).toISOString() : null
+      };
+    });
   } catch (error) {
     throw error;
   } finally {
