@@ -70,7 +70,28 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
   
   if (!isOpen) return null;
 
-
+  // Load units data when modal opens
+  useEffect(() => {
+    const loadUnits = async () => {
+      if (!isOpen || sectionId !== 'unit-tour') return;
+      
+      try {
+        const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-unit');
+        const result = await response.json();
+        if (result.success) {
+          const towerData = result.data.map(unit => ({
+            name: unit.namaUnit,
+            description: `${unit.tipeUnit} - ${unit.luas} m² - ${unit.lokasi}`
+          }));
+          setTowers(towerData);
+        }
+      } catch (error) {
+        console.error('Error loading units:', error);
+      }
+    };
+    
+    loadUnits();
+  }, [isOpen, sectionId]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
