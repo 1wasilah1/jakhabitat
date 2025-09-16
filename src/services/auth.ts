@@ -1,10 +1,10 @@
 import { LoginRequest, LoginResponse, AuthMeRequest, RefreshTokenRequest, User } from '@/types/auth';
 
-const API_BASE = 'https://dprkp.jakarta.go.id/api/sso/v1';
+const API_BASE = 'https://dprkp.jakarta.go.id/jakhabitat/api';
 
 class AuthService {
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    const response = await fetch(`${API_BASE}/auth/login`, {
+    const response = await fetch(`${API_BASE}/sso/v1/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ class AuthService {
   }
 
   async getMe(accessToken: string, appId: number = 1): Promise<User> {
-    const response = await fetch(`${API_BASE}/auth/me`, {
+    const response = await fetch(`${API_BASE}/sso/v1/auth/me`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ class AuthService {
   }
 
   async logout(accessToken: string, appId: number = 9): Promise<void> {
-    const response = await fetch(`${API_BASE}/auth/logout`, {
+    const response = await fetch(`${API_BASE}/sso/v1/auth/logout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ class AuthService {
 
   async refreshToken(refreshToken: string): Promise<LoginResponse> {
     try {
-      const response = await fetch(`${API_BASE}/auth/refresh-token`, {
+      const response = await fetch(`${API_BASE}/sso/v1/auth/refresh-token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
