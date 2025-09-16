@@ -109,13 +109,39 @@ const UnitTourManager = ({ authState, units }) => {
       
       const result = await response.json();
       if (result.success) {
-        alert('Panorama berhasil dihapus!');
+        // Show success toast
+        showToast('Panorama berhasil dihapus!', 'success');
         loadPanoramas();
       }
     } catch (error) {
       console.error('Delete error:', error);
-      alert('Gagal menghapus panorama');
+      showToast('Gagal menghapus panorama', 'error');
     }
+  };
+  
+  const showToast = (message, type = 'success') => {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white text-sm font-medium transition-all duration-300 ${
+      type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => {
+      toast.style.transform = 'translateX(0)';
+      toast.style.opacity = '1';
+    }, 100);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      toast.style.transform = 'translateX(100%)';
+      toast.style.opacity = '0';
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 3000);
   };
 
   return (
