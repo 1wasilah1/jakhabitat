@@ -18,6 +18,7 @@ CREATE TABLE WEBSITE_JAKHABITAT_FOTO (
   CATEGORY VARCHAR2(50) DEFAULT 'panorama',
   UNIT_ID NUMBER,
   ROOM_CATEGORY VARCHAR2(50),
+  IS_DEFAULT NUMBER(1) DEFAULT 0,
   CREATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UPDATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
@@ -75,6 +76,18 @@ export async function initDatabase() {
         console.log('Column ROOM_CATEGORY added to WEBSITE_JAKHABITAT_FOTO');
       }
       
+      // Check if IS_DEFAULT column exists
+      const isDefaultCheck = await connection.execute(
+        `SELECT COUNT(*) as count FROM user_tab_columns WHERE table_name = 'WEBSITE_JAKHABITAT_FOTO' AND column_name = 'IS_DEFAULT'`,
+        {},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      
+      if (isDefaultCheck.rows[0].COUNT === 0) {
+        await connection.execute(`ALTER TABLE WEBSITE_JAKHABITAT_FOTO ADD IS_DEFAULT NUMBER(1) DEFAULT 0`);
+        console.log('Column IS_DEFAULT added to WEBSITE_JAKHABITAT_FOTO');
+      }
+      
       // Check and create HOTSPOTS table
       const hotspotTableCheck = await connection.execute(
         `SELECT COUNT(*) as count FROM user_tables WHERE table_name = 'WEBSITE_JAKHABITAT_HOTSPOTS'`,
@@ -101,10 +114,19 @@ export async function insertPhoto(photoData) {
   try {
     connection = await oracledb.getConnection(dbConfig);
     
+    // If this is set as default, unset other defaults for same unit
+    if (photoData.isDefault) {
+      await connection.execute(
+        `UPDATE WEBSITE_JAKHABITAT_FOTO SET IS_DEFAULT = 0 WHERE UNIT_ID = :unitId`,
+        { unitId: photoData.unitId },
+        { autoCommit: false }
+      );
+    }
+    
     const result = await connection.execute(
       `INSERT INTO WEBSITE_JAKHABITAT_FOTO 
-       (FILENAME, ORIGINAL_NAME, FILE_PATH, FILE_SIZE, MIME_TYPE, CATEGORY, UNIT_ID, ROOM_CATEGORY) 
-       VALUES (:filename, :originalName, :filePath, :fileSize, :mimeType, :category, :unitId, :roomCategory)`,
+       (FILENAME, ORIGINAL_NAME, FILE_PATH, FILE_SIZE, MIME_TYPE, CATEGORY, UNIT_ID, ROOM_CATEGORY, IS_DEFAULT) 
+       VALUES (:filename, :originalName, :filePath, :fileSize, :mimeType, :category, :unitId, :roomCategory, :isDefault)`,
       {
         filename: photoData.filename,
         originalName: photoData.originalName,
@@ -113,7 +135,8 @@ export async function insertPhoto(photoData) {
         mimeType: photoData.mimeType,
         category: photoData.category || 'panorama',
         unitId: photoData.unitId,
-        roomCategory: photoData.roomCategory
+        roomCategory: photoData.roomCategory,
+        isDefault: photoData.isDefault ? 1 : 0
       },
       { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );

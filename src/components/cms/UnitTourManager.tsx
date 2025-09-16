@@ -4,6 +4,7 @@ import { Image, Eye, Trash2 } from 'lucide-react';
 const UnitTourManager = ({ authState, units }) => {
   const [selectedUnit, setSelectedUnit] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [isDefaultPanorama, setIsDefaultPanorama] = useState(false);
   const [panoramas, setPanoramas] = useState([]);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedPanorama, setSelectedPanorama] = useState(null);
@@ -65,6 +66,7 @@ const UnitTourManager = ({ authState, units }) => {
         formData.append('panorama', file);
         formData.append('unitId', selectedUnit);
         formData.append('category', selectedCategory);
+        formData.append('isDefault', isDefaultPanorama);
         
         const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/upload/panorama', {
           method: 'POST',
@@ -174,6 +176,19 @@ const UnitTourManager = ({ authState, units }) => {
                 <option value="lobby">Lobby</option>
                 <option value="lift">Lift</option>
               </select>
+            </div>
+          </div>
+          
+          <div className="mb-4">
+            <label className="flex items-center space-x-2">
+              <input 
+                type="checkbox" 
+                checked={isDefaultPanorama}
+                onChange={(e) => setIsDefaultPanorama(e.target.checked)}
+                className="rounded"
+              />
+              <span className="text-sm font-medium text-gray-700">Set sebagai panorama default</span>
+            </label>
               {selectedUnit && (
                 <div className="mt-2 p-3 bg-blue-50 rounded-md">
                   {(() => {

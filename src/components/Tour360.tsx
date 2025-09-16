@@ -91,8 +91,9 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
         // Sort photos by createdAt ascending (oldest first)
         const sortedPhotos = result.photos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
         
-        // Use first photo (oldest) as currentRoom
-        const firstPhoto = sortedPhotos[0];
+        // Use default photo if available, otherwise use first photo (oldest)
+        const defaultPhoto = sortedPhotos.find(photo => photo.isDefault);
+        const firstPhoto = defaultPhoto || sortedPhotos[0];
         const dynamicRooms = [{
           id: firstPhoto.roomCategory || 'room',
           name: String(firstPhoto.roomCategory || 'Room').replace('_', ' '),
@@ -225,19 +226,44 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
     <div className="w-full space-y-6">
       {/* Room Selection Header */}
       {showRoomSelector && (
-        <div 
-          className="relative h-96 rounded-lg overflow-hidden"
-          style={{
-            backgroundImage: `url(${roomInterior})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        >
-          <div className="absolute inset-0 bg-black/50"></div>
-          <div className="relative z-10 flex flex-col items-center justify-center h-full text-white p-8">
-            <h2 className="text-3xl font-bold mb-2">360° VIRTUAL TOUR</h2>
-            <p className="text-white/80 mb-8">Jelajahi setiap ruangan dengan teknologi immersive 3D</p>
-            <p className="text-sm text-white/60">Powered by Virtual Reality Technology</p>
+        <div className="relative h-96 rounded-lg overflow-hidden bg-black">
+          {currentRoom ? (
+            <Canvas camera={{ position: [0, 0, 0], fov: 75 }}>
+              <PanoramaSphere 
+                currentRoom={currentRoom.id} 
+                roomImage={currentRoom.image}
+                doors={currentRoom.doors}
+                onDoorClick={goToRoom}
+              />
+              <OrbitControls 
+                enableZoom={true}
+                enablePan={false}
+                enableRotate={true}
+                enableDamping={true}
+                dampingFactor={0.05}
+                minDistance={0.1}
+                maxDistance={1}
+              />
+            </Canvas>
+          ) : (
+            <div 
+              className="w-full h-full"
+              style={{
+                backgroundImage: `url(${roomInterior})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            />
+          )}
+          
+          <div className="absolute inset-0 bg-black/30"></div>
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 text-white text-center">
+            <h2 className="text-2xl font-bold mb-1">360° VIRTUAL TOUR</h2>
+            <p className="text-white/80 text-sm">Jelajahi setiap ruangan dengan teknologi immersive 3D</p>
+          </div>
+          
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
+            <p className="text-xs text-white/60">Powered by Virtual Reality Technology</p>
           </div>
         </div>
       )}
