@@ -137,7 +137,7 @@ export async function getUnits() {
         tipeUnit: String(row.TIPE_UNIT || ''),
         tipe: String(row.TIPE || ''),
         luas: Number(row.LUAS || 0),
-        deskripsi: String(row.DESKRIPSI || ''),
+        deskripsi: row.DESKRIPSI ? (typeof row.DESKRIPSI === 'string' ? row.DESKRIPSI : row.DESKRIPSI.toString()) : '',
         createdAt: row.CREATED_AT ? new Date(row.CREATED_AT).toISOString() : null
       };
     });

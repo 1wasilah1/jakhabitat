@@ -126,7 +126,7 @@ export const CMSDashboard = () => {
       tipeUnit: unit.tipeUnit,
       tipe: unit.tipe,
       luas: unit.luas,
-      deskripsi: unit.deskripsi || ''
+      deskripsi: typeof unit.deskripsi === 'string' ? unit.deskripsi : (unit.deskripsi ? String(unit.deskripsi) : '')
     });
     setShowUnitForm(true);
   };
