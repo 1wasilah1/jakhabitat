@@ -67,6 +67,7 @@ const sectionContent: Record<string, {
 
 export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModalProps) => {
   const [towers, setTowers] = useState([]);
+  const [panoramaPhotos, setPanoramaPhotos] = useState([]);
   
   if (!isOpen) return null;
 
@@ -81,9 +82,15 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
         if (result.success) {
           const towerData = result.data.map(unit => ({
             name: unit.namaUnit,
-            description: `${unit.tipeUnit} - ${unit.luas} m² - ${unit.lokasi}`
+            description: `${unit.tipeUnit} - ${unit.luas} m² - ${unit.lokasi}`,
+            images: [roomInterior, buildingExterior] // fallback images
           }));
           setTowers(towerData);
+          
+          // Load panorama photos for first tower
+          if (result.data.length > 0) {
+            loadPanoramaPhotos(result.data[0].id);
+          }
         }
       } catch (error) {
         console.error('Error loading units:', error);
@@ -92,6 +99,19 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
     
     loadUnits();
   }, [isOpen, sectionId]);
+  
+  // Load panorama photos for selected tower
+  const loadPanoramaPhotos = async (unitId) => {
+    try {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/panoramas/${unitId}`);
+      const result = await response.json();
+      if (result.success && result.photos.length > 0) {
+        setPanoramaPhotos(result.photos);
+      }
+    } catch (error) {
+      console.error('Error loading panorama photos:', error);
+    }
+  };
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -215,17 +235,30 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                     
                     {/* Tower Images Gallery */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {towers.find(t => t.name === selectedTower)?.images.map((image, index) => (
-                        <div key={index} className="aspect-video bg-muted rounded-lg overflow-hidden">
+                      {panoramaPhotos.length > 0 ? (
+                        panoramaPhotos.map((photo) => (
+                          <div key={photo.id} className="aspect-video bg-muted rounded-lg overflow-hidden">
+                            <img 
+                              src={`https://dprkp.jakarta.go.id/api/jakhabitat/image/${photo.filename}`}
+                              alt={photo.originalName}
+                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                              decoding="async"
+                              onError={(e) => {
+                                e.target.src = roomInterior;
+                              }}
+                            />
+                          </div>
+                        ))
+                      ) : (
+                        <div className="aspect-video bg-muted rounded-lg overflow-hidden">
                           <img 
-                            src={image} 
-                            alt={`${selectedTower} ${index + 1}`}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            loading="lazy"
-                            decoding="async"
+                            src={roomInterior}
+                            alt="Default room"
+                            className="w-full h-full object-cover"
                           />
                         </div>
-                      ))}
+                      )}
                     </div>
 
                     {/* 360 Tour for Selected Tower and Area */}
