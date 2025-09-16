@@ -88,8 +88,13 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
       const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/panoramas/${unitId}`);
       const result = await response.json();
       if (result.success && result.photos.length > 0) {
-        const photosByCategory = result.photos.reduce((acc, photo) => {
-          acc[photo.roomCategory] = photo;
+        // Sort photos by createdAt descending (newest first)
+        const sortedPhotos = result.photos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        const photosByCategory = sortedPhotos.reduce((acc, photo) => {
+          if (!acc[photo.roomCategory]) {
+            acc[photo.roomCategory] = photo; // Keep only the first (newest) photo per category
+          }
           return acc;
         }, {});
         
@@ -124,17 +129,17 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
     }
   };
   
-  // Auto-select and load when selectedTower is provided
+  // Initialize with selectedTower if provided
   useEffect(() => {
-    if (selectedTower && units.length > 0) {
+    if (selectedTower && units.length > 0 && !selectedUnit) {
       const unit = units.find(u => u.namaUnit === selectedTower);
-      if (unit && !selectedUnit) {
+      if (unit) {
         setSelectedUnit(unit);
         setShowRoomSelector(false);
         loadPanoramas(unit.id);
       }
     }
-  }, [selectedTower, units]);
+  }, [selectedTower, units.length]);
 
   // Don't render if rooms not loaded yet and no selectedTower
   if (!rooms.length && !selectedTower) {
@@ -243,11 +248,11 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
               <div className="max-w-md mx-auto">
                 <select 
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center bg-white"
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     if (e.target.value) {
                       const unit = units.find(u => u.id == e.target.value);
                       setSelectedUnit(unit);
-                      loadPanoramas(unit.id);
+                      await loadPanoramas(unit.id);
                     }
                   }}
                   defaultValue=""
