@@ -48,13 +48,38 @@ app.use((req, res, next) => {
   next();
 });
 
+// Auth middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+
+  // For development, accept mock tokens
+  if (token.startsWith('mock_access_token_')) {
+    req.user = { id: 1, username: 'mock_user' };
+    return next();
+  }
+
+  // For production, validate with SSO
+  // This is a simplified validation - in production you'd verify with SSO server
+  if (token.length > 10) {
+    req.user = { id: 1, username: 'authenticated_user' };
+    return next();
+  }
+
+  return res.status(403).json({ error: 'Invalid token' });
+};
+
 // Root endpoint for testing
 app.get('/', (req, res) => {
   res.json({ message: 'Jakhabitat API Server', status: 'running' });
 });
 
 // Upload panorama endpoint
-app.post('/upload/panorama', upload.single('panorama'), async (req, res) => {
+app.post('/upload/panorama', authenticateToken, upload.single('panorama'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -82,7 +107,7 @@ app.post('/upload/panorama', upload.single('panorama'), async (req, res) => {
 });
 
 // Get uploaded panoramas
-app.get('/panoramas', async (req, res) => {
+app.get('/panoramas', authenticateToken, async (req, res) => {
   try {
     const photos = await getPhotos('panorama');
     res.json({ success: true, photos });
@@ -92,7 +117,7 @@ app.get('/panoramas', async (req, res) => {
 });
 
 // Delete panorama
-app.delete('/panoramas/:id', async (req, res) => {
+app.delete('/panoramas/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     await deletePhoto(id);
@@ -103,7 +128,7 @@ app.delete('/panoramas/:id', async (req, res) => {
 });
 
 // MASTER UNIT ENDPOINTS
-app.post('/master-unit', async (req, res) => {
+app.post('/master-unit', authenticateToken, async (req, res) => {
   try {
     await createUnit(req.body);
     res.json({ success: true, message: 'Unit created successfully' });
@@ -112,7 +137,7 @@ app.post('/master-unit', async (req, res) => {
   }
 });
 
-app.get('/master-unit', async (req, res) => {
+app.get('/master-unit', authenticateToken, async (req, res) => {
   try {
     const units = await getUnits();
     res.json({ success: true, data: units });
@@ -121,7 +146,7 @@ app.get('/master-unit', async (req, res) => {
   }
 });
 
-app.put('/master-unit/:id', async (req, res) => {
+app.put('/master-unit/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     await updateUnit(id, req.body);
@@ -131,7 +156,7 @@ app.put('/master-unit/:id', async (req, res) => {
   }
 });
 
-app.delete('/master-unit/:id', async (req, res) => {
+app.delete('/master-unit/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     await deleteUnit(id);
@@ -142,7 +167,7 @@ app.delete('/master-unit/:id', async (req, res) => {
 });
 
 // MASTER HARGA ENDPOINTS
-app.post('/master-harga', async (req, res) => {
+app.post('/master-harga', authenticateToken, async (req, res) => {
   try {
     await createHarga(req.body);
     res.json({ success: true, message: 'Harga created successfully' });
@@ -151,7 +176,7 @@ app.post('/master-harga', async (req, res) => {
   }
 });
 
-app.get('/master-harga', async (req, res) => {
+app.get('/master-harga', authenticateToken, async (req, res) => {
   try {
     const harga = await getHarga();
     res.json({ success: true, data: harga });
@@ -160,7 +185,7 @@ app.get('/master-harga', async (req, res) => {
   }
 });
 
-app.put('/master-harga/:id', async (req, res) => {
+app.put('/master-harga/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     await updateHarga(id, req.body);
@@ -170,7 +195,7 @@ app.put('/master-harga/:id', async (req, res) => {
   }
 });
 
-app.delete('/master-harga/:id', async (req, res) => {
+app.delete('/master-harga/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     await deleteHarga(id);
