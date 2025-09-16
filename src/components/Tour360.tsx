@@ -46,7 +46,7 @@ const FALLBACK_IMAGES = {
   kamar: `${import.meta.env.BASE_URL}panorama/kamar.png`
 };
 
-export const Tour360 = () => {
+export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: string; selectedArea?: string } = {}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -71,6 +71,16 @@ export const Tour360 = () => {
         const result = await response.json();
         if (result.success) {
           setUnits(result.data);
+          
+          // Auto-select unit if selectedTower is provided
+          if (selectedTower && !selectedUnit) {
+            const unit = result.data.find(u => u.namaUnit === selectedTower);
+            if (unit) {
+              setSelectedUnit(unit);
+              loadPanoramasForUnit(unit.id, selectedArea);
+              setShowRoomSelector(false);
+            }
+          }
         }
       } catch (error) {
         console.error('Error loading units:', error);
@@ -78,16 +88,24 @@ export const Tour360 = () => {
     };
     
     loadUnits();
-  }, []);
+  }, [selectedTower, selectedArea]);
 
   // Load panoramas for selected unit
-  const loadPanoramasForUnit = async (unitId) => {
+  const loadPanoramasForUnit = async (unitId, filterByArea = null) => {
     try {
       const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/panoramas/${unitId}`);
       const result = await response.json();
       if (result.success && result.photos.length > 0) {
+        // Filter photos by area if specified
+        let filteredPhotos = result.photos;
+        if (filterByArea) {
+          filteredPhotos = result.photos.filter(photo => 
+            photo.unitName === selectedTower || photo.tipeUnit === filterByArea
+          );
+        }
+        
         // Group photos by category
-        const photosByCategory = result.photos.reduce((acc, photo) => {
+        const photosByCategory = filteredPhotos.reduce((acc, photo) => {
           acc[photo.roomCategory] = photo;
           return acc;
         }, {});
@@ -98,7 +116,7 @@ export const Tour360 = () => {
           dynamicRooms.push({
             id: category,
             name: String(category).replace('_', ' '),
-            description: `${String(category).replace('_', ' ')} ${selectedUnit.namaUnit}`,
+            description: `${String(category).replace('_', ' ')} ${selectedUnit?.namaUnit || selectedTower || ''}`,
             features: ['360° View', 'High Resolution', 'Interactive'],
             image: `https://dprkp.jakarta.go.id/api/jakhabitat/image/${photo.filename}`,
             type: category
@@ -124,9 +142,14 @@ export const Tour360 = () => {
     }
   };
 
-  // Don't render if rooms not loaded yet
-  if (!rooms.length) {
+  // Don't render if rooms not loaded yet and no selectedTower
+  if (!rooms.length && !selectedTower) {
     return <div className="flex justify-center items-center h-96">Loading panoramas...</div>;
+  }
+  
+  // Show loading for selected tower
+  if (selectedTower && !rooms.length) {
+    return <div className="flex justify-center items-center h-96">Loading {selectedTower} panoramas...</div>;
   }
 
   // Group rooms by type for better organization

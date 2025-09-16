@@ -248,7 +248,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                         Virtual Tour 360° - {selectedTower} ({selectedArea})
                       </h3>
                       <Suspense fallback={<div className="flex items-center justify-center h-64 bg-muted rounded-lg"><div className="text-muted-foreground">Loading virtual tour...</div></div>}>
-                        <Tour360 />
+                        <Tour360 selectedTower={selectedTower} selectedArea={selectedArea} />
                       </Suspense>
                       
                       {/* Navigation between areas */}
