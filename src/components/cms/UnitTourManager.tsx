@@ -280,16 +280,16 @@ const UnitTourManager = ({ authState, units }) => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <strong>Unit:</strong> {selectedPanorama.unitName || 'N/A'}
+                  <strong>Unit:</strong> {String(selectedPanorama.unitName || 'N/A')}
                 </div>
                 <div>
-                  <strong>Filename:</strong> {selectedPanorama.originalName}
+                  <strong>Filename:</strong> {String(selectedPanorama.originalName || '')}
                 </div>
                 <div>
-                  <strong>Size:</strong> {Math.round(selectedPanorama.fileSize / 1024)} KB
+                  <strong>Size:</strong> {selectedPanorama.fileSize ? `${Math.round(Number(selectedPanorama.fileSize) / 1024)} KB` : 'N/A'}
                 </div>
                 <div>
-                  <strong>Upload Date:</strong> {new Date(selectedPanorama.createdAt).toLocaleString('id-ID')}
+                  <strong>Upload Date:</strong> {selectedPanorama.createdAt ? new Date(selectedPanorama.createdAt).toLocaleString('id-ID') : 'N/A'}
                 </div>
               </div>
               
@@ -298,7 +298,13 @@ const UnitTourManager = ({ authState, units }) => {
                 <img 
                   src={selectedPanorama.filePath && selectedPanorama.filePath.includes('/jakhabitat/') 
                     ? `/images/${selectedPanorama.filePath.split('/jakhabitat/')[1]}` 
-                    : `/images/360/${selectedPanorama.filename}`}
+                    : (() => {
+                        const date = new Date(selectedPanorama.createdAt);
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        return `/images/360/${year}/${month}/${day}/${selectedPanorama.filename}`;
+                      })()}
                   alt={selectedPanorama.originalName}
                   className="w-full h-64 object-cover rounded"
                   onError={(e) => {
