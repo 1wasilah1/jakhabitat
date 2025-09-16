@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LogOut, Settings, FileText, Image, Users, BarChart3 } from 'lucide-react';
+import { LogOut, Settings, FileText, Image, Users, BarChart3, ChevronDown, ChevronRight, Building, Heart, HelpCircle, Phone, MapPin, MessageSquare, ClipboardList } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const menuItems = [
@@ -10,8 +10,21 @@ const menuItems = [
   { id: 'settings', label: 'Pengaturan', icon: Settings },
 ];
 
+const contentSubmenus = [
+  { id: 'htm', label: 'HTM Info', icon: HelpCircle },
+  { id: 'contact', label: 'Kontak', icon: Phone },
+  { id: 'location', label: 'Lokasi', icon: MapPin },
+  { id: 'brochure', label: 'E-Brochure', icon: FileText },
+  { id: 'register', label: 'Cara Daftar', icon: ClipboardList },
+  { id: 'faq', label: 'FAQ', icon: MessageSquare },
+  { id: 'benefits', label: 'Benefits', icon: Heart },
+  { id: 'unit-tour', label: 'Unit & Tour', icon: Building },
+];
+
 export const CMSDashboard = () => {
   const [activeMenu, setActiveMenu] = useState('content');
+  const [activeSubmenu, setActiveSubmenu] = useState('');
+  const [contentExpanded, setContentExpanded] = useState(false);
   const { user, logout } = useAuth();
 
   const handleLogout = () => {
@@ -58,19 +71,56 @@ export const CMSDashboard = () => {
             <ul className="space-y-2">
               {menuItems.map((item) => {
                 const Icon = item.icon;
+                const isContent = item.id === 'content';
                 return (
                   <li key={item.id}>
                     <button
-                      onClick={() => setActiveMenu(item.id)}
-                      className={`w-full flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                      onClick={() => {
+                        setActiveMenu(item.id);
+                        if (isContent) {
+                          setContentExpanded(!contentExpanded);
+                        } else {
+                          setContentExpanded(false);
+                        }
+                      }}
+                      className={`w-full flex items-center justify-between px-4 py-2 text-sm font-medium rounded-md ${
                         activeMenu === item.id
                           ? 'bg-indigo-100 text-indigo-700'
                           : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                       }`}
                     >
-                      <Icon className="h-5 w-5 mr-3" />
-                      {item.label}
+                      <div className="flex items-center">
+                        <Icon className="h-5 w-5 mr-3" />
+                        {item.label}
+                      </div>
+                      {isContent && (
+                        contentExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />
+                      )}
                     </button>
+                    
+                    {/* Content Submenu */}
+                    {isContent && contentExpanded && (
+                      <ul className="mt-2 ml-8 space-y-1">
+                        {contentSubmenus.map((submenu) => {
+                          const SubIcon = submenu.icon;
+                          return (
+                            <li key={submenu.id}>
+                              <button
+                                onClick={() => setActiveSubmenu(submenu.id)}
+                                className={`w-full flex items-center px-3 py-2 text-sm rounded-md ${
+                                  activeSubmenu === submenu.id
+                                    ? 'bg-indigo-50 text-indigo-600'
+                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                                }`}
+                              >
+                                <SubIcon className="h-4 w-4 mr-2" />
+                                {submenu.label}
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </li>
                 );
               })}
@@ -83,43 +133,34 @@ export const CMSDashboard = () => {
           <div className="max-w-7xl mx-auto">
             {activeMenu === 'content' && (
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Manajemen Konten</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
-                    <h3 className="text-lg font-semibold mb-3">Hero Section</h3>
-                    <p className="text-gray-600 text-sm mb-4">Edit judul utama, deskripsi, dan gambar hero</p>
-                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit →</button>
-                  </div>
-                  
-                  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
-                    <h3 className="text-lg font-semibold mb-3">Interactive Hub</h3>
-                    <p className="text-gray-600 text-sm mb-4">Kelola menu dan konten hub interaktif</p>
-                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit →</button>
-                  </div>
-                  
-                  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
-                    <h3 className="text-lg font-semibold mb-3">Tour 360°</h3>
-                    <p className="text-gray-600 text-sm mb-4">Upload gambar panorama dan atur tour virtual</p>
-                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit →</button>
-                  </div>
-                  
-                  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
-                    <h3 className="text-lg font-semibold mb-3">FAQ</h3>
-                    <p className="text-gray-600 text-sm mb-4">Tambah, edit, atau hapus pertanyaan FAQ</p>
-                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit →</button>
-                  </div>
-                  
-                  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
-                    <h3 className="text-lg font-semibold mb-3">Kontak & Lokasi</h3>
-                    <p className="text-gray-600 text-sm mb-4">Update informasi kontak dan alamat</p>
-                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit →</button>
-                  </div>
-                  
-                  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
-                    <h3 className="text-lg font-semibold mb-3">E-Brochure</h3>
-                    <p className="text-gray-600 text-sm mb-4">Upload dan kelola file brochure</p>
-                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit →</button>
-                  </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  {activeSubmenu ? contentSubmenus.find(s => s.id === activeSubmenu)?.label : 'Manajemen Konten'}
+                </h2>
+                <div className="bg-white rounded-lg shadow p-6">
+                  {!activeSubmenu ? (
+                    <p className="text-gray-600">
+                      Pilih submenu di sidebar untuk mengelola konten spesifik.
+                    </p>
+                  ) : (
+                    <div>
+                      <p className="text-gray-600 mb-4">
+                        Kelola konten untuk bagian {contentSubmenus.find(s => s.id === activeSubmenu)?.label}.
+                      </p>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Judul</label>
+                          <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+                          <textarea className="w-full px-3 py-2 border border-gray-300 rounded-md" rows={4}></textarea>
+                        </div>
+                        <button className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                          Simpan Perubahan
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
