@@ -70,40 +70,27 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
   
   if (!isOpen) return null;
 
-  // Load towers and unit areas from database
+  // Set default unit areas (hardcoded for now)
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-unit');
-        const result = await response.json();
-        if (result.success) {
-          const towerData = result.data.map(unit => ({
-            name: unit.namaUnit,
-            images: [roomInterior, buildingExterior],
-            description: `${unit.tipeUnit} - ${unit.luas} m² - ${unit.lokasi}`
-          }));
-          setTowers(towerData);
-          
-          // Get unique unit types for tabs
-          const uniqueTypes = [...new Set(result.data.map(unit => unit.tipeUnit))].filter(Boolean);
-          const areaData = uniqueTypes.map(type => ({
-            name: type,
-            description: `Unit ${type} dengan fasilitas modern`
-          }));
-          setUnitAreas(areaData);
-          
-          // Set first area as default
-          if (areaData.length > 0 && !selectedArea) {
-            setSelectedArea(areaData[0].name);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
-      }
-    };
-    
     if (isOpen && sectionId === 'unit-tour') {
-      loadData();
+      const defaultAreas = [
+        { name: 'Studio', description: 'Unit studio dengan fasilitas modern' },
+        { name: '1 BR', description: 'Unit 1 BR dengan fasilitas modern' },
+        { name: '2 BR', description: 'Unit 2 BR dengan fasilitas modern' },
+        { name: '3 BR', description: 'Unit 3 BR dengan fasilitas modern' }
+      ];
+      setUnitAreas(defaultAreas);
+      
+      if (!selectedArea) {
+        setSelectedArea(defaultAreas[0].name);
+      }
+      
+      // Set default towers
+      const defaultTowers = [
+        { name: 'Tower Kanaya', description: '1 BR - 45 m² - Jakarta' },
+        { name: 'Tower Nuansa Indah', description: '2 BR - 60 m² - Jakarta' }
+      ];
+      setTowers(defaultTowers);
     }
   }, [isOpen, sectionId]);
 

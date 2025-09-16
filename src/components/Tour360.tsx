@@ -236,33 +236,19 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
       {showRoomSelector && (
         <div className="relative h-96 rounded-lg overflow-hidden bg-black">
           {currentRoom && currentRoom.image ? (
-            <Canvas camera={{ position: [0, 0, 0], fov: 75 }}>
-              <Suspense fallback={null}>
-                <PanoramaSphere 
-                  currentRoom={currentRoom.id} 
-                  roomImage={currentRoom.image}
-                  doors={currentRoom.doors}
-                  onDoorClick={goToRoom}
-                />
-              </Suspense>
-              <OrbitControls 
-                enableZoom={true}
-                enablePan={false}
-                enableRotate={true}
-                enableDamping={true}
-                dampingFactor={0.05}
-                minDistance={0.1}
-                maxDistance={1}
-              />
-            </Canvas>
-          ) : (
-            <div 
-              className="w-full h-full"
-              style={{
-                backgroundImage: `url(${roomInterior})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
+            <img 
+              src={currentRoom.image}
+              alt={currentRoom.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.src = roomInterior;
               }}
+            />
+          ) : (
+            <img 
+              src={roomInterior}
+              alt="Default room"
+              className="w-full h-full object-cover"
             />
           )}
           
