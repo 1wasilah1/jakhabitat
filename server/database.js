@@ -37,6 +37,18 @@ export async function initDatabase() {
     if (result.rows[0].COUNT === 0) {
       await connection.execute(createTableSQL);
       console.log('Table WEBSITE_JAKHABITAT_FOTO created successfully');
+    } else {
+      // Check if UNIT_ID column exists
+      const columnCheck = await connection.execute(
+        `SELECT COUNT(*) as count FROM user_tab_columns WHERE table_name = 'WEBSITE_JAKHABITAT_FOTO' AND column_name = 'UNIT_ID'`,
+        {},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      
+      if (columnCheck.rows[0].COUNT === 0) {
+        await connection.execute(`ALTER TABLE WEBSITE_JAKHABITAT_FOTO ADD UNIT_ID NUMBER`);
+        console.log('Column UNIT_ID added to WEBSITE_JAKHABITAT_FOTO');
+      }
     }
   } catch (error) {
     console.error('Database initialization error:', error);
@@ -85,7 +97,7 @@ export async function getPhotos(category = 'panorama') {
     
     const result = await connection.execute(
       `SELECT f.ID, f.FILENAME, f.ORIGINAL_NAME, f.FILE_PATH, f.FILE_SIZE, f.MIME_TYPE, f.CATEGORY, f.UNIT_ID, f.CREATED_AT,
-              u.NAMA_UNIT as UNIT_NAME
+              u.NAMA_UNIT as UNIT_NAME, u.TIPE_UNIT, u.LUAS, u.LOKASI
        FROM WEBSITE_JAKHABITAT_FOTO f
        LEFT JOIN WEBSITE_JAKHABITAT_MASTER_UNIT u ON f.UNIT_ID = u.ID
        WHERE f.CATEGORY = :category 
@@ -104,6 +116,9 @@ export async function getPhotos(category = 'panorama') {
       category: row.CATEGORY,
       unitId: row.UNIT_ID,
       unitName: row.UNIT_NAME,
+      tipeUnit: row.TIPE_UNIT,
+      luas: row.LUAS,
+      lokasi: row.LOKASI,
       createdAt: row.CREATED_AT
     }));
   } catch (error) {
