@@ -10,15 +10,20 @@ import { initMasterTables, createUnit, getUnits, updateUnit, deleteUnit, createH
 const app = express();
 app.use(cors());
 
-// Ensure upload directory exists
-const uploadDir = '/home/wasilah/migration/images';
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const date = String(now.getDate()).padStart(2, '0');
+    
+    const uploadDir = `/home/wasilah/migration/images/jakhabitat/360/${year}/${month}/${date}`;
+    
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
@@ -43,8 +48,8 @@ const upload = multer({
 
 app.use(express.json());
 
-// Serve uploaded images
-app.use('/images', express.static('/home/wasilah/migration/images'));
+// Serve uploaded images from jakhabitat directory
+app.use('/images', express.static('/home/wasilah/migration/images/jakhabitat'));
 
 // Debug middleware
 app.use((req, res, next) => {

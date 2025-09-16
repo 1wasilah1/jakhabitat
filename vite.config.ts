@@ -9,6 +9,12 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 6500,
+    proxy: {
+      '/images': {
+        target: 'http://127.0.0.1:6000',
+        changeOrigin: true
+      }
+    }
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
