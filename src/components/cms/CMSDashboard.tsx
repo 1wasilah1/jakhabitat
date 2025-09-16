@@ -53,7 +53,7 @@ export const CMSDashboard = () => {
 
   const loadUnits = async () => {
     try {
-      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/master-unit', {
+      const response = await fetch('http://localhost:6000/master-unit', {
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
         },
@@ -73,8 +73,8 @@ export const CMSDashboard = () => {
     
     try {
       const url = editingUnit 
-        ? `https://dprkp.jakarta.go.id/api/jakhabitat/master-unit/${editingUnit.id}`
-        : 'https://dprkp.jakarta.go.id/api/jakhabitat/master-unit';
+        ? `http://localhost:6000/master-unit/${editingUnit.id}`
+        : 'http://localhost:6000/master-unit';
       
       const method = editingUnit ? 'PUT' : 'POST';
       
@@ -130,7 +130,7 @@ export const CMSDashboard = () => {
     if (!confirm('Yakin ingin menghapus unit ini?')) return;
     
     try {
-      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/master-unit/${id}`, {
+      const response = await fetch(`http://localhost:6000/master-unit/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
@@ -295,7 +295,7 @@ export const CMSDashboard = () => {
                                       const formData = new FormData();
                                       formData.append('panorama', file);
                                       
-                                      fetch('https://dprkp.jakarta.go.id/api/jakhabitat/upload/panorama', {
+                                      fetch('http://localhost:6000/upload/panorama', {
                                         method: 'POST',
                                         headers: {
                                           'Authorization': `Bearer ${authState.accessToken}`,
