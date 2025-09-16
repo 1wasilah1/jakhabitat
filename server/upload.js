@@ -138,8 +138,11 @@ app.post('/upload/panorama', authenticateToken, upload.single('panorama'), async
 app.get('/panoramas', authenticateToken, async (req, res) => {
   try {
     const photos = await getPhotos('panorama');
-    res.json({ success: true, photos });
+    // Ensure clean JSON serialization
+    const cleanPhotos = JSON.parse(JSON.stringify(photos));
+    res.json({ success: true, photos: cleanPhotos });
   } catch (error) {
+    console.error('Get photos error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -168,8 +171,11 @@ app.post('/master-unit', authenticateToken, async (req, res) => {
 app.get('/master-unit', authenticateToken, async (req, res) => {
   try {
     const units = await getUnits();
-    res.json({ success: true, data: units });
+    // Ensure clean JSON serialization
+    const cleanUnits = JSON.parse(JSON.stringify(units));
+    res.json({ success: true, data: cleanUnits });
   } catch (error) {
+    console.error('Get units error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -207,8 +213,11 @@ app.post('/master-harga', authenticateToken, async (req, res) => {
 app.get('/master-harga', authenticateToken, async (req, res) => {
   try {
     const harga = await getHarga();
-    res.json({ success: true, data: harga });
+    // Ensure clean JSON serialization
+    const cleanHarga = JSON.parse(JSON.stringify(harga));
+    res.json({ success: true, data: cleanHarga });
   } catch (error) {
+    console.error('Get harga error:', error);
     res.status(500).json({ error: error.message });
   }
 });
