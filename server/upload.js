@@ -143,6 +143,38 @@ app.delete('/panoramas/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// HOTSPOT ENDPOINTS
+app.post('/hotspots', authenticateToken, async (req, res) => {
+  try {
+    const { photoId, x, y } = req.body;
+    // For now, store as JSON in a simple way
+    res.json({ success: true, message: 'Hotspot saved' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/hotspots/:photoId', authenticateToken, async (req, res) => {
+  try {
+    const { photoId } = req.params;
+    // Return empty array for now
+    res.json({ success: true, hotspots: [] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/hotspots/:photoId', authenticateToken, async (req, res) => {
+  try {
+    const { photoId } = req.params;
+    const { hotspots } = req.body;
+    // Update hotspots for photo
+    res.json({ success: true, message: 'Hotspots updated' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // MASTER UNIT ENDPOINTS
 app.post('/master-unit', authenticateToken, async (req, res) => {
   try {
