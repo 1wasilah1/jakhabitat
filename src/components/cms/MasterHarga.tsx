@@ -254,22 +254,28 @@ export const MasterHarga = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Harga Jual <span className="text-red-500">*</span></label>
                 <input 
-                  type="number" 
+                  type="text" 
                   className="w-full px-3 py-2 border border-gray-300 rounded-md" 
-                  placeholder="500000000"
-                  value={priceForm.hargaJual}
-                  onChange={(e) => setPriceForm({...priceForm, hargaJual: e.target.value})}
+                  placeholder="Rp 500.000.000"
+                  value={priceForm.hargaJual ? `Rp ${parseInt(priceForm.hargaJual).toLocaleString('id-ID')}` : ''}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    setPriceForm({...priceForm, hargaJual: value});
+                  }}
                   required 
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Harga Sewa/Bulan</label>
                 <input 
-                  type="number" 
+                  type="text" 
                   className="w-full px-3 py-2 border border-gray-300 rounded-md" 
-                  placeholder="5000000"
-                  value={priceForm.hargaSewa}
-                  onChange={(e) => setPriceForm({...priceForm, hargaSewa: e.target.value})}
+                  placeholder="Rp 5.000.000"
+                  value={priceForm.hargaSewa ? `Rp ${parseInt(priceForm.hargaSewa).toLocaleString('id-ID')}` : ''}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    setPriceForm({...priceForm, hargaSewa: value});
+                  }}
                 />
               </div>
               
@@ -324,88 +330,112 @@ export const MasterHarga = () => {
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">5 Tahun</label>
                         <input 
-                          type="number" 
+                          type="text" 
                           className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
-                          placeholder="4504186"
-                          value={priceForm.cicilan5th}
-                          onChange={(e) => setPriceForm({...priceForm, cicilan5th: e.target.value})}
+                          placeholder="Rp 4.504.186"
+                          value={priceForm.cicilan5th ? `Rp ${parseInt(priceForm.cicilan5th).toLocaleString('id-ID')}` : ''}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            setPriceForm({...priceForm, cicilan5th: value});
+                          }}
                           disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">7 Tahun</label>
                         <input 
-                          type="number" 
+                          type="text" 
                           className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
-                          placeholder="3373481"
-                          value={priceForm.cicilan7th}
-                          onChange={(e) => setPriceForm({...priceForm, cicilan7th: e.target.value})}
+                          placeholder="Rp 3.373.481"
+                          value={priceForm.cicilan7th ? `Rp ${parseInt(priceForm.cicilan7th).toLocaleString('id-ID')}` : ''}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            setPriceForm({...priceForm, cicilan7th: value});
+                          }}
                           disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">10 Tahun</label>
                         <input 
-                          type="number" 
+                          type="text" 
                           className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
-                          placeholder="2531572"
-                          value={priceForm.cicilan10th}
-                          onChange={(e) => setPriceForm({...priceForm, cicilan10th: e.target.value})}
+                          placeholder="Rp 2.531.572"
+                          value={priceForm.cicilan10th ? `Rp ${parseInt(priceForm.cicilan10th).toLocaleString('id-ID')}` : ''}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            setPriceForm({...priceForm, cicilan10th: value});
+                          }}
                           disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">11 Tahun</label>
                         <input 
-                          type="number" 
+                          type="text" 
                           className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
-                          placeholder="2354456"
-                          value={priceForm.cicilan11th}
-                          onChange={(e) => setPriceForm({...priceForm, cicilan11th: e.target.value})}
+                          placeholder="Rp 2.354.456"
+                          value={priceForm.cicilan11th ? `Rp ${parseInt(priceForm.cicilan11th).toLocaleString('id-ID')}` : ''}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            setPriceForm({...priceForm, cicilan11th: value});
+                          }}
                           disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">15 Tahun</label>
                         <input 
-                          type="number" 
+                          type="text" 
                           className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
-                          placeholder="1875000"
-                          value={priceForm.cicilan15th}
-                          onChange={(e) => setPriceForm({...priceForm, cicilan15th: e.target.value})}
+                          placeholder="Rp 1.875.000"
+                          value={priceForm.cicilan15th ? `Rp ${parseInt(priceForm.cicilan15th).toLocaleString('id-ID')}` : ''}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            setPriceForm({...priceForm, cicilan15th: value});
+                          }}
                           disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">20 Tahun</label>
                         <input 
-                          type="number" 
+                          type="text" 
                           className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
-                          placeholder="1575182"
-                          value={priceForm.cicilan20th}
-                          onChange={(e) => setPriceForm({...priceForm, cicilan20th: e.target.value})}
+                          placeholder="Rp 1.575.182"
+                          value={priceForm.cicilan20th ? `Rp ${parseInt(priceForm.cicilan20th).toLocaleString('id-ID')}` : ''}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            setPriceForm({...priceForm, cicilan20th: value});
+                          }}
                           disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">25 Tahun</label>
                         <input 
-                          type="number" 
+                          type="text" 
                           className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
-                          placeholder="1350000"
-                          value={priceForm.cicilan25th}
-                          onChange={(e) => setPriceForm({...priceForm, cicilan25th: e.target.value})}
+                          placeholder="Rp 1.350.000"
+                          value={priceForm.cicilan25th ? `Rp ${parseInt(priceForm.cicilan25th).toLocaleString('id-ID')}` : ''}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            setPriceForm({...priceForm, cicilan25th: value});
+                          }}
                           disabled={!manualCicilan}
                         />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">30 Tahun</label>
                         <input 
-                          type="number" 
+                          type="text" 
                           className={`w-full px-2 py-1 text-sm border border-gray-300 rounded ${!manualCicilan ? 'bg-gray-100' : ''}`}
-                          placeholder="1200000"
-                          value={priceForm.cicilan30th}
-                          onChange={(e) => setPriceForm({...priceForm, cicilan30th: e.target.value})}
+                          placeholder="Rp 1.200.000"
+                          value={priceForm.cicilan30th ? `Rp ${parseInt(priceForm.cicilan30th).toLocaleString('id-ID')}` : ''}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            setPriceForm({...priceForm, cicilan30th: value});
+                          }}
                           disabled={!manualCicilan}
                         />
                       </div>
@@ -612,7 +642,7 @@ export const MasterHarga = () => {
                   
                   return (
                     <div key={item.tenor} className="border rounded-lg p-3">
-                      <h5 className="font-medium text-center mb-2">{item.tenor} Tahun</h5>
+                      <h5 className="font-medium text-center mb-2">{item.tenor} Tahun ({item.tenor * 12} Bulan)</h5>
                       <div className="text-sm space-y-1">
                         <div className="flex justify-between">
                           <span>Cicilan/bulan:</span>
