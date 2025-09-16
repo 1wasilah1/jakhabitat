@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
 import { initDatabase, insertPhoto, getPhotos, deletePhoto } from './database.js';
+import { initMasterTables, createUnit, getUnits, updateUnit, deleteUnit, createHarga, getHarga, updateHarga, deleteHarga } from './masterData.js';
 
 const app = express();
 app.use(cors());
@@ -40,6 +41,12 @@ const upload = multer({
 });
 
 app.use(express.json());
+
+// Debug middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
 
 // Root endpoint for testing
 app.get('/', (req, res) => {
@@ -95,11 +102,102 @@ app.delete('/panoramas/:id', async (req, res) => {
   }
 });
 
+// MASTER UNIT ENDPOINTS
+app.post('/master-unit', async (req, res) => {
+  try {
+    await createUnit(req.body);
+    res.json({ success: true, message: 'Unit created successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/master-unit', async (req, res) => {
+  try {
+    const units = await getUnits();
+    res.json({ success: true, data: units });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/master-unit/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await updateUnit(id, req.body);
+    res.json({ success: true, message: 'Unit updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/master-unit/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await deleteUnit(id);
+    res.json({ success: true, message: 'Unit deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// MASTER HARGA ENDPOINTS
+app.post('/master-harga', async (req, res) => {
+  try {
+    await createHarga(req.body);
+    res.json({ success: true, message: 'Harga created successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/master-harga', async (req, res) => {
+  try {
+    const harga = await getHarga();
+    res.json({ success: true, data: harga });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/master-harga/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await updateHarga(id, req.body);
+    res.json({ success: true, message: 'Harga updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/master-harga/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await deleteHarga(id);
+    res.json({ success: true, message: 'Harga deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const PORT = process.env.PORT || 6000;
 
 // Initialize database and start server
-initDatabase().then(() => {
+Promise.all([initDatabase(), initMasterTables()]).then(() => {
   app.listen(PORT, () => {
-    console.log(`Upload server running on port ${PORT}`);
+    console.log(`Jakhabitat API Server running on port ${PORT}`);
+    console.log('Available endpoints:');
+    console.log('GET  / - Server status');
+    console.log('POST /upload/panorama - Upload panorama');
+    console.log('GET  /panoramas - List panoramas');
+    console.log('DELETE /panoramas/:id - Delete panorama');
+    console.log('POST /master-unit - Create unit');
+    console.log('GET  /master-unit - List units');
+    console.log('PUT  /master-unit/:id - Update unit');
+    console.log('DELETE /master-unit/:id - Delete unit');
+    console.log('POST /master-harga - Create harga');
+    console.log('GET  /master-harga - List harga');
+    console.log('PUT  /master-harga/:id - Update harga');
+    console.log('DELETE /master-harga/:id - Delete harga');
   });
 });

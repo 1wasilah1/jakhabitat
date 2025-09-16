@@ -4,6 +4,8 @@ import { useAuth } from '@/hooks/useAuth';
 
 const menuItems = [
   { id: 'content', label: 'Konten', icon: FileText },
+  { id: 'master-unit', label: 'Master Unit', icon: Building },
+  { id: 'master-harga', label: 'Master Harga', icon: BarChart3 },
   { id: 'media', label: 'Media', icon: Image },
   { id: 'users', label: 'Pengguna', icon: Users },
   { id: 'analytics', label: 'Analitik', icon: BarChart3 },
@@ -25,6 +27,11 @@ export const CMSDashboard = () => {
   const [activeMenu, setActiveMenu] = useState('content');
   const [activeSubmenu, setActiveSubmenu] = useState('');
   const [contentExpanded, setContentExpanded] = useState(false);
+  const [units, setUnits] = useState([]);
+  const [showUnitForm, setShowUnitForm] = useState(false);
+  const [editingUnit, setEditingUnit] = useState(null);
+  const [showPriceForm, setShowPriceForm] = useState(false);
+  const [editingPrice, setEditingPrice] = useState(null);
   const { user, logout } = useAuth();
 
   const handleLogout = () => {
@@ -245,6 +252,338 @@ export const CMSDashboard = () => {
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+
+            {activeMenu === 'master-unit' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Master Unit</h2>
+                  <button
+                    onClick={() => setShowUnitForm(true)}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center gap-2"
+                  >
+                    <Building className="h-4 w-4" />
+                    Tambah Unit
+                  </button>
+                </div>
+                
+                {showUnitForm && (
+                  <div className="bg-white rounded-lg shadow p-6 mb-6">
+                    <h3 className="text-lg font-semibold mb-4">
+                      {editingUnit ? 'Edit Unit' : 'Tambah Unit Baru'}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Nama Unit</label>
+                        <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Tower Kanaya" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Lokasi</label>
+                        <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Jakarta Barat" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Tipe Unit</label>
+                        <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
+                          <option>Studio</option>
+                          <option>1 BR</option>
+                          <option>2 BR</option>
+                          <option>3 BR</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Tipe</label>
+                        <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
+                          <option>Apartemen</option>
+                          <option>Rumah</option>
+                          <option>Ruko</option>
+                          <option>Kantor</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Luas (m²)</label>
+                        <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="45" />
+                      </div>
+                      <div className="md:col-span-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+                        <textarea className="w-full px-3 py-2 border border-gray-300 rounded-md" rows={3} placeholder="Deskripsi unit..."></textarea>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-4">
+                      <button className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                        {editingUnit ? 'Update' : 'Simpan'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowUnitForm(false);
+                          setEditingUnit(null);
+                        }}
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                      >
+                        Batal
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="bg-white rounded-lg shadow">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Unit</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe Unit</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Luas</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        <tr>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tower Kanaya</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Jakarta Barat</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2 BR</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apartemen</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">45 m²</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button className="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                            <button className="text-red-600 hover:text-red-900">Hapus</button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tower Melati</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Jakarta Pusat</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1 BR</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apartemen</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">36 m²</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button className="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                            <button className="text-red-600 hover:text-red-900">Hapus</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeMenu === 'master-harga' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Master Harga</h2>
+                  <button
+                    onClick={() => setShowPriceForm(true)}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center gap-2"
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    Set Harga
+                  </button>
+                </div>
+                
+                {showPriceForm && (
+                  <div className="bg-white rounded-lg shadow p-6 mb-6">
+                    <h3 className="text-lg font-semibold mb-4">
+                      {editingPrice ? 'Edit Harga' : 'Set Harga Unit'}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Pilih Unit</label>
+                        <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
+                          <option value="kanaya">Tower Kanaya - 2BR (45 m²) - Jakarta Barat</option>
+                          <option value="melati">Tower Melati - 1BR (36 m²) - Jakarta Pusat</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Luas Unit</label>
+                        <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100" value="45 m²" disabled />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Harga Jual <span className="text-red-500">*</span></label>
+                        <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="500000000" required />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Harga Sewa/Bulan</label>
+                        <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="5000000" />
+                      </div>
+                      
+                      {/* Skema Cicilan */}
+                      <div className="md:col-span-3">
+                        <h4 className="text-md font-semibold text-gray-900 mb-3 border-t pt-4">Skema Cicilan Multi Tenor</h4>
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">DP Minimum (%)</label>
+                              <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="20" min="0" max="100" />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">Bunga Tahunan (%)</label>
+                              <input type="number" step="0.1" className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="12" />
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <h5 className="font-medium text-gray-800">Cicilan per Tenor:</h5>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">5 Tahun</label>
+                                <input type="number" className="w-full px-2 py-1 text-sm border border-gray-300 rounded" placeholder="4504186" />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">7 Tahun</label>
+                                <input type="number" className="w-full px-2 py-1 text-sm border border-gray-300 rounded" placeholder="3373481" />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">10 Tahun</label>
+                                <input type="number" className="w-full px-2 py-1 text-sm border border-gray-300 rounded" placeholder="2531572" />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">11 Tahun</label>
+                                <input type="number" className="w-full px-2 py-1 text-sm border border-gray-300 rounded" placeholder="2354456" />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">15 Tahun</label>
+                                <input type="number" className="w-full px-2 py-1 text-sm border border-gray-300 rounded" placeholder="1875000" />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">20 Tahun</label>
+                                <input type="number" className="w-full px-2 py-1 text-sm border border-gray-300 rounded" placeholder="1575182" />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">25 Tahun</label>
+                                <input type="number" className="w-full px-2 py-1 text-sm border border-gray-300 rounded" placeholder="1350000" />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">30 Tahun</label>
+                                <input type="number" className="w-full px-2 py-1 text-sm border border-gray-300 rounded" placeholder="1200000" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Diskon (%)</label>
+                        <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="10" min="0" max="100" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Tanggal Mulai</label>
+                        <input type="date" className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Tanggal Berakhir</label>
+                        <input type="date" className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+                      </div>
+                      
+                      <div className="md:col-span-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
+                        <textarea className="w-full px-3 py-2 border border-gray-300 rounded-md" rows={2} placeholder="Promo spesial..."></textarea>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-4">
+                      <button className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                        {editingPrice ? 'Update' : 'Simpan'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowPriceForm(false);
+                          setEditingPrice(null);
+                        }}
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                      >
+                        Batal
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="bg-white rounded-lg shadow">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit & Luas</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga Jual</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skema Cicilan</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        <tr>
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                            <div>Tower Kanaya - 2BR</div>
+                            <div className="text-xs text-gray-500">36,00 m²</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp 416.583.000</td>
+                          <td className="px-6 py-4 text-xs text-gray-500">
+                            <div>5 th: Rp 7.861.435</div>
+                            <div>7 th: Rp 5.887.946</div>
+                            <div>10 th: Rp 4.418.509</div>
+                            <div>11 th: Rp 4.109.378</div>
+                            <div>20 th: Rp 2.749.263</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                              Aktif
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button className="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                            <button className="text-red-600 hover:text-red-900">Hapus</button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                            <div>Tower Melati - Studio</div>
+                            <div className="text-xs text-gray-500">23,40 m²</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp 238.680.000</td>
+                          <td className="px-6 py-4 text-xs text-gray-500">
+                            <div>5 th: Rp 4.504.186</div>
+                            <div>7 th: Rp 3.373.481</div>
+                            <div>10 th: Rp 2.531.572</div>
+                            <div>11 th: Rp 2.354.456</div>
+                            <div>20 th: Rp 1.575.182</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                              Promo
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button className="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                            <button className="text-red-600 hover:text-red-900">Hapus</button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                            <div>Tower Mawar - 1BR</div>
+                            <div className="text-xs text-gray-500">24,50 m²</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp 249.900.000</td>
+                          <td className="px-6 py-4 text-xs text-gray-500">
+                            <div>5 th: Rp 4.715.921</div>
+                            <div>7 th: Rp 3.532.064</div>
+                            <div>10 th: Rp 2.650.577</div>
+                            <div>11 th: Rp 2.465.136</div>
+                            <div>20 th: Rp 1.649.229</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                              Aktif
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button className="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                            <button className="text-red-600 hover:text-red-900">Hapus</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             )}
