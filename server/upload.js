@@ -85,7 +85,8 @@ app.post('/upload/panorama', authenticateToken, upload.single('panorama'), async
       fileSize: req.file.size,
       mimeType: req.file.mimetype,
       category: 'panorama',
-      unitId: req.body.unitId || null
+      unitId: req.body.unitId || null,
+      roomCategory: req.body.category || null
     });
 
     res.json({

@@ -17,6 +17,7 @@ CREATE TABLE WEBSITE_JAKHABITAT_FOTO (
   MIME_TYPE VARCHAR2(100),
   CATEGORY VARCHAR2(50) DEFAULT 'panorama',
   UNIT_ID NUMBER,
+  ROOM_CATEGORY VARCHAR2(50),
   CREATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UPDATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
@@ -49,6 +50,18 @@ export async function initDatabase() {
         await connection.execute(`ALTER TABLE WEBSITE_JAKHABITAT_FOTO ADD UNIT_ID NUMBER`);
         console.log('Column UNIT_ID added to WEBSITE_JAKHABITAT_FOTO');
       }
+      
+      // Check if ROOM_CATEGORY column exists
+      const roomCategoryCheck = await connection.execute(
+        `SELECT COUNT(*) as count FROM user_tab_columns WHERE table_name = 'WEBSITE_JAKHABITAT_FOTO' AND column_name = 'ROOM_CATEGORY'`,
+        {},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      
+      if (roomCategoryCheck.rows[0].COUNT === 0) {
+        await connection.execute(`ALTER TABLE WEBSITE_JAKHABITAT_FOTO ADD ROOM_CATEGORY VARCHAR2(50)`);
+        console.log('Column ROOM_CATEGORY added to WEBSITE_JAKHABITAT_FOTO');
+      }
     }
   } catch (error) {
     console.error('Database initialization error:', error);
@@ -66,8 +79,8 @@ export async function insertPhoto(photoData) {
     
     const result = await connection.execute(
       `INSERT INTO WEBSITE_JAKHABITAT_FOTO 
-       (FILENAME, ORIGINAL_NAME, FILE_PATH, FILE_SIZE, MIME_TYPE, CATEGORY, UNIT_ID) 
-       VALUES (:filename, :originalName, :filePath, :fileSize, :mimeType, :category, :unitId)`,
+       (FILENAME, ORIGINAL_NAME, FILE_PATH, FILE_SIZE, MIME_TYPE, CATEGORY, UNIT_ID, ROOM_CATEGORY) 
+       VALUES (:filename, :originalName, :filePath, :fileSize, :mimeType, :category, :unitId, :roomCategory)`,
       {
         filename: photoData.filename,
         originalName: photoData.originalName,
@@ -75,7 +88,8 @@ export async function insertPhoto(photoData) {
         fileSize: photoData.fileSize,
         mimeType: photoData.mimeType,
         category: photoData.category || 'panorama',
-        unitId: photoData.unitId
+        unitId: photoData.unitId,
+        roomCategory: photoData.roomCategory
       },
       { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -96,7 +110,7 @@ export async function getPhotos(category = 'panorama') {
     connection = await oracledb.getConnection(dbConfig);
     
     const result = await connection.execute(
-      `SELECT f.ID, f.FILENAME, f.ORIGINAL_NAME, f.FILE_PATH, f.FILE_SIZE, f.MIME_TYPE, f.CATEGORY, f.UNIT_ID, f.CREATED_AT,
+      `SELECT f.ID, f.FILENAME, f.ORIGINAL_NAME, f.FILE_PATH, f.FILE_SIZE, f.MIME_TYPE, f.CATEGORY, f.UNIT_ID, f.ROOM_CATEGORY, f.CREATED_AT,
               u.NAMA_UNIT as UNIT_NAME, u.TIPE_UNIT, u.LUAS, u.LOKASI
        FROM WEBSITE_JAKHABITAT_FOTO f
        LEFT JOIN WEBSITE_JAKHABITAT_MASTER_UNIT u ON f.UNIT_ID = u.ID
@@ -119,6 +133,7 @@ export async function getPhotos(category = 'panorama') {
       tipeUnit: row.TIPE_UNIT,
       luas: row.LUAS,
       lokasi: row.LOKASI,
+      roomCategory: row.ROOM_CATEGORY,
       createdAt: row.CREATED_AT
     }));
   } catch (error) {
