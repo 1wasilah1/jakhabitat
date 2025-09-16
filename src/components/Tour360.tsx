@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -237,12 +237,14 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
         <div className="relative h-96 rounded-lg overflow-hidden bg-black">
           {currentRoom && currentRoom.image ? (
             <Canvas camera={{ position: [0, 0, 0], fov: 75 }}>
-              <PanoramaSphere 
-                currentRoom={currentRoom.id} 
-                roomImage={currentRoom.image}
-                doors={currentRoom.doors}
-                onDoorClick={goToRoom}
-              />
+              <Suspense fallback={null}>
+                <PanoramaSphere 
+                  currentRoom={currentRoom.id} 
+                  roomImage={currentRoom.image}
+                  doors={currentRoom.doors}
+                  onDoorClick={goToRoom}
+                />
+              </Suspense>
               <OrbitControls 
                 enableZoom={true}
                 enablePan={false}
@@ -286,14 +288,16 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
         >
 
       <Canvas camera={{ position: [0, 0, 0], fov: 75 }}>
-        {currentRoom && (
-          <PanoramaSphere 
-            currentRoom={currentRoom.id} 
-            roomImage={currentRoom.image}
-            doors={currentRoom.doors}
-            onDoorClick={goToRoom}
-          />
-        )}
+        <Suspense fallback={null}>
+          {currentRoom && (
+            <PanoramaSphere 
+              currentRoom={currentRoom.id} 
+              roomImage={currentRoom.image}
+              doors={currentRoom.doors}
+              onDoorClick={goToRoom}
+            />
+          )}
+        </Suspense>
         <OrbitControls 
           enableZoom={true}
           enablePan={false}
