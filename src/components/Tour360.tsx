@@ -63,41 +63,6 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
   
   const currentRoom = rooms[currentRoomIndex];
 
-  // Load units from master unit (public access)
-  useEffect(() => {
-    const loadUnits = async () => {
-      try {
-        const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-unit');
-        const result = await response.json();
-        if (result.success) {
-          setUnits(result.data);
-        }
-      } catch (error) {
-        console.error('Error loading units:', error);
-      }
-    };
-    
-    loadUnits();
-  }, []);
-  
-  // Auto-select unit when selectedTower changes
-  useEffect(() => {
-    if (selectedTower && units.length > 0 && !selectedUnit) {
-      const unit = units.find(u => u.namaUnit === selectedTower);
-      if (unit) {
-        setSelectedUnit(unit);
-        setShowRoomSelector(false);
-      }
-    }
-  }, [selectedTower, units, selectedUnit]);
-  
-  // Load panoramas when unit is selected
-  useEffect(() => {
-    if (selectedUnit && selectedTower) {
-      loadPanoramasForUnit(selectedUnit.id, selectedArea);
-    }
-  }, [selectedUnit, selectedArea, loadPanoramasForUnit]);
-
   // Load panoramas for selected unit
   const loadPanoramasForUnit = useCallback(async (unitId, filterByArea = null) => {
     try {
@@ -149,6 +114,41 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
       console.error('Error loading panoramas:', error);
     }
   }, [selectedUnit, selectedTower]);
+
+  // Load units from master unit (public access)
+  useEffect(() => {
+    const loadUnits = async () => {
+      try {
+        const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-unit');
+        const result = await response.json();
+        if (result.success) {
+          setUnits(result.data);
+        }
+      } catch (error) {
+        console.error('Error loading units:', error);
+      }
+    };
+    
+    loadUnits();
+  }, []);
+  
+  // Auto-select unit when selectedTower changes
+  useEffect(() => {
+    if (selectedTower && units.length > 0 && !selectedUnit) {
+      const unit = units.find(u => u.namaUnit === selectedTower);
+      if (unit) {
+        setSelectedUnit(unit);
+        setShowRoomSelector(false);
+      }
+    }
+  }, [selectedTower, units, selectedUnit]);
+  
+  // Load panoramas when unit is selected
+  useEffect(() => {
+    if (selectedUnit && selectedTower) {
+      loadPanoramasForUnit(selectedUnit.id, selectedArea);
+    }
+  }, [selectedUnit, selectedArea, loadPanoramasForUnit]);
 
   // Don't render if rooms not loaded yet and no selectedTower
   if (!rooms.length && !selectedTower) {
