@@ -31,18 +31,7 @@ const sectionContent: Record<string, {
     images: [buildingExterior, roomInterior],
     description: 'Jelajahi unit-unit apartemen kami dengan teknologi virtual tour 360°. Pilih salah satu tower untuk melihat galeri foto dan tour virtual.',
     show360Tour: true,
-    towers: [
-      {
-        name: 'Tower Kanaya',
-        images: [roomInterior, buildingExterior],
-        description: 'Tower premium dengan pemandangan kota yang menakjubkan'
-      },
-      {
-        name: 'Tower Nuansa Indah', 
-        images: [buildingExterior, roomInterior],
-        description: 'Tower modern dengan fasilitas lengkap dan akses mudah'
-      }
-    ]
+    towers: []
   },
   'contact': {
     images: [buildingExterior],
@@ -77,7 +66,33 @@ const sectionContent: Record<string, {
 };
 
 export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModalProps) => {
+  const [towers, setTowers] = useState([]);
+  
   if (!isOpen) return null;
+
+  // Load towers from database
+  useEffect(() => {
+    const loadTowers = async () => {
+      try {
+        const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-unit');
+        const result = await response.json();
+        if (result.success) {
+          const towerData = result.data.map(unit => ({
+            name: unit.namaUnit,
+            images: [roomInterior, buildingExterior],
+            description: `${unit.tipeUnit} - ${unit.luas} m² - ${unit.lokasi}`
+          }));
+          setTowers(towerData);
+        }
+      } catch (error) {
+        console.error('Error loading towers:', error);
+      }
+    };
+    
+    if (isOpen && sectionId === 'unit-tour') {
+      loadTowers();
+    }
+  }, [isOpen, sectionId]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -124,7 +139,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
         
         <div className="p-6 space-y-6">
           {/* Tower Selection for Unit Tour */}
-          {sectionId === 'unit-tour' && content.towers ? (
+          {sectionId === 'unit-tour' && towers.length > 0 ? (
             <>
               {!selectedTower ? (
                 <>
@@ -153,7 +168,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-foreground">Pilih Tower</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {content.towers.map((tower, index) => (
+                      {towers.map((tower, index) => (
                         <div 
                           key={index}
                           onClick={() => setSelectedTower(tower.name)}
@@ -208,7 +223,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                     
                     {/* Tower Images Gallery */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {content.towers.find(t => t.name === selectedTower)?.images.map((image, index) => (
+                      {towers.find(t => t.name === selectedTower)?.images.map((image, index) => (
                         <div key={index} className="aspect-video bg-muted rounded-lg overflow-hidden">
                           <img 
                             src={image} 
