@@ -157,7 +157,7 @@ export async function getPhotos(category = 'panorama') {
     connection = await oracledb.getConnection(dbConfig);
     
     const result = await connection.execute(
-      `SELECT f.ID, f.FILENAME, f.ORIGINAL_NAME, f.FILE_PATH, f.FILE_SIZE, f.MIME_TYPE, f.CATEGORY, f.UNIT_ID, f.ROOM_CATEGORY, f.CREATED_AT,
+      `SELECT f.ID, f.FILENAME, f.ORIGINAL_NAME, f.FILE_PATH, f.FILE_SIZE, f.MIME_TYPE, f.CATEGORY, f.UNIT_ID, f.ROOM_CATEGORY, f.IS_DEFAULT, f.CREATED_AT,
               u.NAMA_UNIT as UNIT_NAME, u.TIPE_UNIT, u.LUAS, u.LOKASI
        FROM WEBSITE_JAKHABITAT_FOTO f
        LEFT JOIN WEBSITE_JAKHABITAT_MASTER_UNIT u ON f.UNIT_ID = u.ID
@@ -181,6 +181,7 @@ export async function getPhotos(category = 'panorama') {
       luas: row.LUAS,
       lokasi: row.LOKASI,
       roomCategory: row.ROOM_CATEGORY,
+      isDefault: row.IS_DEFAULT === 1,
       createdAt: row.CREATED_AT
     }));
   } catch (error) {

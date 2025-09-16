@@ -14,7 +14,15 @@ function PanoramaSphere({ currentRoom, roomImage, doors, onDoorClick }: {
   onDoorClick?: (roomId: string) => void;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
-  const texture = useLoader(THREE.TextureLoader, roomImage);
+  
+  let texture;
+  try {
+    texture = useLoader(THREE.TextureLoader, roomImage);
+  } catch (error) {
+    console.error('Error loading texture:', error);
+    // Use fallback texture
+    texture = useLoader(THREE.TextureLoader, roomInterior);
+  }
   
 
 
@@ -227,7 +235,7 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
       {/* Room Selection Header */}
       {showRoomSelector && (
         <div className="relative h-96 rounded-lg overflow-hidden bg-black">
-          {currentRoom ? (
+          {currentRoom && currentRoom.image ? (
             <Canvas camera={{ position: [0, 0, 0], fov: 75 }}>
               <PanoramaSphere 
                 currentRoom={currentRoom.id} 
