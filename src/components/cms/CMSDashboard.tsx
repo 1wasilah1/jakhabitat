@@ -30,9 +30,125 @@ export const CMSDashboard = () => {
   const [units, setUnits] = useState([]);
   const [showUnitForm, setShowUnitForm] = useState(false);
   const [editingUnit, setEditingUnit] = useState(null);
+  const [unitForm, setUnitForm] = useState({
+    namaUnit: '',
+    lokasi: '',
+    tipeUnit: 'Studio',
+    tipe: 'Apartemen',
+    luas: '',
+    deskripsi: ''
+  });
+  const [loading, setLoading] = useState(false);
   const [showPriceForm, setShowPriceForm] = useState(false);
   const [editingPrice, setEditingPrice] = useState(null);
   const { user, logout } = useAuth();
+
+  // Load units on component mount
+  React.useEffect(() => {
+    if (activeMenu === 'master-unit') {
+      loadUnits();
+    }
+  }, [activeMenu]);
+
+  const loadUnits = async () => {
+    try {
+      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/master-unit', {
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        setUnits(result.data);
+      }
+    } catch (error) {
+      console.error('Error loading units:', error);
+    }
+  };
+
+  const handleUnitSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const url = editingUnit 
+        ? `https://dprkp.jakarta.go.id/api/jakhabitat/master-unit/${editingUnit.id}`
+        : 'https://dprkp.jakarta.go.id/api/jakhabitat/master-unit';
+      
+      const method = editingUnit ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+        body: JSON.stringify(unitForm),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(editingUnit ? 'Unit berhasil diupdate!' : 'Unit berhasil ditambahkan!');
+        setShowUnitForm(false);
+        setEditingUnit(null);
+        setUnitForm({
+          namaUnit: '',
+          lokasi: '',
+          tipeUnit: 'Studio',
+          tipe: 'Apartemen',
+          luas: '',
+          deskripsi: ''
+        });
+        loadUnits();
+      } else {
+        alert('Error: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error saving unit:', error);
+      alert('Terjadi kesalahan saat menyimpan unit');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditUnit = (unit) => {
+    setEditingUnit(unit);
+    setUnitForm({
+      namaUnit: unit.namaUnit,
+      lokasi: unit.lokasi,
+      tipeUnit: unit.tipeUnit,
+      tipe: unit.tipe,
+      luas: unit.luas,
+      deskripsi: unit.deskripsi || ''
+    });
+    setShowUnitForm(true);
+  };
+
+  const handleDeleteUnit = async (id) => {
+    if (!confirm('Yakin ingin menghapus unit ini?')) return;
+    
+    try {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/master-unit/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('Unit berhasil dihapus!');
+        loadUnits();
+      } else {
+        alert('Error: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error deleting unit:', error);
+      alert('Terjadi kesalahan saat menghapus unit');
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -180,6 +296,9 @@ export const CMSDashboard = () => {
                                       
                                       fetch('https://dprkp.jakarta.go.id/api/jakhabitat/upload/panorama', {
                                         method: 'POST',
+                                        headers: {
+                                          'Authorization': `Bearer ${authState.accessToken}`,
+                                        },
                                         body: formData,
                                       })
                                       .then(response => {
@@ -274,56 +393,106 @@ export const CMSDashboard = () => {
                     <h3 className="text-lg font-semibold mb-4">
                       {editingUnit ? 'Edit Unit' : 'Tambah Unit Baru'}
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Nama Unit</label>
-                        <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Tower Kanaya" />
+                    <form onSubmit={handleUnitSubmit}>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Nama Unit</label>
+                          <input 
+                            type="text" 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                            placeholder="Tower Kanaya"
+                            value={unitForm.namaUnit}
+                            onChange={(e) => setUnitForm({...unitForm, namaUnit: e.target.value})}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Lokasi</label>
+                          <input 
+                            type="text" 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                            placeholder="Jakarta Barat"
+                            value={unitForm.lokasi}
+                            onChange={(e) => setUnitForm({...unitForm, lokasi: e.target.value})}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Tipe Unit</label>
+                          <select 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            value={unitForm.tipeUnit}
+                            onChange={(e) => setUnitForm({...unitForm, tipeUnit: e.target.value})}
+                          >
+                            <option>Studio</option>
+                            <option>1 BR</option>
+                            <option>2 BR</option>
+                            <option>3 BR</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Tipe</label>
+                          <select 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            value={unitForm.tipe}
+                            onChange={(e) => setUnitForm({...unitForm, tipe: e.target.value})}
+                          >
+                            <option>Apartemen</option>
+                            <option>Rumah</option>
+                            <option>Ruko</option>
+                            <option>Kantor</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Luas (m²)</label>
+                          <input 
+                            type="number" 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                            placeholder="45"
+                            value={unitForm.luas}
+                            onChange={(e) => setUnitForm({...unitForm, luas: e.target.value})}
+                            required
+                          />
+                        </div>
+                        <div className="md:col-span-3">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+                          <textarea 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                            rows={3} 
+                            placeholder="Deskripsi unit..."
+                            value={unitForm.deskripsi}
+                            onChange={(e) => setUnitForm({...unitForm, deskripsi: e.target.value})}
+                          ></textarea>
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Lokasi</label>
-                        <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Jakarta Barat" />
+                      <div className="flex gap-2 mt-4">
+                        <button 
+                          type="submit"
+                          className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                          disabled={loading}
+                        >
+                          {loading ? 'Menyimpan...' : (editingUnit ? 'Update' : 'Simpan')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowUnitForm(false);
+                            setEditingUnit(null);
+                            setUnitForm({
+                              namaUnit: '',
+                              lokasi: '',
+                              tipeUnit: 'Studio',
+                              tipe: 'Apartemen',
+                              luas: '',
+                              deskripsi: ''
+                            });
+                          }}
+                          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                        >
+                          Batal
+                        </button>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Tipe Unit</label>
-                        <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
-                          <option>Studio</option>
-                          <option>1 BR</option>
-                          <option>2 BR</option>
-                          <option>3 BR</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Tipe</label>
-                        <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
-                          <option>Apartemen</option>
-                          <option>Rumah</option>
-                          <option>Ruko</option>
-                          <option>Kantor</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Luas (m²)</label>
-                        <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="45" />
-                      </div>
-                      <div className="md:col-span-3">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
-                        <textarea className="w-full px-3 py-2 border border-gray-300 rounded-md" rows={3} placeholder="Deskripsi unit..."></textarea>
-                      </div>
-                    </div>
-                    <div className="flex gap-2 mt-4">
-                      <button className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-                        {editingUnit ? 'Update' : 'Simpan'}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowUnitForm(false);
-                          setEditingUnit(null);
-                        }}
-                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
-                      >
-                        Batal
-                      </button>
-                    </div>
+                    </form>
                   </div>
                 )}
                 
@@ -341,28 +510,37 @@ export const CMSDashboard = () => {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tower Kanaya</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Jakarta Barat</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2 BR</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apartemen</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">45 m²</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button className="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-                            <button className="text-red-600 hover:text-red-900">Hapus</button>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tower Melati</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Jakarta Pusat</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1 BR</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apartemen</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">36 m²</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button className="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-                            <button className="text-red-600 hover:text-red-900">Hapus</button>
-                          </td>
-                        </tr>
+                        {units.length === 0 ? (
+                          <tr>
+                            <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                              Belum ada data unit
+                            </td>
+                          </tr>
+                        ) : (
+                          units.map((unit) => (
+                            <tr key={unit.id}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.namaUnit}</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{unit.lokasi}</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{unit.tipeUnit}</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{unit.tipe}</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{unit.luas} m²</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button 
+                                  onClick={() => handleEditUnit(unit)}
+                                  className="text-indigo-600 hover:text-indigo-900 mr-3"
+                                >
+                                  Edit
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteUnit(unit.id)}
+                                  className="text-red-600 hover:text-red-900"
+                                >
+                                  Hapus
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>
