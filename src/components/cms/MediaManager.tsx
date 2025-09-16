@@ -12,6 +12,7 @@ const MediaManager = ({ authState }) => {
   const [showHotspotModal, setShowHotspotModal] = useState(false);
   const [pendingHotspot, setPendingHotspot] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     loadPanoramas();
@@ -184,6 +185,33 @@ const MediaManager = ({ authState }) => {
     }
   };
 
+  const navigateToDestination = async (destination) => {
+    if (!destination || isTransitioning) return;
+    
+    // Find photo with matching category in same unit
+    const targetPhoto = panoramas.find(photo => 
+      photo.unitId === selectedPanorama.unitId && 
+      photo.roomCategory === destination
+    );
+    
+    if (targetPhoto) {
+      setIsTransitioning(true);
+      
+      // Fade out effect
+      setTimeout(async () => {
+        setSelectedPanorama(targetPhoto);
+        await loadHotspots(targetPhoto.id);
+        
+        // Fade in effect
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 300);
+      }, 300);
+    } else {
+      alert('Foto tujuan tidak ditemukan');
+    }
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Manajemen Media</h2>
@@ -335,14 +363,23 @@ const MediaManager = ({ authState }) => {
                   </button>
                 </div>
                 <div className="relative">
-                  <img 
-                    src={`https://dprkp.jakarta.go.id/api/jakhabitat/image/${selectedPanorama.filename}`}
-                    alt={selectedPanorama.originalName}
-                    className="w-full h-64 object-cover rounded"
-                    onError={(e) => {
-                      e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
-                    }}
-                  />
+                  <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+                    <img 
+                      src={`https://dprkp.jakarta.go.id/api/jakhabitat/image/${selectedPanorama.filename}`}
+                      alt={selectedPanorama.originalName}
+                      className="w-full h-64 object-cover rounded"
+                      onError={(e) => {
+                        e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Loading overlay during transition */}
+                  {isTransitioning && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded">
+                      <div className="text-white text-sm">Berpindah ruangan...</div>
+                    </div>
+                  )}
                   
                   {isAddingHotspot && (
                     <div 
@@ -351,13 +388,13 @@ const MediaManager = ({ authState }) => {
                     />
                   )}
                   
-                  {hotspots.map((hotspot, index) => (
+                  {!isTransitioning && hotspots.map((hotspot, index) => (
                     <div
                       key={index}
-                      className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white cursor-pointer transform -translate-x-2 -translate-y-2"
+                      className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white cursor-pointer transform -translate-x-2 -translate-y-2 hover:bg-red-600 animate-pulse"
                       style={{ left: hotspot.x, top: hotspot.y }}
-                      onClick={() => handleRemoveHotspot(index)}
-                      title={`Hotspot ${index + 1} - Klik untuk hapus`}
+                      onClick={() => isAddingHotspot ? handleRemoveHotspot(index) : navigateToDestination(hotspot.destination)}
+                      title={isAddingHotspot ? `Hotspot ${index + 1} - Klik untuk hapus` : `Ke ${String(hotspot.destination || 'Unknown').replace('_', ' ')}`}
                     />
                   ))}
                 </div>
