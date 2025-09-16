@@ -296,7 +296,7 @@ const UnitTourManager = ({ authState, units }) => {
               <div className="border rounded-lg p-4">
                 <h4 className="font-medium mb-2">Preview:</h4>
                 <img 
-                  src={`/images/360/2024/12/27/${selectedPanorama.filename}`}
+                  src={`https://dprkp.jakarta.go.id:6000/images/360/2024/12/27/${selectedPanorama.filename}`}
                   alt={selectedPanorama.originalName}
                   className="w-full h-64 object-cover rounded"
                   onError={(e) => {
