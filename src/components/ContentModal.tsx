@@ -1,7 +1,8 @@
-import { X } from 'lucide-react';
+import { X, Eye } from 'lucide-react';
 import { useState, Suspense, lazy, useEffect } from 'react';
 import buildingExterior from '@/assets/building-exterior.jpg';
 import roomInterior from '@/assets/room-interior.jpg';
+import { Tour360Modal } from './Tour360Modal';
 
 const Tour360 = lazy(() => import('./Tour360').then(module => ({ default: module.Tour360 })));
 
@@ -68,6 +69,7 @@ const sectionContent: Record<string, {
 export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModalProps) => {
   const [towers, setTowers] = useState([]);
   const [panoramaPhotos, setPanoramaPhotos] = useState([]);
+  const [show360Modal, setShow360Modal] = useState(false);
   
   if (!isOpen) return null;
 
@@ -261,51 +263,24 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                       )}
                     </div>
 
-                    {/* 360 Tour for Selected Tower and Area */}
+                    {/* Photo Gallery with 360 Button */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-foreground">
-                        Virtual Tour 360° - {selectedTower} ({selectedArea})
-                      </h3>
-                      <Suspense fallback={<div className="flex items-center justify-center h-64 bg-muted rounded-lg"><div className="text-muted-foreground">Loading virtual tour...</div></div>}>
-                        <Tour360 
-                          selectedTower={selectedTower} 
-                          selectedArea={selectedArea}
-                          onUnitsLoaded={(units) => {
-                            const towerData = units.map(unit => ({
-                              name: unit.namaUnit,
-                              description: `${unit.tipeUnit} - ${unit.luas} m² - ${unit.lokasi}`
-                            }));
-                            setTowers(towerData);
-                            
-                            const uniqueTypes = [...new Set(units.map(unit => unit.tipeUnit))].filter(Boolean);
-                            const areaData = uniqueTypes.map(type => ({
-                              name: type,
-                              description: `Unit ${type} dengan fasilitas modern`
-                            }));
-                            setUnitAreas(areaData);
-                            
-                            if (areaData.length > 0 && !selectedArea) {
-                              setSelectedArea(areaData[0].name);
-                            }
-                          }}
-                        />
-                      </Suspense>
-                      
-                      {/* Navigation between areas */}
-                      <div className="flex flex-wrap gap-2 mt-4">
-                        {unitAreas.map((area) => (
-                          <button
-                            key={area.name}
-                            onClick={() => setSelectedArea(area.name)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                              selectedArea === area.name
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                            }`}
-                          >
-                            {area.name}
-                          </button>
-                        ))}
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="text-lg font-semibold text-foreground">
+                            Galeri Foto - {selectedTower}
+                          </h3>
+                          <p className="text-muted-foreground text-sm">
+                            Lihat foto-foto unit apartemen dari berbagai sudut
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setShow360Modal(true)}
+                          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                        >
+                          <Eye className="w-4 h-4" />
+                          <span className="text-sm font-medium">Lihat 360°</span>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -356,6 +331,15 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
           </div>
         </div>
       </div>
+      
+      {/* 360 Tour Modal */}
+      <Tour360Modal 
+        isOpen={show360Modal}
+        onClose={() => setShow360Modal(false)}
+        selectedTower={selectedTower}
+        selectedArea={selectedArea}
+        onBackToGallery={() => setShow360Modal(false)}
+      />
     </div>
   );
 };
