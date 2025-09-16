@@ -3,8 +3,8 @@ import { Eye, EyeOff, LogIn } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 export const LoginForm = () => {
-  const [username, setUsername] = useState('opt_barat');
-  const [password, setPassword] = useState('optbarat123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   
@@ -22,6 +22,9 @@ export const LoginForm = () => {
     
     if (!result.success) {
       setError(result.error || 'Login failed');
+    } else {
+      // Refresh page after successful login
+      window.location.reload();
     }
   };
 
@@ -63,6 +66,7 @@ export const LoginForm = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Masukkan username"
+                autoComplete="off"
               />
             </div>
             
@@ -80,6 +84,7 @@ export const LoginForm = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="Masukkan password"
+                  autoComplete="off"
                 />
                 <button
                   type="button"
