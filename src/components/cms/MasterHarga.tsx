@@ -9,6 +9,8 @@ export const MasterHarga = () => {
   const [editingPrice, setEditingPrice] = useState(null);
   const [loading, setLoading] = useState(false);
   const [manualCicilan, setManualCicilan] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedHarga, setSelectedHarga] = useState(null);
   const [priceForm, setPriceForm] = useState({
     unitId: '',
     hargaJual: '',
@@ -543,6 +545,15 @@ export const MasterHarga = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button 
+                        onClick={() => {
+                          setSelectedHarga(harga);
+                          setShowDetailModal(true);
+                        }}
+                        className="text-blue-600 hover:text-blue-900 mr-3"
+                      >
+                        Detail
+                      </button>
+                      <button 
                         onClick={() => handleEditPrice(harga)}
                         className="text-indigo-600 hover:text-indigo-900 mr-3"
                       >
@@ -562,6 +573,77 @@ export const MasterHarga = () => {
           </table>
         </div>
       </div>
+      
+      {/* Detail Modal */}
+      {showDetailModal && selectedHarga && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Detail Simulasi Cicilan</h3>
+              <button 
+                onClick={() => setShowDetailModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">{selectedHarga.namaUnit} - {selectedHarga.tipeUnit}</h4>
+                <p className="text-sm text-gray-600">Luas: {selectedHarga.luas} m² | Lokasi: {selectedHarga.lokasi}</p>
+                <p className="text-lg font-semibold mt-2">Harga: Rp {parseInt(selectedHarga.hargaJual).toLocaleString('id-ID')}</p>
+                <p className="text-sm text-gray-600">Bunga: {selectedHarga.bungaTahunan}% per tahun</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { tenor: 5, cicilan: selectedHarga.cicilan5th },
+                  { tenor: 7, cicilan: selectedHarga.cicilan7th },
+                  { tenor: 10, cicilan: selectedHarga.cicilan10th },
+                  { tenor: 11, cicilan: selectedHarga.cicilan11th },
+                  { tenor: 15, cicilan: selectedHarga.cicilan15th },
+                  { tenor: 20, cicilan: selectedHarga.cicilan20th },
+                  { tenor: 25, cicilan: selectedHarga.cicilan25th },
+                  { tenor: 30, cicilan: selectedHarga.cicilan30th }
+                ].filter(item => item.cicilan > 0).map(item => {
+                  const totalBayar = item.cicilan * item.tenor * 12;
+                  const totalBunga = totalBayar - selectedHarga.hargaJual;
+                  
+                  return (
+                    <div key={item.tenor} className="border rounded-lg p-3">
+                      <h5 className="font-medium text-center mb-2">{item.tenor} Tahun</h5>
+                      <div className="text-sm space-y-1">
+                        <div className="flex justify-between">
+                          <span>Cicilan/bulan:</span>
+                          <span className="font-medium">Rp {parseInt(item.cicilan).toLocaleString('id-ID')}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Total bayar:</span>
+                          <span>Rp {totalBayar.toLocaleString('id-ID')}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Total bunga:</span>
+                          <span className="text-red-600">Rp {totalBunga.toLocaleString('id-ID')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            
+            <div className="mt-6 text-center">
+              <button 
+                onClick={() => setShowDetailModal(false)}
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
