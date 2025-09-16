@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -96,10 +96,10 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
     if (selectedUnit && selectedTower) {
       loadPanoramasForUnit(selectedUnit.id, selectedArea);
     }
-  }, [selectedUnit, selectedArea]);
+  }, [selectedUnit, selectedArea, loadPanoramasForUnit]);
 
   // Load panoramas for selected unit
-  const loadPanoramasForUnit = async (unitId, filterByArea = null) => {
+  const loadPanoramasForUnit = useCallback(async (unitId, filterByArea = null) => {
     try {
       const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/panoramas/${unitId}`);
       const result = await response.json();
@@ -148,7 +148,7 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
     } catch (error) {
       console.error('Error loading panoramas:', error);
     }
-  };
+  }, [selectedUnit, selectedTower]);
 
   // Don't render if rooms not loaded yet and no selectedTower
   if (!rooms.length && !selectedTower) {
