@@ -7,6 +7,8 @@ const MediaManager = ({ authState }) => {
   const [expandedUnits, setExpandedUnits] = useState({});
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedPanorama, setSelectedPanorama] = useState(null);
+  const [hotspots, setHotspots] = useState([]);
+  const [isAddingHotspot, setIsAddingHotspot] = useState(false);
 
   useEffect(() => {
     loadPanoramas();
@@ -77,6 +79,68 @@ const MediaManager = ({ authState }) => {
     }
   };
 
+  const handleAddHotspot = async (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.round(e.clientX - rect.left);
+    const y = Math.round(e.clientY - rect.top);
+    
+    const newHotspot = { x, y };
+    const updatedHotspots = [...hotspots, newHotspot];
+    setHotspots(updatedHotspots);
+    
+    try {
+      await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/hotspots', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+        body: JSON.stringify({
+          photoId: selectedPanorama.id,
+          x: x,
+          y: y
+        }),
+      });
+    } catch (error) {
+      console.error('Error saving hotspot:', error);
+    }
+  };
+
+  const handleRemoveHotspot = async (index) => {
+    const updatedHotspots = hotspots.filter((_, i) => i !== index);
+    setHotspots(updatedHotspots);
+    
+    try {
+      await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/hotspots/${selectedPanorama.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+        body: JSON.stringify({ hotspots: updatedHotspots }),
+      });
+    } catch (error) {
+      console.error('Error updating hotspots:', error);
+    }
+  };
+
+  const loadHotspots = async (photoId) => {
+    try {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/hotspots/${photoId}`, {
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        setHotspots(result.hotspots || []);
+      }
+    } catch (error) {
+      console.error('Error loading hotspots:', error);
+      setHotspots([]);
+    }
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Manajemen Media</h2>
@@ -143,6 +207,7 @@ const MediaManager = ({ authState }) => {
                                     onClick={() => {
                                       setSelectedPanorama(photo);
                                       setShowDetailModal(true);
+                                      loadHotspots(photo.id);
                                     }}
                                     className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-100"
                                   >
@@ -217,15 +282,61 @@ const MediaManager = ({ authState }) => {
               </div>
               
               <div className="border rounded-lg p-4">
-                <h4 className="font-medium mb-2">Preview:</h4>
-                <img 
-                  src={`https://dprkp.jakarta.go.id/api/jakhabitat/image/${selectedPanorama.filename}`}
-                  alt={selectedPanorama.originalName}
-                  className="w-full h-64 object-cover rounded"
-                  onError={(e) => {
-                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
-                  }}
-                />
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="font-medium">Preview:</h4>
+                  <button
+                    onClick={() => setIsAddingHotspot(!isAddingHotspot)}
+                    className={`px-3 py-1 text-sm rounded ${isAddingHotspot ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'}`}
+                  >
+                    {isAddingHotspot ? 'Selesai' : 'Tambah Hotspot'}
+                  </button>
+                </div>
+                <div className="relative">
+                  <img 
+                    src={`https://dprkp.jakarta.go.id/api/jakhabitat/image/${selectedPanorama.filename}`}
+                    alt={selectedPanorama.originalName}
+                    className="w-full h-64 object-cover rounded"
+                    onError={(e) => {
+                      e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
+                    }}
+                  />
+                  
+                  {isAddingHotspot && (
+                    <div 
+                      className="absolute inset-0 cursor-crosshair"
+                      onClick={handleAddHotspot}
+                    />
+                  )}
+                  
+                  {hotspots.map((hotspot, index) => (
+                    <div
+                      key={index}
+                      className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white cursor-pointer transform -translate-x-2 -translate-y-2"
+                      style={{ left: hotspot.x, top: hotspot.y }}
+                      onClick={() => handleRemoveHotspot(index)}
+                      title={`Hotspot ${index + 1} - Klik untuk hapus`}
+                    />
+                  ))}
+                </div>
+                
+                {hotspots.length > 0 && (
+                  <div className="mt-3">
+                    <h5 className="text-sm font-medium mb-2">Hotspots ({hotspots.length}):</h5>
+                    <div className="space-y-1 max-h-20 overflow-y-auto">
+                      {hotspots.map((hotspot, index) => (
+                        <div key={index} className="text-xs text-gray-600 flex justify-between">
+                          <span>Hotspot {index + 1}: x={hotspot.x}px, y={hotspot.y}px</span>
+                          <button 
+                            onClick={() => handleRemoveHotspot(index)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
