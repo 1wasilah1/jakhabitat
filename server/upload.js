@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
+import fetch from 'node-fetch';
 import { initDatabase, insertPhoto, getPhotos, deletePhoto } from './database.js';
 import { initMasterTables, createUnit, getUnits, updateUnit, deleteUnit, createHarga, getHarga, updateHarga, deleteHarga } from './masterData.js';
 
@@ -48,8 +49,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Auth middleware
-const authenticateToken = (req, res, next) => {
+// Auth middleware with role validation
+const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -59,18 +60,45 @@ const authenticateToken = (req, res, next) => {
 
   // For development, accept mock tokens
   if (token.startsWith('mock_access_token_')) {
-    req.user = { id: 1, username: 'mock_user' };
+    req.user = { id: 1, username: 'updp', role: 'admin' };
     return next();
   }
 
-  // For production, validate with SSO
-  // This is a simplified validation - in production you'd verify with SSO server
-  if (token.length > 10) {
-    req.user = { id: 1, username: 'authenticated_user' };
-    return next();
-  }
+  try {
+    // Validate token with SSO auth/me endpoint
+    const response = await fetch('https://dprkp.jakarta.go.id/api/sso/v1/auth/me', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ app_id: 9 }),
+    });
 
-  return res.status(403).json({ error: 'Invalid token' });
+    const result = await response.json();
+    
+    if (!response.ok || !result.success) {
+      return res.status(403).json({ error: 'Invalid token' });
+    }
+
+    const userData = result.data;
+    
+    // Check if user has required role (updp or admin)
+    if (!userData.username || (userData.username !== 'updp' && userData.role !== 'admin')) {
+      return res.status(403).json({ error: 'Access denied. Only updp user or admin role allowed.' });
+    }
+
+    req.user = {
+      id: userData.id,
+      username: userData.username,
+      role: userData.role || 'user'
+    };
+    
+    next();
+  } catch (error) {
+    console.error('Token validation error:', error);
+    return res.status(403).json({ error: 'Token validation failed' });
+  }
 };
 
 // Root endpoint for testing
