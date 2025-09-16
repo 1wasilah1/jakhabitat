@@ -252,9 +252,8 @@ const UnitTourManager = ({ authState, units }) => {
             </div>
           </div>
         </div>
-      </div>
         
-      {/* Records Table */}
+        {/* Records Table */}
         <div>
           <h4 className="text-md font-medium mb-3">Panorama yang sudah diupload:</h4>
           <div className="bg-white rounded-lg shadow overflow-hidden">
