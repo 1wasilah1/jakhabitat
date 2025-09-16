@@ -70,9 +70,9 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
   
   if (!isOpen) return null;
 
-  // Load towers from database
+  // Load towers and unit areas from database
   useEffect(() => {
-    const loadTowers = async () => {
+    const loadData = async () => {
       try {
         const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-unit');
         const result = await response.json();
@@ -83,14 +83,27 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
             description: `${unit.tipeUnit} - ${unit.luas} m² - ${unit.lokasi}`
           }));
           setTowers(towerData);
+          
+          // Get unique unit types for tabs
+          const uniqueTypes = [...new Set(result.data.map(unit => unit.tipeUnit))].filter(Boolean);
+          const areaData = uniqueTypes.map(type => ({
+            name: type,
+            description: `Unit ${type} dengan fasilitas modern`
+          }));
+          setUnitAreas(areaData);
+          
+          // Set first area as default
+          if (areaData.length > 0 && !selectedArea) {
+            setSelectedArea(areaData[0].name);
+          }
         }
       } catch (error) {
-        console.error('Error loading towers:', error);
+        console.error('Error loading data:', error);
       }
     };
     
     if (isOpen && sectionId === 'unit-tour') {
-      loadTowers();
+      loadData();
     }
   }, [isOpen, sectionId]);
 
@@ -114,15 +127,8 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
   };
 
   const [selectedTower, setSelectedTower] = useState<string | null>(null);
-  const [selectedArea, setSelectedArea] = useState<string>('Studio');
-
-  const unitAreas = [
-    { name: 'Studio', description: 'Unit studio 25-30m² dengan design modern' },
-    { name: '1 BR', description: 'Unit 1 kamar tidur 35-40m² dengan balkon' },
-    { name: '2 BR', description: 'Unit 2 kamar tidur 50-60m² dengan ruang keluarga' },
-    { name: '3 BR', description: 'Unit 3 kamar tidur 70-80m² dengan pemandangan kota' },
-    { name: 'Penthouse', description: 'Unit premium dengan rooftop garden' }
-  ];
+  const [selectedArea, setSelectedArea] = useState<string>('');
+  const [unitAreas, setUnitAreas] = useState([]);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
