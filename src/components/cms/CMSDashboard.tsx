@@ -84,10 +84,42 @@ export const CMSDashboard = () => {
             {activeMenu === 'content' && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Manajemen Konten</h2>
-                <div className="bg-white rounded-lg shadow p-6">
-                  <p className="text-gray-600">
-                    Kelola konten website Jakhabitat di sini. Fitur ini akan dikembangkan lebih lanjut.
-                  </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <h3 className="text-lg font-semibold mb-3">Hero Section</h3>
+                    <p className="text-gray-600 text-sm mb-4">Edit judul utama, deskripsi, dan gambar hero</p>
+                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit →</button>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <h3 className="text-lg font-semibold mb-3">Interactive Hub</h3>
+                    <p className="text-gray-600 text-sm mb-4">Kelola menu dan konten hub interaktif</p>
+                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit →</button>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <h3 className="text-lg font-semibold mb-3">Tour 360°</h3>
+                    <p className="text-gray-600 text-sm mb-4">Upload gambar panorama dan atur tour virtual</p>
+                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit →</button>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <h3 className="text-lg font-semibold mb-3">FAQ</h3>
+                    <p className="text-gray-600 text-sm mb-4">Tambah, edit, atau hapus pertanyaan FAQ</p>
+                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit →</button>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <h3 className="text-lg font-semibold mb-3">Kontak & Lokasi</h3>
+                    <p className="text-gray-600 text-sm mb-4">Update informasi kontak dan alamat</p>
+                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit →</button>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <h3 className="text-lg font-semibold mb-3">E-Brochure</h3>
+                    <p className="text-gray-600 text-sm mb-4">Upload dan kelola file brochure</p>
+                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit →</button>
+                  </div>
                 </div>
               </div>
             )}
