@@ -189,7 +189,9 @@ const UnitTourManager = ({ authState, units }) => {
               />
               <span className="text-sm font-medium text-gray-700">Set sebagai panorama default</span>
             </label>
-              {selectedUnit && (
+          </div>
+          
+          {selectedUnit && (
                 <div className="mt-2 p-3 bg-blue-50 rounded-md">
                   {(() => {
                     const unit = allUnits.find(u => u.id == selectedUnit);
@@ -208,7 +210,6 @@ const UnitTourManager = ({ authState, units }) => {
                   })()}
                 </div>
               )}
-            </div>
           </div>
           
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
