@@ -90,7 +90,7 @@ app.delete('/api/panoramas/:id', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 6000;
+const PORT = process.env.PORT || 3001;
 
 // Initialize database and start server
 initDatabase().then(() => {

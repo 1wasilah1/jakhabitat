@@ -171,7 +171,7 @@ export const CMSDashboard = () => {
                                       const formData = new FormData();
                                       formData.append('panorama', file);
                                       
-                                      fetch('http://localhost:6000/api/upload/panorama', {
+                                      fetch('https://dprkp.jakarta.go.id/jakhabitat/api/upload/panorama', {
                                         method: 'POST',
                                         body: formData,
                                       })
