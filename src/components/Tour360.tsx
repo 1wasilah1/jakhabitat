@@ -122,15 +122,15 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
   
   // Initialize with selectedTower if provided (only once)
   useEffect(() => {
-    if (selectedTower && units.length > 0 && !selectedUnit) {
+    if (selectedTower && units.length > 0) {
       const unit = units.find(u => u.namaUnit === selectedTower);
-      if (unit) {
+      if (unit && !selectedUnit) {
         setSelectedUnit(unit);
         setShowRoomSelector(false);
         loadPanoramas(unit.id);
       }
     }
-  }, [selectedTower]);
+  }, [selectedTower, units.length]);
 
   // Show loading when no rooms available
   if (!rooms.length && selectedUnit) {
