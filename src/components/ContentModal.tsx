@@ -70,29 +70,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
   
   if (!isOpen) return null;
 
-  // Set default unit areas (hardcoded for now)
-  useEffect(() => {
-    if (isOpen && sectionId === 'unit-tour') {
-      const defaultAreas = [
-        { name: 'Studio', description: 'Unit studio dengan fasilitas modern' },
-        { name: '1 BR', description: 'Unit 1 BR dengan fasilitas modern' },
-        { name: '2 BR', description: 'Unit 2 BR dengan fasilitas modern' },
-        { name: '3 BR', description: 'Unit 3 BR dengan fasilitas modern' }
-      ];
-      setUnitAreas(defaultAreas);
-      
-      if (!selectedArea) {
-        setSelectedArea(defaultAreas[0].name);
-      }
-      
-      // Set default towers
-      const defaultTowers = [
-        { name: 'Tower Kanaya', description: '1 BR - 45 m² - Jakarta' },
-        { name: 'Tower Nuansa Indah', description: '2 BR - 60 m² - Jakarta' }
-      ];
-      setTowers(defaultTowers);
-    }
-  }, [isOpen, sectionId]);
+
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -235,7 +213,28 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                         Virtual Tour 360° - {selectedTower} ({selectedArea})
                       </h3>
                       <Suspense fallback={<div className="flex items-center justify-center h-64 bg-muted rounded-lg"><div className="text-muted-foreground">Loading virtual tour...</div></div>}>
-                        <Tour360 selectedTower={selectedTower} selectedArea={selectedArea} />
+                        <Tour360 
+                          selectedTower={selectedTower} 
+                          selectedArea={selectedArea}
+                          onUnitsLoaded={(units) => {
+                            const towerData = units.map(unit => ({
+                              name: unit.namaUnit,
+                              description: `${unit.tipeUnit} - ${unit.luas} m² - ${unit.lokasi}`
+                            }));
+                            setTowers(towerData);
+                            
+                            const uniqueTypes = [...new Set(units.map(unit => unit.tipeUnit))].filter(Boolean);
+                            const areaData = uniqueTypes.map(type => ({
+                              name: type,
+                              description: `Unit ${type} dengan fasilitas modern`
+                            }));
+                            setUnitAreas(areaData);
+                            
+                            if (areaData.length > 0 && !selectedArea) {
+                              setSelectedArea(areaData[0].name);
+                            }
+                          }}
+                        />
                       </Suspense>
                       
                       {/* Navigation between areas */}
