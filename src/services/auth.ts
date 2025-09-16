@@ -1,6 +1,6 @@
 import { LoginRequest, LoginResponse, AuthMeRequest, RefreshTokenRequest, User } from '@/types/auth';
 
-const API_BASE = 'https://dprkp.jakarta.go.id/jakhabitat/api';
+const API_BASE = 'https://dprkp.jakarta.go.id/api';
 
 class AuthService {
   async login(credentials: LoginRequest): Promise<LoginResponse> {
