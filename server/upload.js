@@ -318,6 +318,27 @@ app.delete('/master-harga/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// PUBLIC ENDPOINTS (no authentication required)
+app.get('/public/master-unit', async (req, res) => {
+  try {
+    const units = await getUnits();
+    res.json({ success: true, data: units });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/public/panoramas/:unitId', async (req, res) => {
+  try {
+    const { unitId } = req.params;
+    const photos = await getPhotos('panorama');
+    const unitPhotos = photos.filter(photo => photo.unitId == unitId);
+    res.json({ success: true, photos: unitPhotos });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const PORT = process.env.PORT || 6000;
 
 // Initialize database and start server
@@ -337,5 +358,7 @@ Promise.all([initDatabase(), initMasterTables()]).then(() => {
     console.log('GET  /master-harga - List harga');
     console.log('PUT  /master-harga/:id - Update harga');
     console.log('DELETE /master-harga/:id - Delete harga');
+    console.log('GET  /public/master-unit - Public units list');
+    console.log('GET  /public/panoramas/:unitId - Public panoramas by unit');
   });
 });

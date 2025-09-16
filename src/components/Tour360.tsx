@@ -57,82 +57,72 @@ export const Tour360 = () => {
   const [clickCoordinates, setClickCoordinates] = useState<{x: string, y: string} | null>(null);
   const [uploadedPhotos, setUploadedPhotos] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const [units, setUnits] = useState([]);
+  const [selectedUnit, setSelectedUnit] = useState(null);
   const { authState } = useAuth();
   
   const currentRoom = rooms[currentRoomIndex];
 
-  // Load uploaded panorama photos
+  // Load units from master unit (public access)
   useEffect(() => {
-    const loadPanoramas = async () => {
+    const loadUnits = async () => {
       try {
-        const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/panoramas', {
-          headers: {
-            'Authorization': `Bearer ${authState.accessToken}`,
-          },
-        });
+        const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-unit');
         const result = await response.json();
         if (result.success) {
-          setUploadedPhotos(result.photos);
-          
-          // Create rooms from uploaded photos or use fallback
-          const dynamicRooms = [];
-          
-          // Try to find uploaded panoramas
-          const lorongPhoto = result.photos.find(p => p.originalName.toLowerCase().includes('lorong'));
-          const kamarPhoto = result.photos.find(p => p.originalName.toLowerCase().includes('kamar'));
-          
-          dynamicRooms.push({
-            id: 'hallway',
-            name: 'Lorong',
-            description: 'Lorong utama apartemen dengan akses ke semua ruangan',
-            features: ['Pencahayaan LED', 'Lantai marmer', 'Storage cabinet', 'Cermin dinding'],
-            image: lorongPhoto ? `https://dprkp.jakarta.go.id/images/${lorongPhoto.filename}` : FALLBACK_IMAGES.lorong,
-            type: 'corridor',
-            doors: [{ to: 'bedroom', position: { x: '59.5%', y: '64.1%' }, label: 'Masuk Kamar 360°' }]
-          });
-          
-          dynamicRooms.push({
-            id: 'bedroom',
-            name: 'Kamar Tidur',
-            description: 'Kamar tidur utama Tower Kanaya',
-            features: ['King size bed', 'Walk in closet', 'AC', 'Pemandangan kota'],
-            image: kamarPhoto ? `https://dprkp.jakarta.go.id/images/${kamarPhoto.filename}` : FALLBACK_IMAGES.kamar,
-            type: 'bedroom',
-            doors: [{ to: 'hallway', position: { x: '35%', y: '60%' }, label: 'Kembali ke Lorong' }]
-          });
-          
-          setRooms(dynamicRooms);
+          setUnits(result.data);
         }
       } catch (error) {
-        console.error('Error loading panoramas:', error);
-        // Use fallback rooms if API fails
+        console.error('Error loading units:', error);
+      }
+    };
+    
+    loadUnits();
+  }, []);
+
+  // Load panoramas for selected unit
+  const loadPanoramasForUnit = async (unitId) => {
+    try {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/panoramas/${unitId}`);
+      const result = await response.json();
+      if (result.success && result.photos.length > 0) {
+        // Group photos by category
+        const photosByCategory = result.photos.reduce((acc, photo) => {
+          acc[photo.roomCategory] = photo;
+          return acc;
+        }, {});
+        
+        // Create dynamic rooms from photos
+        const dynamicRooms = [];
+        Object.entries(photosByCategory).forEach(([category, photo]) => {
+          dynamicRooms.push({
+            id: category,
+            name: String(category).replace('_', ' '),
+            description: `${String(category).replace('_', ' ')} ${selectedUnit.namaUnit}`,
+            features: ['360° View', 'High Resolution', 'Interactive'],
+            image: `https://dprkp.jakarta.go.id/api/jakhabitat/image/${photo.filename}`,
+            type: category
+          });
+        });
+        
+        setRooms(dynamicRooms);
+      } else {
+        // Use fallback if no photos
         setRooms([
           {
             id: 'hallway',
             name: 'Lorong',
-            description: 'Lorong utama apartemen dengan akses ke semua ruangan',
-            features: ['Pencahayaan LED', 'Lantai marmer', 'Storage cabinet', 'Cermin dinding'],
+            description: `Lorong ${selectedUnit.namaUnit}`,
+            features: ['Pencahayaan LED', 'Lantai marmer'],
             image: FALLBACK_IMAGES.lorong,
-            type: 'corridor',
-            doors: [{ to: 'bedroom', position: { x: '59.5%', y: '64.1%' }, label: 'Masuk Kamar 360°' }]
-          },
-          {
-            id: 'bedroom',
-            name: 'Kamar Tidur',
-            description: 'Kamar tidur utama Tower Kanaya',
-            features: ['King size bed', 'Walk in closet', 'AC', 'Pemandangan kota'],
-            image: FALLBACK_IMAGES.kamar,
-            type: 'bedroom',
-            doors: [{ to: 'hallway', position: { x: '35%', y: '60%' }, label: 'Kembali ke Lorong' }]
+            type: 'corridor'
           }
         ]);
       }
-    };
-    
-    if (authState.accessToken) {
-      loadPanoramas();
+    } catch (error) {
+      console.error('Error loading panoramas:', error);
     }
-  }, [authState.accessToken]);
+  };
 
   // Don't render if rooms not loaded yet
   if (!rooms.length) {
@@ -230,39 +220,75 @@ export const Tour360 = () => {
             <p className="text-muted-foreground">Jelajahi setiap ruangan dengan teknologi immersive 3D</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            <div className="bg-card p-6 rounded-lg border text-center">
-              <Home className="w-12 h-12 mx-auto mb-4 text-primary" />
-              <h3 className="text-xl font-semibold mb-2">Lorong Tower Kanaya</h3>
-              <p className="text-sm text-muted-foreground mb-4">Mulai tour dari lorong utama</p>
-              <button
-                onClick={() => {
-                  setCurrentRoomIndex(0);
-                  setShowRoomSelector(false);
-                }}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
-              >
-                <Eye className="w-4 h-4" />
-                Mulai Tour 360°
-              </button>
+          {!selectedUnit ? (
+            <div>
+              <h3 className="text-xl font-semibold mb-4 text-center">Pilih Tower</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                {units.map((unit) => (
+                  <div key={unit.id} className="bg-card p-4 rounded-lg border text-center hover:shadow-lg transition-shadow">
+                    <Home className="w-10 h-10 mx-auto mb-3 text-primary" />
+                    <h4 className="font-semibold mb-1">{unit.namaUnit}</h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {unit.tipeUnit} - {unit.luas} m²
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-3">{unit.lokasi}</p>
+                    <button
+                      onClick={() => {
+                        setSelectedUnit(unit);
+                        loadPanoramasForUnit(unit.id);
+                      }}
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 px-3 py-2 rounded-lg transition-colors text-sm"
+                    >
+                      Pilih Tower
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
-            
-            <div className="bg-card p-6 rounded-lg border text-center">
-              <Home className="w-12 h-12 mx-auto mb-4 text-primary" />
-              <h3 className="text-xl font-semibold mb-2">Kamar Tower Kanaya</h3>
-              <p className="text-sm text-muted-foreground mb-4">Langsung ke kamar tidur utama</p>
-              <button
-                onClick={() => {
-                  setCurrentRoomIndex(1);
-                  setShowRoomSelector(false);
-                }}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
-              >
-                <Eye className="w-4 h-4" />
-                Lihat Kamar 360°
-              </button>
+          ) : (
+            <div>
+              <div className="text-center mb-4">
+                <button
+                  onClick={() => {
+                    setSelectedUnit(null);
+                    setRooms([]);
+                  }}
+                  className="text-sm text-muted-foreground hover:text-primary mb-2"
+                >
+                  ← Kembali ke Pilih Tower
+                </button>
+                <h3 className="text-xl font-semibold">{selectedUnit.namaUnit}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {selectedUnit.tipeUnit} - {selectedUnit.luas} m² - {selectedUnit.lokasi}
+                </p>
+              </div>
+              
+              {rooms.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                  {rooms.map((room, index) => (
+                    <div key={room.id} className="bg-card p-4 rounded-lg border text-center">
+                      <Eye className="w-10 h-10 mx-auto mb-3 text-primary" />
+                      <h4 className="font-semibold mb-2">{room.name}</h4>
+                      <p className="text-sm text-muted-foreground mb-3">{room.description}</p>
+                      <button
+                        onClick={() => {
+                          setCurrentRoomIndex(index);
+                          setShowRoomSelector(false);
+                        }}
+                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 px-3 py-2 rounded-lg transition-colors text-sm"
+                      >
+                        Mulai Tour 360°
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">Memuat panorama untuk {selectedUnit.namaUnit}...</p>
+                </div>
+              )}
             </div>
-          </div>
+          )}
           
           <div className="text-center mt-6">
             <p className="text-sm text-muted-foreground">Powered by Virtual Reality Technology</p>
