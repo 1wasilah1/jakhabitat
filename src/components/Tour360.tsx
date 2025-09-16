@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -63,57 +63,7 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
   
   const currentRoom = rooms[currentRoomIndex];
 
-  // Load panoramas for selected unit
-  const loadPanoramasForUnit = useCallback(async (unitId, filterByArea = null) => {
-    try {
-      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/panoramas/${unitId}`);
-      const result = await response.json();
-      if (result.success && result.photos.length > 0) {
-        // Filter photos by area if specified
-        let filteredPhotos = result.photos;
-        if (filterByArea) {
-          filteredPhotos = result.photos.filter(photo => 
-            photo.unitName === selectedTower || photo.tipeUnit === filterByArea
-          );
-        }
-        
-        // Group photos by category
-        const photosByCategory = filteredPhotos.reduce((acc, photo) => {
-          acc[photo.roomCategory] = photo;
-          return acc;
-        }, {});
-        
-        // Create dynamic rooms from photos
-        const dynamicRooms = [];
-        Object.entries(photosByCategory).forEach(([category, photo]) => {
-          dynamicRooms.push({
-            id: category,
-            name: String(category).replace('_', ' '),
-            description: `${String(category).replace('_', ' ')} ${selectedUnit?.namaUnit || selectedTower || ''}`,
-            features: ['360° View', 'High Resolution', 'Interactive'],
-            image: `https://dprkp.jakarta.go.id/api/jakhabitat/image/${photo.filename}`,
-            type: category
-          });
-        });
-        
-        setRooms(dynamicRooms);
-      } else {
-        // Use fallback if no photos
-        setRooms([
-          {
-            id: 'hallway',
-            name: 'Lorong',
-            description: `Lorong ${selectedUnit.namaUnit}`,
-            features: ['Pencahayaan LED', 'Lantai marmer'],
-            image: FALLBACK_IMAGES.lorong,
-            type: 'corridor'
-          }
-        ]);
-      }
-    } catch (error) {
-      console.error('Error loading panoramas:', error);
-    }
-  }, [selectedUnit, selectedTower]);
+
 
   // Load units from master unit (public access)
   useEffect(() => {
@@ -145,10 +95,48 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
   
   // Load panoramas when unit is selected
   useEffect(() => {
-    if (selectedUnit && selectedTower) {
-      loadPanoramasForUnit(selectedUnit.id, selectedArea);
-    }
-  }, [selectedUnit, selectedArea, loadPanoramasForUnit]);
+    if (!selectedUnit) return;
+    
+    const loadPanoramas = async () => {
+      try {
+        const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/panoramas/${selectedUnit.id}`);
+        const result = await response.json();
+        if (result.success && result.photos.length > 0) {
+          const photosByCategory = result.photos.reduce((acc, photo) => {
+            acc[photo.roomCategory] = photo;
+            return acc;
+          }, {});
+          
+          const dynamicRooms = [];
+          Object.entries(photosByCategory).forEach(([category, photo]) => {
+            dynamicRooms.push({
+              id: category,
+              name: String(category).replace('_', ' '),
+              description: `${String(category).replace('_', ' ')} ${selectedUnit.namaUnit}`,
+              features: ['360° View', 'High Resolution', 'Interactive'],
+              image: `https://dprkp.jakarta.go.id/api/jakhabitat/image/${photo.filename}`,
+              type: category
+            });
+          });
+          
+          setRooms(dynamicRooms);
+        } else {
+          setRooms([{
+            id: 'hallway',
+            name: 'Lorong',
+            description: `Lorong ${selectedUnit.namaUnit}`,
+            features: ['Pencahayaan LED', 'Lantai marmer'],
+            image: FALLBACK_IMAGES.lorong,
+            type: 'corridor'
+          }]);
+        }
+      } catch (error) {
+        console.error('Error loading panoramas:', error);
+      }
+    };
+    
+    loadPanoramas();
+  }, [selectedUnit?.id]);
 
   // Don't render if rooms not loaded yet and no selectedTower
   if (!rooms.length && !selectedTower) {
@@ -261,7 +249,7 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
                     if (e.target.value) {
                       const unit = units.find(u => u.id == e.target.value);
                       setSelectedUnit(unit);
-                      loadPanoramasForUnit(unit.id);
+                      // Will be loaded by useEffect
                     }
                   }}
                   defaultValue=""
