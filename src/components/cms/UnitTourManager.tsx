@@ -149,8 +149,7 @@ const UnitTourManager = ({ authState, units }) => {
                         {unit.deskripsi && <div className="text-blue-600 mt-1 text-xs">{unit.deskripsi}</div>}
                       </div>
                     ) : null;
-                  })()
-                  )}
+                  })()}
                 </div>
               )}
             </div>
