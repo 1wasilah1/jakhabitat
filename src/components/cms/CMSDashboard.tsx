@@ -87,7 +87,12 @@ export const CMSDashboard = () => {
         body: JSON.stringify(unitForm),
       });
       
-      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const text = await response.text();
+      const result = text ? JSON.parse(text) : { success: false, error: 'Empty response' };
       
       if (result.success) {
         alert(editingUnit ? 'Unit berhasil diupdate!' : 'Unit berhasil ditambahkan!');
@@ -439,9 +444,8 @@ export const CMSDashboard = () => {
                             onChange={(e) => setUnitForm({...unitForm, tipe: e.target.value})}
                           >
                             <option>Apartemen</option>
+                            <option>Rusun</option>
                             <option>Rumah</option>
-                            <option>Ruko</option>
-                            <option>Kantor</option>
                           </select>
                         </div>
                         <div>
