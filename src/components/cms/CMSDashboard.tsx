@@ -42,7 +42,7 @@ export const CMSDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [showPriceForm, setShowPriceForm] = useState(false);
   const [editingPrice, setEditingPrice] = useState(null);
-  const { user, logout } = useAuth();
+  const { user, logout, authState } = useAuth();
 
   // Load units on component mount
   React.useEffect(() => {
