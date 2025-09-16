@@ -198,14 +198,23 @@ export async function deletePhoto(id) {
   try {
     connection = await oracledb.getConnection(dbConfig);
     
+    console.log('Deleting photo with ID:', id);
+    
     const result = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_FOTO WHERE ID = :id`,
-      { id },
+      { id: parseInt(id) },
       { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
+    console.log('Delete result:', result.rowsAffected);
+    
+    if (result.rowsAffected === 0) {
+      throw new Error(`No photo found with ID: ${id}`);
+    }
+    
     return result;
   } catch (error) {
+    console.error('Database delete error:', error);
     throw error;
   } finally {
     if (connection) {

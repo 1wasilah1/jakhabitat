@@ -34,14 +34,16 @@ const UnitTourManager = ({ authState, units }) => {
 
   const loadPanoramas = async () => {
     try {
+      console.log('Loading panoramas...');
       const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/panoramas', {
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
         },
       });
       const result = await response.json();
+      console.log('Panoramas loaded:', result.photos?.length || 0);
       if (result.success) {
-        setPanoramas(result.photos);
+        setPanoramas(result.photos || []);
       }
     } catch (error) {
       console.error('Error loading panoramas:', error);
@@ -126,7 +128,10 @@ const UnitTourManager = ({ authState, units }) => {
         }
         
         showToast('Panorama berhasil dihapus!', 'success');
-        loadPanoramas();
+        // Force refresh the panoramas list
+        setTimeout(() => {
+          loadPanoramas();
+        }, 500);
       } else {
         const errorText = await response.text();
         console.error('Delete failed:', response.status, errorText);
