@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
 // import fetch from 'node-fetch'; // Disabled for testing
-import { initDatabase, insertPhoto, getPhotos, deletePhoto } from './database.js';
+import { initDatabase, insertPhoto, getPhotos, deletePhoto, insertHotspot, getHotspots, deleteHotspotsByPhoto } from './database.js';
 import { initMasterTables, createUnit, getUnits, updateUnit, deleteUnit, createHarga, getHarga, updateHarga, deleteHarga } from './masterData.js';
 
 const app = express();
@@ -146,8 +146,8 @@ app.delete('/panoramas/:id', authenticateToken, async (req, res) => {
 // HOTSPOT ENDPOINTS
 app.post('/hotspots', authenticateToken, async (req, res) => {
   try {
-    const { photoId, x, y } = req.body;
-    // For now, store as JSON in a simple way
+    const { photoId, x, y, destination } = req.body;
+    await insertHotspot({ photoId, x, y, destination });
     res.json({ success: true, message: 'Hotspot saved' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -157,8 +157,8 @@ app.post('/hotspots', authenticateToken, async (req, res) => {
 app.get('/hotspots/:photoId', authenticateToken, async (req, res) => {
   try {
     const { photoId } = req.params;
-    // Return empty array for now
-    res.json({ success: true, hotspots: [] });
+    const hotspots = await getHotspots(photoId);
+    res.json({ success: true, hotspots });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -168,7 +168,19 @@ app.put('/hotspots/:photoId', authenticateToken, async (req, res) => {
   try {
     const { photoId } = req.params;
     const { hotspots } = req.body;
-    // Update hotspots for photo
+    
+    // Delete existing hotspots and insert new ones
+    await deleteHotspotsByPhoto(photoId);
+    
+    for (const hotspot of hotspots) {
+      await insertHotspot({
+        photoId: parseInt(photoId),
+        x: hotspot.x,
+        y: hotspot.y,
+        destination: hotspot.destination
+      });
+    }
+    
     res.json({ success: true, message: 'Hotspots updated' });
   } catch (error) {
     res.status(500).json({ error: error.message });
