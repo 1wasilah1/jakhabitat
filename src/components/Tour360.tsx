@@ -223,26 +223,26 @@ export const Tour360 = () => {
           {!selectedUnit ? (
             <div>
               <h3 className="text-xl font-semibold mb-4 text-center">Pilih Tower</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                {units.map((unit) => (
-                  <div key={unit.id} className="bg-card p-4 rounded-lg border text-center hover:shadow-lg transition-shadow">
-                    <Home className="w-10 h-10 mx-auto mb-3 text-primary" />
-                    <h4 className="font-semibold mb-1">{unit.namaUnit}</h4>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {unit.tipeUnit} - {unit.luas} m²
-                    </p>
-                    <p className="text-xs text-muted-foreground mb-3">{unit.lokasi}</p>
-                    <button
-                      onClick={() => {
-                        setSelectedUnit(unit);
-                        loadPanoramasForUnit(unit.id);
-                      }}
-                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 px-3 py-2 rounded-lg transition-colors text-sm"
-                    >
-                      Pilih Tower
-                    </button>
-                  </div>
-                ))}
+              <div className="max-w-md mx-auto">
+                <select 
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center bg-white"
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      const unit = units.find(u => u.id == e.target.value);
+                      setSelectedUnit(unit);
+                      loadPanoramasForUnit(unit.id);
+                    }
+                  }}
+                  defaultValue=""
+                >
+                  <option value="" disabled>-- Pilih Tower --</option>
+                  {units.map((unit) => (
+                    <option key={unit.id} value={unit.id}>
+                      {unit.namaUnit} ({unit.luas} m²)
+                    </option>
+                  ))}
+                </select>
+              </div>
               </div>
             </div>
           ) : (
