@@ -86,11 +86,17 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
       const unit = units.find(u => u.namaUnit === selectedTower);
       if (unit) {
         setSelectedUnit(unit);
-        loadPanoramasForUnit(unit.id, selectedArea);
         setShowRoomSelector(false);
       }
     }
-  }, [selectedTower, units, selectedUnit, selectedArea]);
+  }, [selectedTower, units, selectedUnit]);
+  
+  // Load panoramas when unit is selected
+  useEffect(() => {
+    if (selectedUnit && selectedTower) {
+      loadPanoramasForUnit(selectedUnit.id, selectedArea);
+    }
+  }, [selectedUnit, selectedArea]);
 
   // Load panoramas for selected unit
   const loadPanoramasForUnit = async (unitId, filterByArea = null) => {
