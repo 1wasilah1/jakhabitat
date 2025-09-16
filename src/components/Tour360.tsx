@@ -243,7 +243,6 @@ export const Tour360 = () => {
                   ))}
                 </select>
               </div>
-              </div>
             </div>
           ) : (
             <div>
