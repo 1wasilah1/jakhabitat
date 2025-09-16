@@ -241,55 +241,31 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
             <p className="text-muted-foreground">Jelajahi setiap ruangan dengan teknologi immersive 3D</p>
           </div>
           
-          {!selectedUnit ? (
-            <div>
-              <h3 className="text-xl font-semibold mb-4 text-center">Pilih Tower</h3>
-              <div className="max-w-md mx-auto">
-                <select 
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center bg-white"
-                  onChange={async (e) => {
-                    if (e.target.value) {
-                      const unit = units.find(u => u.id == e.target.value);
-                      setSelectedUnit(unit);
-                      await loadPanoramas(unit.id);
-                      setShowRoomSelector(false);
-                      setCurrentRoomIndex(0);
-                    }
-                  }}
-                  defaultValue=""
-                >
-                  <option value="" disabled>-- Pilih Tower --</option>
-                  {units.map((unit) => (
-                    <option key={unit.id} value={unit.id}>
-                      {unit.namaUnit} ({unit.luas} m²)
-                    </option>
-                  ))}
-                </select>
-              </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-center">Pilih Tower</h3>
+            <div className="max-w-md mx-auto">
+              <select 
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center bg-white"
+                onChange={async (e) => {
+                  if (e.target.value) {
+                    const unit = units.find(u => u.id == e.target.value);
+                    setSelectedUnit(unit);
+                    await loadPanoramas(unit.id);
+                    setShowRoomSelector(false);
+                    setCurrentRoomIndex(0);
+                  }
+                }}
+                defaultValue=""
+              >
+                <option value="" disabled>-- Pilih Tower --</option>
+                {units.map((unit) => (
+                  <option key={unit.id} value={unit.id}>
+                    {unit.namaUnit} ({unit.luas} m²)
+                  </option>
+                ))}
+              </select>
             </div>
-          ) : (
-            <div>
-              <div className="text-center mb-4">
-                <button
-                  onClick={() => {
-                    setSelectedUnit(null);
-                    setRooms([]);
-                  }}
-                  className="text-sm text-muted-foreground hover:text-primary mb-2"
-                >
-                  ← Kembali ke Pilih Tower
-                </button>
-                <h3 className="text-xl font-semibold">{selectedUnit.namaUnit}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {selectedUnit.tipeUnit} - {selectedUnit.luas} m² - {selectedUnit.lokasi}
-                </p>
-              </div>
-              
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">Memuat panorama untuk {selectedUnit.namaUnit}...</p>
-              </div>
-            </div>
-          )}
+          </div>
           
           <div className="text-center mt-6">
             <p className="text-sm text-muted-foreground">Powered by Virtual Reality Technology</p>
