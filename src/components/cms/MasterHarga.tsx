@@ -636,8 +636,22 @@ export const MasterHarga = () => {
                   { tenor: 20, cicilan: selectedHarga.cicilan20th },
                   { tenor: 25, cicilan: selectedHarga.cicilan25th },
                   { tenor: 30, cicilan: selectedHarga.cicilan30th }
-                ].filter(item => item.cicilan && item.cicilan > 0).map(item => {
-                  const totalBayar = item.cicilan * item.tenor * 12;
+                ].map(item => {
+                  let cicilan = item.cicilan;
+                  
+                  // Calculate using PMT formula if not set
+                  if (!cicilan || cicilan <= 0) {
+                    const P = selectedHarga.hargaJual; // DP = 0
+                    const i = (selectedHarga.bungaTahunan || 5) / 100 / 12; // Monthly rate
+                    const n = item.tenor * 12; // Total months
+                    
+                    // PMT formula: (P × i) / (1 - (1 + i)^(-n))
+                    const numerator = P * i;
+                    const denominator = 1 - Math.pow(1 + i, -n);
+                    cicilan = Math.round(numerator / denominator);
+                  }
+                  
+                  const totalBayar = cicilan * item.tenor * 12;
                   const totalBunga = totalBayar - selectedHarga.hargaJual;
                   
                   return (
@@ -646,7 +660,7 @@ export const MasterHarga = () => {
                       <div className="text-sm space-y-1">
                         <div className="flex justify-between">
                           <span>Cicilan/bulan:</span>
-                          <span className="font-medium">Rp {parseInt(item.cicilan).toLocaleString('id-ID')}</span>
+                          <span className="font-medium">Rp {parseInt(cicilan).toLocaleString('id-ID')}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Total bayar:</span>
