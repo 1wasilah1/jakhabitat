@@ -137,7 +137,15 @@ export async function getUnits() {
         tipeUnit: String(row.TIPE_UNIT || ''),
         tipe: String(row.TIPE || ''),
         luas: Number(row.LUAS || 0),
-        deskripsi: row.DESKRIPSI ? (typeof row.DESKRIPSI === 'string' ? row.DESKRIPSI : row.DESKRIPSI.toString()) : '',
+        deskripsi: (() => {
+          if (!row.DESKRIPSI) return '';
+          if (typeof row.DESKRIPSI === 'string') return row.DESKRIPSI;
+          if (row.DESKRIPSI && typeof row.DESKRIPSI.getData === 'function') {
+            // Handle Oracle CLOB
+            return row.DESKRIPSI.getData ? row.DESKRIPSI.getData() : '';
+          }
+          return row.DESKRIPSI.toString();
+        })(),
         createdAt: row.CREATED_AT ? new Date(row.CREATED_AT).toISOString() : null
       };
     });

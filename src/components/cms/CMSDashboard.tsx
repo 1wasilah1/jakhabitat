@@ -120,13 +120,26 @@ export const CMSDashboard = () => {
 
   const handleEditUnit = (unit) => {
     setEditingUnit(unit);
+    
+    // Handle deskripsi properly
+    let deskripsi = '';
+    if (unit.deskripsi) {
+      if (typeof unit.deskripsi === 'string') {
+        deskripsi = unit.deskripsi;
+      } else if (unit.deskripsi.toString && typeof unit.deskripsi.toString === 'function') {
+        deskripsi = unit.deskripsi.toString();
+      } else {
+        deskripsi = JSON.stringify(unit.deskripsi);
+      }
+    }
+    
     setUnitForm({
-      namaUnit: unit.namaUnit,
-      lokasi: unit.lokasi,
-      tipeUnit: unit.tipeUnit,
-      tipe: unit.tipe,
-      luas: unit.luas,
-      deskripsi: typeof unit.deskripsi === 'string' ? unit.deskripsi : (unit.deskripsi ? String(unit.deskripsi) : '')
+      namaUnit: unit.namaUnit || '',
+      lokasi: unit.lokasi || '',
+      tipeUnit: unit.tipeUnit || 'Studio',
+      tipe: unit.tipe || 'Apartemen',
+      luas: unit.luas || '',
+      deskripsi: deskripsi
     });
     setShowUnitForm(true);
   };
