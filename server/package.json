@@ -1,0 +1,17 @@
+{
+  "name": "jakhabitat-server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node db.js",
+    "dev": "nodemon db.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "oracledb": "^6.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
