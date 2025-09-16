@@ -71,16 +71,6 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
         const result = await response.json();
         if (result.success) {
           setUnits(result.data);
-          
-          // Auto-select unit if selectedTower is provided
-          if (selectedTower && !selectedUnit) {
-            const unit = result.data.find(u => u.namaUnit === selectedTower);
-            if (unit) {
-              setSelectedUnit(unit);
-              loadPanoramasForUnit(unit.id, selectedArea);
-              setShowRoomSelector(false);
-            }
-          }
         }
       } catch (error) {
         console.error('Error loading units:', error);
@@ -88,7 +78,19 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
     };
     
     loadUnits();
-  }, [selectedTower, selectedArea]);
+  }, []);
+  
+  // Auto-select unit when selectedTower changes
+  useEffect(() => {
+    if (selectedTower && units.length > 0 && !selectedUnit) {
+      const unit = units.find(u => u.namaUnit === selectedTower);
+      if (unit) {
+        setSelectedUnit(unit);
+        loadPanoramasForUnit(unit.id, selectedArea);
+        setShowRoomSelector(false);
+      }
+    }
+  }, [selectedTower, units, selectedUnit, selectedArea]);
 
   // Load panoramas for selected unit
   const loadPanoramasForUnit = async (unitId, filterByArea = null) => {
