@@ -3,6 +3,7 @@ import { Image, Eye, Trash2 } from 'lucide-react';
 
 const UnitTourManager = ({ authState, units }) => {
   const [selectedUnit, setSelectedUnit] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [panoramas, setPanoramas] = useState([]);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedPanorama, setSelectedPanorama] = useState(null);
@@ -51,6 +52,10 @@ const UnitTourManager = ({ authState, units }) => {
       alert('Pilih unit terlebih dahulu');
       return;
     }
+    if (!selectedCategory) {
+      alert('Pilih kategori ruangan terlebih dahulu');
+      return;
+    }
 
     setLoading(true);
     
@@ -59,6 +64,7 @@ const UnitTourManager = ({ authState, units }) => {
         const formData = new FormData();
         formData.append('panorama', file);
         formData.append('unitId', selectedUnit);
+        formData.append('category', selectedCategory);
         
         const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/upload/panorama', {
           method: 'POST',
@@ -133,6 +139,41 @@ const UnitTourManager = ({ authState, units }) => {
                   </option>
                 ))}
               </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Kategori Ruangan</label>
+              <select 
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                required
+              >
+                <option value="">Pilih Kategori</option>
+                <option value="lorong">Lorong</option>
+                <option value="kamar_1">Kamar 1</option>
+                <option value="kamar_2">Kamar 2</option>
+                <option value="kamar_3">Kamar 3</option>
+                <option value="kamar_4">Kamar 4</option>
+                <option value="kamar_5">Kamar 5</option>
+                <option value="kamar_6">Kamar 6</option>
+                <option value="kamar_7">Kamar 7</option>
+                <option value="kamar_8">Kamar 8</option>
+                <option value="kamar_mandi">Kamar Mandi</option>
+                <option value="balkon">Balkon</option>
+                <option value="dapur">Dapur</option>
+                <option value="ruang_tamu">Ruang Tamu</option>
+                <option value="lantai_1">Lantai 1</option>
+                <option value="lantai_2">Lantai 2</option>
+                <option value="lantai_3">Lantai 3</option>
+                <option value="lantai_4">Lantai 4</option>
+                <option value="lantai_5">Lantai 5</option>
+                <option value="lantai_6">Lantai 6</option>
+                <option value="lantai_7">Lantai 7</option>
+                <option value="kamar_anak">Kamar Anak</option>
+                <option value="playground">Playground</option>
+                <option value="lobby">Lobby</option>
+                <option value="lift">Lift</option>
+              </select>
               {selectedUnit && (
                 <div className="mt-2 p-3 bg-blue-50 rounded-md">
                   {(() => {
@@ -187,7 +228,7 @@ const UnitTourManager = ({ authState, units }) => {
                   type="button"
                   className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:opacity-50"
                   onClick={() => document.getElementById('panorama-upload')?.click()}
-                  disabled={!selectedUnit || loading}
+                  disabled={!selectedUnit || !selectedCategory || loading}
                 >
                   {loading ? 'Uploading...' : 'Pilih File'}
                 </button>
@@ -204,6 +245,7 @@ const UnitTourManager = ({ authState, units }) => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit & Detail</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Filename</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Upload Date</th>
@@ -213,7 +255,7 @@ const UnitTourManager = ({ authState, units }) => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {panoramas.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                       Belum ada panorama yang diupload
                     </td>
                   </tr>
@@ -227,6 +269,11 @@ const UnitTourManager = ({ authState, units }) => {
                           {panorama.luas ? `${String(panorama.luas)} m² | ` : ''}
                           {String(panorama.lokasi || 'Lokasi tidak tersedia')}
                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                          {String(panorama.roomCategory || panorama.category || 'N/A').replace('_', ' ')}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {String(panorama.originalName || '')}

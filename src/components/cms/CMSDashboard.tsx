@@ -3,6 +3,7 @@ import { LogOut, Settings, FileText, Image, Users, BarChart3, ChevronDown, Chevr
 import { useAuth } from '@/hooks/useAuth';
 import { MasterHarga } from './MasterHarga';
 import UnitTourManager from './UnitTourManager';
+import MediaManager from './MediaManager';
 
 const menuItems = [
   { id: 'content', label: 'Konten', icon: FileText },
@@ -485,14 +486,7 @@ export const CMSDashboard = () => {
             {activeMenu === 'master-harga' && <MasterHarga />}
 
             {activeMenu === 'media' && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Manajemen Media</h2>
-                <div className="bg-white rounded-lg shadow p-6">
-                  <p className="text-gray-600">
-                    Upload dan kelola gambar, video, dan file media lainnya.
-                  </p>
-                </div>
-              </div>
+              <MediaManager authState={authState} />
             )}
 
             {activeMenu === 'users' && (
