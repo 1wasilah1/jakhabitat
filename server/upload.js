@@ -159,10 +159,13 @@ app.delete('/panoramas/:id', authenticateToken, async (req, res) => {
 // MASTER UNIT ENDPOINTS
 app.post('/master-unit', authenticateToken, async (req, res) => {
   try {
-    await createUnit(req.body);
-    res.json({ success: true, message: 'Unit created successfully' });
+    console.log('Creating unit:', req.body);
+    const result = await createUnit(req.body);
+    console.log('Unit created successfully');
+    res.json({ success: true, message: 'Unit created successfully', data: result });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Create unit error:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -179,20 +182,26 @@ app.get('/master-unit', authenticateToken, async (req, res) => {
 app.put('/master-unit/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    await updateUnit(id, req.body);
-    res.json({ success: true, message: 'Unit updated successfully' });
+    console.log('Updating unit:', id, req.body);
+    const result = await updateUnit(id, req.body);
+    console.log('Unit updated successfully');
+    res.json({ success: true, message: 'Unit updated successfully', data: result });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Update unit error:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
 app.delete('/master-unit/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    await deleteUnit(id);
-    res.json({ success: true, message: 'Unit deleted successfully' });
+    console.log('Deleting unit:', id);
+    const result = await deleteUnit(id);
+    console.log('Unit deleted successfully');
+    res.json({ success: true, message: 'Unit deleted successfully', data: result });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Delete unit error:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
