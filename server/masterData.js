@@ -99,7 +99,7 @@ export async function createUnit(unitData) {
         luas: unitData.luas,
         deskripsi: unitData.deskripsi
       },
-      { autoCommit: true }
+      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     return result;
@@ -120,18 +120,20 @@ export async function getUnits() {
     const result = await connection.execute(
       `SELECT ID, NAMA_UNIT, LOKASI, TIPE_UNIT, TIPE, LUAS, DESKRIPSI, CREATED_AT 
        FROM WEBSITE_JAKHABITAT_MASTER_UNIT 
-       ORDER BY CREATED_AT DESC`
+       ORDER BY CREATED_AT DESC`,
+      {},
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     return result.rows.map(row => ({
-      id: row[0],
-      namaUnit: row[1],
-      lokasi: row[2],
-      tipeUnit: row[3],
-      tipe: row[4],
-      luas: row[5],
-      deskripsi: row[6],
-      createdAt: row[7]
+      id: row.ID,
+      namaUnit: row.NAMA_UNIT,
+      lokasi: row.LOKASI,
+      tipeUnit: row.TIPE_UNIT,
+      tipe: row.TIPE,
+      luas: row.LUAS,
+      deskripsi: row.DESKRIPSI,
+      createdAt: row.CREATED_AT
     }));
   } catch (error) {
     throw error;
@@ -161,7 +163,7 @@ export async function updateUnit(id, unitData) {
         luas: unitData.luas,
         deskripsi: unitData.deskripsi
       },
-      { autoCommit: true }
+      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     return result;
@@ -182,7 +184,7 @@ export async function deleteUnit(id) {
     const result = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_MASTER_UNIT WHERE ID = :id`,
       { id },
-      { autoCommit: true }
+      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     return result;
@@ -212,7 +214,7 @@ export async function createHarga(hargaData) {
                :cicilan20th, :cicilan25th, :cicilan30th, :diskon, :tanggalMulai,
                :tanggalBerakhir, :keterangan, :status)`,
       hargaData,
-      { autoCommit: true }
+      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     return result;
@@ -238,31 +240,33 @@ export async function getHarga() {
               h.DISKON, h.STATUS, h.CREATED_AT
        FROM WEBSITE_JAKHABITAT_MASTER_HARGA h
        JOIN WEBSITE_JAKHABITAT_MASTER_UNIT u ON h.UNIT_ID = u.ID
-       ORDER BY h.CREATED_AT DESC`
+       ORDER BY h.CREATED_AT DESC`,
+      {},
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     return result.rows.map(row => ({
-      id: row[0],
-      unitId: row[1],
-      namaUnit: row[2],
-      lokasi: row[3],
-      tipeUnit: row[4],
-      luas: row[5],
-      hargaJual: row[6],
-      hargaSewa: row[7],
-      dpMinimum: row[8],
-      bungaTahunan: row[9],
-      cicilan5th: row[10],
-      cicilan7th: row[11],
-      cicilan10th: row[12],
-      cicilan11th: row[13],
-      cicilan15th: row[14],
-      cicilan20th: row[15],
-      cicilan25th: row[16],
-      cicilan30th: row[17],
-      diskon: row[18],
-      status: row[19],
-      createdAt: row[20]
+      id: row.ID,
+      unitId: row.UNIT_ID,
+      namaUnit: row.NAMA_UNIT,
+      lokasi: row.LOKASI,
+      tipeUnit: row.TIPE_UNIT,
+      luas: row.LUAS,
+      hargaJual: row.HARGA_JUAL,
+      hargaSewa: row.HARGA_SEWA,
+      dpMinimum: row.DP_MINIMUM,
+      bungaTahunan: row.BUNGA_TAHUNAN,
+      cicilan5th: row.CICILAN_5TH,
+      cicilan7th: row.CICILAN_7TH,
+      cicilan10th: row.CICILAN_10TH,
+      cicilan11th: row.CICILAN_11TH,
+      cicilan15th: row.CICILAN_15TH,
+      cicilan20th: row.CICILAN_20TH,
+      cicilan25th: row.CICILAN_25TH,
+      cicilan30th: row.CICILAN_30TH,
+      diskon: row.DISKON,
+      status: row.STATUS,
+      createdAt: row.CREATED_AT
     }));
   } catch (error) {
     throw error;
@@ -291,7 +295,7 @@ export async function updateHarga(id, hargaData) {
            STATUS = :status, UPDATED_AT = CURRENT_TIMESTAMP
        WHERE ID = :id`,
       { ...hargaData, id },
-      { autoCommit: true }
+      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     return result;
@@ -312,7 +316,7 @@ export async function deleteHarga(id) {
     const result = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_MASTER_HARGA WHERE ID = :id`,
       { id },
-      { autoCommit: true }
+      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     return result;
