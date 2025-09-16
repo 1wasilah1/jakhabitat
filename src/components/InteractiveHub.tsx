@@ -80,13 +80,14 @@ export const InteractiveHub = () => {
       {/* Central Jakhabitat Logo */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <div className="flex items-center justify-center">
-          <img 
-            src="/JAKHABITAT-LOGO-01.png" 
-            alt="Jakhabitat Logo" 
+          <img
+            src={`${import.meta.env.BASE_URL}JAKHABITAT-LOGO-01.png`}
+            alt="Jakhabitat Logo"
             className="w-48 h-48 object-contain"
             loading="eager"
             decoding="async"
           />
+
         </div>
       </div>
 
