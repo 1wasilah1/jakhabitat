@@ -221,21 +221,21 @@ const UnitTourManager = ({ authState, units }) => {
                   panoramas.map((panorama) => (
                     <tr key={panorama.id}>
                       <td className="px-6 py-4 text-sm">
-                        <div className="font-medium text-gray-900">{panorama.unitName || 'N/A'}</div>
+                        <div className="font-medium text-gray-900">{String(panorama.unitName || 'N/A')}</div>
                         <div className="text-xs text-gray-500">
-                          {panorama.tipeUnit && `${panorama.tipeUnit} | `}
-                          {panorama.luas && `${panorama.luas} m² | `}
-                          {panorama.lokasi || 'Lokasi tidak tersedia'}
+                          {panorama.tipeUnit ? `${String(panorama.tipeUnit)} | ` : ''}
+                          {panorama.luas ? `${String(panorama.luas)} m² | ` : ''}
+                          {String(panorama.lokasi || 'Lokasi tidak tersedia')}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {panorama.originalName}
+                        {String(panorama.originalName || '')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {Math.round(panorama.fileSize / 1024)} KB
+                        {panorama.fileSize ? `${Math.round(Number(panorama.fileSize) / 1024)} KB` : 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(panorama.createdAt).toLocaleDateString('id-ID')}
+                        {panorama.createdAt ? new Date(panorama.createdAt).toLocaleDateString('id-ID') : 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button 
