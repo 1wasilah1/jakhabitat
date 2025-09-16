@@ -18,15 +18,15 @@ export const useAuth = () => {
   });
 
   const saveToStorage = (accessToken: string, refreshToken: string, user: User) => {
-    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-    localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+    sessionStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+    sessionStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+    sessionStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
   };
 
   const clearStorage = () => {
-    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.USER);
+    sessionStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    sessionStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+    sessionStorage.removeItem(STORAGE_KEYS.USER);
   };
 
   const login = useCallback(async (credentials: LoginRequest) => {
@@ -34,7 +34,12 @@ export const useAuth = () => {
       setAuthState(prev => ({ ...prev, isLoading: true }));
       
       const response = await authService.login(credentials);
-      const user = await authService.getMe(response.accessToken);
+      let user = response.user;
+      
+      // If user info is minimal, get full user info
+      if (!user.username || !user.id) {
+        user = await authService.getMe(response.accessToken);
+      }
       
       saveToStorage(response.accessToken, response.refreshToken, user);
       
@@ -53,7 +58,18 @@ export const useAuth = () => {
     }
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    console.log('Logging out...');
+    
+    // Call logout API if we have an access token
+    if (authState.accessToken) {
+      try {
+        await authService.logout(authState.accessToken);
+      } catch (error) {
+        console.warn('Logout API failed:', error);
+      }
+    }
+    
     clearStorage();
     setAuthState({
       user: null,
@@ -62,10 +78,11 @@ export const useAuth = () => {
       isAuthenticated: false,
       isLoading: false,
     });
-  }, []);
+    console.log('Logout completed');
+  }, [authState.accessToken]);
 
   const refreshToken = useCallback(async () => {
-    const storedRefreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+    const storedRefreshToken = sessionStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
     if (!storedRefreshToken) return false;
 
     try {
@@ -90,31 +107,27 @@ export const useAuth = () => {
   }, [logout]);
 
   const initializeAuth = useCallback(async () => {
-    const storedAccessToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-    const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
-
-    if (storedAccessToken && storedUser) {
+    const storedAccessToken = sessionStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    
+    if (storedAccessToken) {
       try {
-        const user = JSON.parse(storedUser);
-        await authService.getMe(storedAccessToken);
+        const user = await authService.getMe(storedAccessToken);
         
         setAuthState({
           user,
           accessToken: storedAccessToken,
-          refreshToken: localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN),
+          refreshToken: sessionStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN),
           isAuthenticated: true,
           isLoading: false,
         });
       } catch (error) {
-        const refreshSuccess = await refreshToken();
-        if (!refreshSuccess) {
-          setAuthState(prev => ({ ...prev, isLoading: false }));
-        }
+        clearStorage();
+        setAuthState(prev => ({ ...prev, isLoading: false }));
       }
     } else {
       setAuthState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [refreshToken]);
+  }, []);
 
   useEffect(() => {
     initializeAuth();
