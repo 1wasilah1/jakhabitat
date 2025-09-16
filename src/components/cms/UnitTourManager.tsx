@@ -139,14 +139,14 @@ const UnitTourManager = ({ authState, units }) => {
                     const unit = allUnits.find(u => u.id == selectedUnit);
                     return unit ? (
                       <div className="text-sm">
-                        <div className="font-medium text-blue-900">{unit.namaUnit}</div>
+                        <div className="font-medium text-blue-900">{String(unit.namaUnit || '')}</div>
                         <div className="text-blue-700 mt-1">
-                          <span className="inline-block mr-4">Tipe: {unit.tipeUnit}</span>
-                          <span className="inline-block mr-4">Kategori: {unit.tipe}</span>
-                          <span className="inline-block mr-4">Luas: {unit.luas} m²</span>
+                          <span className="inline-block mr-4">Tipe: {String(unit.tipeUnit || '')}</span>
+                          <span className="inline-block mr-4">Kategori: {String(unit.tipe || '')}</span>
+                          <span className="inline-block mr-4">Luas: {String(unit.luas || '')} m²</span>
                         </div>
-                        <div className="text-blue-600 mt-1">Lokasi: {unit.lokasi}</div>
-                        {unit.deskripsi && <div className="text-blue-600 mt-1 text-xs">{unit.deskripsi}</div>}
+                        <div className="text-blue-600 mt-1">Lokasi: {String(unit.lokasi || '')}</div>
+                        {unit.deskripsi && <div className="text-blue-600 mt-1 text-xs">{String(unit.deskripsi)}</div>}
                       </div>
                     ) : null;
                   })()}
