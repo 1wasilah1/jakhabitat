@@ -88,32 +88,22 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
       const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/panoramas/${unitId}`);
       const result = await response.json();
       if (result.success && result.photos.length > 0) {
-        // Sort photos by createdAt descending (newest first)
-        const sortedPhotos = result.photos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // Sort photos by createdAt ascending (oldest first)
+        const sortedPhotos = result.photos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
         
-        const photosByCategory = sortedPhotos.reduce((acc, photo) => {
-          if (!acc[photo.roomCategory]) {
-            acc[photo.roomCategory] = photo; // Keep only the first (newest) photo per category
-          }
-          return acc;
-        }, {});
-        
-        const dynamicRooms = [];
-        
-        // Show only lorong category first
-        const lorongPhoto = photosByCategory['lorong'];
-        if (lorongPhoto) {
-          dynamicRooms.push({
-            id: 'lorong',
-            name: 'Lorong',
-            description: `Lorong ${selectedUnit?.namaUnit || selectedTower || ''}`,
-            features: ['360° View', 'High Resolution', 'Interactive'],
-            image: `https://dprkp.jakarta.go.id/api/jakhabitat/image/${lorongPhoto.filename}`,
-            type: 'lorong'
-          });
-        }
+        // Use first photo (oldest) as currentRoom
+        const firstPhoto = sortedPhotos[0];
+        const dynamicRooms = [{
+          id: firstPhoto.roomCategory || 'room',
+          name: String(firstPhoto.roomCategory || 'Room').replace('_', ' '),
+          description: `${String(firstPhoto.roomCategory || 'Room').replace('_', ' ')} ${selectedUnit?.namaUnit || selectedTower || ''}`,
+          features: ['360° View', 'High Resolution', 'Interactive'],
+          image: `https://dprkp.jakarta.go.id/api/jakhabitat/image/${firstPhoto.filename}`,
+          type: firstPhoto.roomCategory || 'room'
+        }];
         
         setRooms(dynamicRooms);
+        setCurrentRoomIndex(0);
       } else {
         setRooms([{
           id: 'hallway',
@@ -283,12 +273,14 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
         >
 
       <Canvas camera={{ position: [0, 0, 0], fov: 75 }}>
-        <PanoramaSphere 
-          currentRoom={currentRoom.id} 
-          roomImage={currentRoom.image}
-          doors={currentRoom.doors}
-          onDoorClick={goToRoom}
-        />
+        {currentRoom && (
+          <PanoramaSphere 
+            currentRoom={currentRoom.id} 
+            roomImage={currentRoom.image}
+            doors={currentRoom.doors}
+            onDoorClick={goToRoom}
+          />
+        )}
         <OrbitControls 
           enableZoom={true}
           enablePan={false}
@@ -366,9 +358,10 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
           </div>
       
       {/* Room Info Panel */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-6 py-3 rounded-lg text-center max-w-md animate-fade-in">
-        <h4 className="font-semibold text-lg">{currentRoom.name}</h4>
-        <p className="text-sm text-gray-300 mt-1">{currentRoom.description}</p>
+      {currentRoom && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-6 py-3 rounded-lg text-center max-w-md animate-fade-in">
+          <h4 className="font-semibold text-lg">{currentRoom.name}</h4>
+          <p className="text-sm text-gray-300 mt-1">{currentRoom.description}</p>
         {isAutoPlay && (
             <div className="mt-2">
               <div className="w-full bg-gray-600 rounded-full h-1">
@@ -385,17 +378,19 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
       </div>
 
       {/* Room Features Panel */}
-      <div className="absolute right-4 top-20 bg-black/50 text-white p-4 rounded-lg max-w-xs animate-fade-in">
-        <h5 className="font-semibold text-sm mb-2">Fitur Ruangan:</h5>
-        <ul className="space-y-1">
-          {currentRoom.features.map((feature, index) => (
-            <li key={index} className="text-xs text-gray-300 flex items-center">
-              <span className="w-1 h-1 bg-primary rounded-full mr-2"></span>
-              {feature}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {currentRoom && (
+        <div className="absolute right-4 top-20 bg-black/50 text-white p-4 rounded-lg max-w-xs animate-fade-in">
+          <h5 className="font-semibold text-sm mb-2">Fitur Ruangan:</h5>
+          <ul className="space-y-1">
+            {currentRoom.features.map((feature, index) => (
+              <li key={index} className="text-xs text-gray-300 flex items-center">
+                <span className="w-1 h-1 bg-primary rounded-full mr-2"></span>
+                {feature}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Room Indicators */}
       <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2">
