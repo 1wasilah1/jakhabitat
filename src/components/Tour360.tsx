@@ -225,40 +225,19 @@ export const Tour360 = ({ selectedTower, selectedArea }: { selectedTower?: strin
     <div className="w-full space-y-6">
       {/* Room Selection Header */}
       {showRoomSelector && (
-        <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-8 rounded-lg border">
-          <div className="text-center mb-6">
+        <div 
+          className="relative h-96 rounded-lg overflow-hidden"
+          style={{
+            backgroundImage: `url(${roomInterior})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          <div className="absolute inset-0 bg-black/50"></div>
+          <div className="relative z-10 flex flex-col items-center justify-center h-full text-white p-8">
             <h2 className="text-3xl font-bold mb-2">360° VIRTUAL TOUR</h2>
-            <p className="text-muted-foreground">Jelajahi setiap ruangan dengan teknologi immersive 3D</p>
-          </div>
-          
-          <div>
-            <h3 className="text-xl font-semibold mb-4 text-center">Pilih Tower</h3>
-            <div className="max-w-md mx-auto">
-              <select 
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center bg-white"
-                onChange={async (e) => {
-                  if (e.target.value) {
-                    const unit = units.find(u => u.id == e.target.value);
-                    setSelectedUnit(unit);
-                    await loadPanoramas(unit.id);
-                    setShowRoomSelector(false);
-                    setCurrentRoomIndex(0);
-                  }
-                }}
-                defaultValue=""
-              >
-                <option value="" disabled>-- Pilih Tower --</option>
-                {units.map((unit) => (
-                  <option key={unit.id} value={unit.id}>
-                    {unit.namaUnit} ({unit.luas} m²)
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          
-          <div className="text-center mt-6">
-            <p className="text-sm text-muted-foreground">Powered by Virtual Reality Technology</p>
+            <p className="text-white/80 mb-8">Jelajahi setiap ruangan dengan teknologi immersive 3D</p>
+            <p className="text-sm text-white/60">Powered by Virtual Reality Technology</p>
           </div>
         </div>
       )}
