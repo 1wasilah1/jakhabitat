@@ -171,13 +171,17 @@ export const CMSDashboard = () => {
                                       const formData = new FormData();
                                       formData.append('panorama', file);
                                       
-                                      fetch('https://dprkp.jakarta.go.id/jakhabitat/api/upload/panorama', {
+                                      fetch('https://dprkp.jakarta.go.id/api/jakhabitat/upload/panorama', {
                                         method: 'POST',
                                         body: formData,
                                       })
                                       .then(response => {
                                         if (!response.ok) {
                                           throw new Error(`HTTP error! status: ${response.status}`);
+                                        }
+                                        const contentType = response.headers.get('content-type');
+                                        if (!contentType || !contentType.includes('application/json')) {
+                                          throw new Error('Server tidak mengembalikan JSON response. Endpoint mungkin belum tersedia.');
                                         }
                                         return response.json();
                                       })

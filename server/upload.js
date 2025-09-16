@@ -41,8 +41,13 @@ const upload = multer({
 
 app.use(express.json());
 
+// Root endpoint for testing
+app.get('/', (req, res) => {
+  res.json({ message: 'Jakhabitat API Server', status: 'running' });
+});
+
 // Upload panorama endpoint
-app.post('/api/upload/panorama', upload.single('panorama'), async (req, res) => {
+app.post('/upload/panorama', upload.single('panorama'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -70,7 +75,7 @@ app.post('/api/upload/panorama', upload.single('panorama'), async (req, res) => 
 });
 
 // Get uploaded panoramas
-app.get('/api/panoramas', async (req, res) => {
+app.get('/panoramas', async (req, res) => {
   try {
     const photos = await getPhotos('panorama');
     res.json({ success: true, photos });
@@ -80,7 +85,7 @@ app.get('/api/panoramas', async (req, res) => {
 });
 
 // Delete panorama
-app.delete('/api/panoramas/:id', async (req, res) => {
+app.delete('/panoramas/:id', async (req, res) => {
   try {
     const { id } = req.params;
     await deletePhoto(id);
@@ -90,7 +95,7 @@ app.delete('/api/panoramas/:id', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 6000;
 
 // Initialize database and start server
 initDatabase().then(() => {
