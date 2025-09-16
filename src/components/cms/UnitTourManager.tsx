@@ -100,18 +100,37 @@ const UnitTourManager = ({ authState, units }) => {
     if (!confirm('Yakin ingin menghapus panorama ini?')) return;
     
     try {
+      console.log('Deleting panorama ID:', id);
       const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/panoramas/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
+          'Content-Type': 'application/json'
         },
       });
       
-      const result = await response.json();
-      if (result.success) {
-        // Show success toast
+      console.log('Delete response status:', response.status);
+      
+      if (response.ok) {
+        // Try to parse JSON, but handle empty response
+        let result = { success: true };
+        const text = await response.text();
+        console.log('Delete response text:', text);
+        
+        if (text) {
+          try {
+            result = JSON.parse(text);
+          } catch (parseError) {
+            console.log('JSON parse error, but response was OK');
+          }
+        }
+        
         showToast('Panorama berhasil dihapus!', 'success');
         loadPanoramas();
+      } else {
+        const errorText = await response.text();
+        console.error('Delete failed:', response.status, errorText);
+        showToast(`Gagal menghapus panorama: ${response.status}`, 'error');
       }
     } catch (error) {
       console.error('Delete error:', error);
