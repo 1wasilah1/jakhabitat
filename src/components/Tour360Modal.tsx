@@ -99,10 +99,22 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
 
     const loadPhotos = async () => {
       try {
-        // Get unit ID by tower name (simplified - you might need proper mapping)
-        const unitId = selectedTower === 'Tower Kanaya' ? 2 : 1;
+        // Get proper unit ID by fetching units first
+        const unitsResponse = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-unit');
+        const unitsResult = await unitsResponse.json();
+        
+        let unitId = 1; // default
+        if (unitsResult.success) {
+          const unit = unitsResult.data.find(u => u.namaUnit === selectedTower);
+          if (unit) {
+            unitId = unit.id;
+          }
+        }
+        
+        console.log('Loading panoramas for unit ID:', unitId, 'Tower:', selectedTower);
         const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/panoramas/${unitId}`);
         const result = await response.json();
+        console.log('Panoramas result:', result);
         
         if (result.success && result.photos.length > 0) {
           const defaultPhoto = result.photos.find(photo => photo.isDefault);
