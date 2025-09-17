@@ -1,4 +1,4 @@
-import { X, ArrowLeft, Maximize2, RotateCcw } from 'lucide-react';
+import { X, ArrowLeft, Maximize2, RotateCcw, ArrowRight } from 'lucide-react';
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
@@ -6,10 +6,11 @@ import { useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import roomInterior from '@/assets/room-interior.jpg';
 
-function PanoramaSphere({ roomImage, hotspots, onHotspotClick }: { 
+function PanoramaSphere({ roomImage, hotspots, onHotspotClick, onHotspotHover }: { 
   roomImage: string;
   hotspots?: Array<{id: number, x: number, y: number, destination: string}>;
   onHotspotClick?: (destination: string) => void;
+  onHotspotHover?: (hotspotId: number | null, position?: [number, number, number]) => void;
 }) {
   const texture = useLoader(THREE.TextureLoader, roomImage);
   
@@ -39,7 +40,7 @@ function PanoramaSphere({ roomImage, hotspots, onHotspotClick }: {
         <meshBasicMaterial map={texture} side={THREE.BackSide} />
       </mesh>
       
-      {/* Hotspots */}
+      {/* Invisible Hotspots */}
       {hotspots && hotspots.map((hotspot) => {
         const [x, y, z] = convertTo3D(hotspot.x, hotspot.y);
         return (
@@ -47,9 +48,11 @@ function PanoramaSphere({ roomImage, hotspots, onHotspotClick }: {
             key={hotspot.id}
             position={[x, y, z]}
             onClick={() => onHotspotClick && onHotspotClick(hotspot.destination)}
+            onPointerEnter={() => onHotspotHover && onHotspotHover(hotspot.id, [x, y, z])}
+            onPointerLeave={() => onHotspotHover && onHotspotHover(null)}
           >
-            <sphereGeometry args={[1]} />
-            <meshBasicMaterial color="#00ff00" transparent opacity={0.8} />
+            <sphereGeometry args={[2]} />
+            <meshBasicMaterial transparent opacity={0} />
           </mesh>
         );
       })}
@@ -69,6 +72,7 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
   const [currentPhoto, setCurrentPhoto] = useState(null);
   const [photos, setPhotos] = useState([]);
   const [hotspots, setHotspots] = useState([]);
+  const [hoveredHotspot, setHoveredHotspot] = useState(null);
   const [is360Mode, setIs360Mode] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -165,6 +169,15 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
       handlePhotoChange(targetPhoto);
     }
   };
+  
+  // Handle hotspot hover
+  const handleHotspotHover = (hotspotId, position) => {
+    setHoveredHotspot(hotspotId ? { id: hotspotId, position } : null);
+    // Change cursor style
+    if (containerRef.current) {
+      containerRef.current.style.cursor = hotspotId ? 'pointer' : 'grab';
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -222,6 +235,7 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
                     roomImage={`https://dprkp.jakarta.go.id/api/jakhabitat/image/${currentPhoto.filename}`}
                     hotspots={hotspots}
                     onHotspotClick={handleHotspotClick}
+                    onHotspotHover={handleHotspotHover}
                   />
                   <OrbitControls 
                     enableZoom={true}
@@ -278,11 +292,20 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
           )}
           
           {/* Instructions */}
+          {/* Hover Arrow Icon */}
+          {hoveredHotspot && is360Mode && (
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-30">
+              <div className="bg-white/90 text-black p-3 rounded-full shadow-lg animate-pulse">
+                <ArrowRight className="w-6 h-6" />
+              </div>
+            </div>
+          )}
+          
           {is360Mode && (
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-lg backdrop-blur text-center">
               <p className="text-xs text-white/80">
                 🖱️ Drag to look around • 🔍 Scroll to zoom
-                {hotspots.length > 0 && ' • 🟢 Click green dots to navigate'}
+                {hotspots.length > 0 && ' • ➡️ Hover invisible hotspots to navigate'}
               </p>
             </div>
           )}

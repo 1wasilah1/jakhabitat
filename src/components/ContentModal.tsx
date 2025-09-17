@@ -1,8 +1,9 @@
-import { X, Eye } from 'lucide-react';
+import { X, Eye, DollarSign } from 'lucide-react';
 import { useState, Suspense, lazy, useEffect } from 'react';
 import buildingExterior from '@/assets/building-exterior.jpg';
 import roomInterior from '@/assets/room-interior.jpg';
 import { Tour360Modal } from './Tour360Modal';
+import { PriceModal } from './PriceModal';
 
 const Tour360 = lazy(() => import('./Tour360').then(module => ({ default: module.Tour360 })));
 
@@ -70,6 +71,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
   const [towers, setTowers] = useState([]);
   const [panoramaPhotos, setPanoramaPhotos] = useState([]);
   const [show360Modal, setShow360Modal] = useState(false);
+  const [showPriceModal, setShowPriceModal] = useState(false);
   
   if (!isOpen) return null;
 
@@ -224,12 +226,12 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                         <h3 className="text-lg font-semibold text-foreground">{selectedTower}</h3>
                       </div>
                       
-                      {/* Unit Area Navigation */}
-                      <div className="relative">
+                      {/* Unit Area Navigation & Price Button */}
+                      <div className="flex items-center gap-2">
                         <select 
                           value={selectedArea}
                           onChange={(e) => setSelectedArea(e.target.value)}
-                          className="bg-background border border-border rounded-lg px-4 py-2 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary z-50"
+                          className="bg-background border border-border rounded-lg px-4 py-2 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                         >
                           {unitAreas.map((area) => (
                             <option key={area.name} value={area.name}>
@@ -237,6 +239,13 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                             </option>
                           ))}
                         </select>
+                        <button
+                          onClick={() => setShowPriceModal(true)}
+                          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"
+                        >
+                          <DollarSign className="w-4 h-4" />
+                          <span className="text-sm font-medium">Lihat Harga</span>
+                        </button>
                       </div>
                     </div>
 
@@ -352,6 +361,15 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
         selectedTower={selectedTower}
         selectedArea={selectedArea}
         onBackToGallery={() => setShow360Modal(false)}
+      />
+      
+      {/* Price Modal */}
+      <PriceModal 
+        isOpen={showPriceModal}
+        onClose={() => setShowPriceModal(false)}
+        selectedTower={selectedTower}
+        selectedArea={selectedArea}
+        onBackToUnit={() => setShowPriceModal(false)}
       />
     </div>
   );
