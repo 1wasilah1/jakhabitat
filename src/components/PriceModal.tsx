@@ -30,26 +30,32 @@ export const PriceModal = ({ isOpen, onClose, selectedTower, selectedArea, onBac
         if (unitsResult.success) {
           const unit = unitsResult.data.find(u => u.namaUnit === selectedTower);
           if (unit) {
-            // Load price data for this unit
-            const priceResponse = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/harga/${unit.id}`);
-            const priceResult = await priceResponse.json();
+            // Use calculated price data based on unit size
+            const hargaJual = unit.luas * 25000000; // 25jt per m2
+            const biayaAdmin = 5000000;
+            const biayaNotaris = 3000000;
+            const biayaPPN = hargaJual * 0.11;
+            const totalBiaya = hargaJual + biayaAdmin + biayaNotaris + biayaPPN;
             
-            if (priceResult.success) {
-              setPriceData(priceResult.data);
-            } else {
-              // Fallback price data
-              setPriceData({
-                hargaJual: unit.luas * 25000000, // 25jt per m2
-                biayaAdmin: 5000000,
-                biayaNotaris: 3000000,
-                biayaPPN: unit.luas * 25000000 * 0.11,
-                totalBiaya: (unit.luas * 25000000) + 5000000 + 3000000 + (unit.luas * 25000000 * 0.11)
-              });
-            }
+            setPriceData({
+              hargaJual,
+              biayaAdmin,
+              biayaNotaris,
+              biayaPPN,
+              totalBiaya
+            });
           }
         }
       } catch (error) {
         console.error('Error loading price data:', error);
+        // Fallback if units API fails
+        setPriceData({
+          hargaJual: 1000000000, // 1M default
+          biayaAdmin: 5000000,
+          biayaNotaris: 3000000,
+          biayaPPN: 110000000,
+          totalBiaya: 1118000000
+        });
       }
     };
 
