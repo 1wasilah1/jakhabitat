@@ -1,6 +1,6 @@
 import { X, ArrowLeft, Maximize2, RotateCcw, ArrowUp } from 'lucide-react';
 import { useState, useEffect, useRef, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -10,9 +10,10 @@ function PanoramaSphere({ roomImage, hotspots, onHotspotClick, onHotspotHover }:
   roomImage: string;
   hotspots?: Array<{id: number, x: number, y: number, destination: string}>;
   onHotspotClick?: (destination: string) => void;
-  onHotspotHover?: (hotspotId: number | null, position?: [number, number, number]) => void;
+  onHotspotHover?: (hotspotId: number | null, screenPosition?: {x: number, y: number}) => void;
 }) {
   const texture = useLoader(THREE.TextureLoader, roomImage);
+  const { camera, size } = useThree();
   
   // Convert 2D coordinates to 3D sphere positions
   const convertTo3D = (x: number, y: number, radius = 25) => {
@@ -48,7 +49,18 @@ function PanoramaSphere({ roomImage, hotspots, onHotspotClick, onHotspotHover }:
             key={hotspot.id}
             position={[x, y, z]}
             onClick={() => onHotspotClick && onHotspotClick(hotspot.destination)}
-            onPointerEnter={() => onHotspotHover && onHotspotHover(hotspot.id, [x, y, z])}
+            onPointerEnter={() => {
+              if (onHotspotHover) {
+                // Convert 3D position to screen coordinates
+                const vector = new THREE.Vector3(x, y, z);
+                vector.project(camera);
+                
+                const screenX = (vector.x * 0.5 + 0.5) * size.width;
+                const screenY = (vector.y * -0.5 + 0.5) * size.height;
+                
+                onHotspotHover(hotspot.id, { x: screenX, y: screenY });
+              }
+            }}
             onPointerLeave={() => onHotspotHover && onHotspotHover(null)}
           >
             <sphereGeometry args={[5]} />
@@ -142,6 +154,7 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
   // Load hotspots for current photo
   const loadHotspots = async (photoId) => {
     try {
+      setHoveredHotspot(null); // Clear hover state before loading
       const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/hotspots/${photoId}`);
       const result = await response.json();
       if (result.success) {
@@ -156,6 +169,7 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
   // Handle photo change
   const handlePhotoChange = (photo) => {
     setCurrentPhoto(photo);
+    setHoveredHotspot(null); // Clear hover state
     loadHotspots(photo.id);
   };
   
@@ -171,8 +185,8 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
   };
   
   // Handle hotspot hover
-  const handleHotspotHover = (hotspotId, position) => {
-    setHoveredHotspot(hotspotId ? { id: hotspotId, position } : null);
+  const handleHotspotHover = (hotspotId, screenPosition) => {
+    setHoveredHotspot(hotspotId ? { id: hotspotId, screenPosition } : null);
     // Change cursor style
     if (containerRef.current) {
       containerRef.current.style.cursor = hotspotId ? 'pointer' : 'grab';
@@ -296,13 +310,19 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
           
           {/* Instructions */}
           {/* Hover Arrow Icon - Google Maps Style */}
-          {hoveredHotspot && is360Mode && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-30">
+          {hoveredHotspot && is360Mode && hoveredHotspot.screenPosition && (
+            <div 
+              className="absolute pointer-events-none z-30 transform -translate-x-1/2 -translate-y-1/2"
+              style={{
+                left: `${hoveredHotspot.screenPosition.x}px`,
+                top: `${hoveredHotspot.screenPosition.y}px`
+              }}
+            >
               <div className="relative animate-pulse">
                 {/* Google Maps style arrow */}
                 <svg 
-                  width="80" 
-                  height="80" 
+                  width="240" 
+                  height="240" 
                   viewBox="0 0 80 80" 
                   className="drop-shadow-2xl"
                 >
