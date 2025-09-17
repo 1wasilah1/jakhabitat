@@ -1,4 +1,4 @@
-import { X, ArrowLeft, Maximize2, RotateCcw, ArrowRight } from 'lucide-react';
+import { X, ArrowLeft, Maximize2, RotateCcw, ArrowUp } from 'lucide-react';
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
@@ -51,7 +51,7 @@ function PanoramaSphere({ roomImage, hotspots, onHotspotClick, onHotspotHover }:
             onPointerEnter={() => onHotspotHover && onHotspotHover(hotspot.id, [x, y, z])}
             onPointerLeave={() => onHotspotHover && onHotspotHover(null)}
           >
-            <sphereGeometry args={[2]} />
+            <sphereGeometry args={[5]} />
             <meshBasicMaterial transparent opacity={0} />
           </mesh>
         );
@@ -230,7 +230,7 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
                   <div className="text-white/60">Loading 360° view...</div>
                 </div>
               }>
-                <Canvas camera={{ position: [0, 0, 0], fov: 75 }}>
+                <Canvas camera={{ position: [0, 0, 0.1], fov: 75 }}>
                   <PanoramaSphere 
                     roomImage={`https://dprkp.jakarta.go.id/api/jakhabitat/image/${currentPhoto.filename}`}
                     hotspots={hotspots}
@@ -246,6 +246,9 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
                     minDistance={0.1}
                     maxDistance={1}
                     autoRotate={false}
+                    target={[0, 0, -1]}
+                    minPolarAngle={Math.PI * 0.1}
+                    maxPolarAngle={Math.PI * 0.9}
                   />
                 </Canvas>
               </Suspense>
@@ -292,11 +295,41 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
           )}
           
           {/* Instructions */}
-          {/* Hover Arrow Icon */}
+          {/* Hover Arrow Icon - Google Maps Style */}
           {hoveredHotspot && is360Mode && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-30">
-              <div className="bg-white/90 text-black p-3 rounded-full shadow-lg animate-pulse">
-                <ArrowRight className="w-6 h-6" />
+              <div className="relative animate-pulse">
+                {/* Google Maps style arrow */}
+                <svg 
+                  width="80" 
+                  height="80" 
+                  viewBox="0 0 80 80" 
+                  className="drop-shadow-2xl"
+                >
+                  {/* Arrow body */}
+                  <path 
+                    d="M40 10 L50 30 L45 30 L45 50 L35 50 L35 30 L30 30 Z" 
+                    fill="#4285F4" 
+                    stroke="white" 
+                    strokeWidth="2"
+                  />
+                  {/* Arrow circle base */}
+                  <circle 
+                    cx="40" 
+                    cy="60" 
+                    r="12" 
+                    fill="#4285F4" 
+                    stroke="white" 
+                    strokeWidth="2"
+                  />
+                  {/* Inner dot */}
+                  <circle 
+                    cx="40" 
+                    cy="60" 
+                    r="4" 
+                    fill="white"
+                  />
+                </svg>
               </div>
             </div>
           )}
