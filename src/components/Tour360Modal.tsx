@@ -186,7 +186,25 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
   
   // Handle hotspot hover
   const handleHotspotHover = (hotspotId, screenPosition) => {
-    setHoveredHotspot(hotspotId ? { id: hotspotId, screenPosition } : null);
+    if (hotspotId) {
+      // Find target photo info
+      const targetPhoto = photos.find(photo => 
+        photo.roomCategory === hotspots.find(h => h.id === hotspotId)?.destination ||
+        photo.id.toString() === hotspots.find(h => h.id === hotspotId)?.destination
+      );
+      
+      setHoveredHotspot({ 
+        id: hotspotId, 
+        screenPosition,
+        targetInfo: targetPhoto ? {
+          roomName: String(targetPhoto.roomCategory || 'Room').replace('_', ' '),
+          unitName: targetPhoto.unitName || selectedTower
+        } : null
+      });
+    } else {
+      setHoveredHotspot(null);
+    }
+    
     // Change cursor style
     if (containerRef.current) {
       containerRef.current.style.cursor = hotspotId ? 'pointer' : 'grab';
@@ -312,28 +330,27 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
           {/* Hover Arrow Icon - Google Maps Style */}
           {hoveredHotspot && is360Mode && hoveredHotspot.screenPosition && (
             <div 
-              className="absolute pointer-events-none z-30 transform -translate-x-1/2 -translate-y-1/2"
+              className="absolute pointer-events-none z-30 flex items-center gap-4"
               style={{
                 left: `${hoveredHotspot.screenPosition.x}px`,
-                top: `${hoveredHotspot.screenPosition.y}px`
+                top: `${hoveredHotspot.screenPosition.y}px`,
+                transform: 'translate(-50%, -50%)'
               }}
             >
+              {/* Arrow */}
               <div className="relative animate-pulse">
-                {/* Google Maps style arrow */}
                 <svg 
-                  width="240" 
-                  height="240" 
+                  width="120" 
+                  height="120" 
                   viewBox="0 0 80 80" 
                   className="drop-shadow-2xl"
                 >
-                  {/* Arrow body */}
                   <path 
                     d="M40 10 L50 30 L45 30 L45 50 L35 50 L35 30 L30 30 Z" 
                     fill="#4285F4" 
                     stroke="white" 
                     strokeWidth="2"
                   />
-                  {/* Arrow circle base */}
                   <circle 
                     cx="40" 
                     cy="60" 
@@ -342,7 +359,6 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
                     stroke="white" 
                     strokeWidth="2"
                   />
-                  {/* Inner dot */}
                   <circle 
                     cx="40" 
                     cy="60" 
@@ -351,6 +367,18 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
                   />
                 </svg>
               </div>
+              
+              {/* Unit Info Tooltip */}
+              {hoveredHotspot.targetInfo && (
+                <div className="bg-white/95 text-black px-4 py-2 rounded-lg shadow-xl border border-gray-200 backdrop-blur">
+                  <div className="text-sm font-semibold text-blue-600">
+                    {hoveredHotspot.targetInfo.roomName}
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    {hoveredHotspot.targetInfo.unitName}
+                  </div>
+                </div>
+              )}
             </div>
           )}
           
