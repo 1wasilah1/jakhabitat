@@ -418,11 +418,8 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                       
                       {simulationInputs.salary > 0 ? (
                         <div className="space-y-4">
-                          {/* Property Options */}
-                          {simulationResult && (
-                              
-                              {/* Available Units from Master Harga API */}
-                              {allUnits.length > 0 && (
+                          {/* Available Units from Master Harga API */}
+                          {simulationResult && allUnits.length > 0 && (
                                 <div className="p-4 bg-background rounded-lg border">
                                   <h4 className="font-semibold mb-3">Unit yang Tersedia:</h4>
                                   <div className="space-y-2">
