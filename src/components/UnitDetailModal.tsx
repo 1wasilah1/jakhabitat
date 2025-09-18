@@ -19,19 +19,19 @@ export const UnitDetailModal = ({ isOpen, onClose, unit, onView360 }: UnitDetail
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
-      <div className="bg-background w-full max-w-2xl mx-4 rounded-lg overflow-hidden">
-        <div className="flex justify-between items-center p-4 border-b border-border">
-          <h2 className="text-xl font-bold text-foreground">{unit.namaUnit}</h2>
+    <div className="fixed inset-0 bg-background z-[60]" onClick={onClose}>
+      <div className="w-full h-full overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="sticky top-0 bg-background border-b border-border p-4">
           <button
             onClick={onClose}
-            className="p-2 hover:bg-muted rounded-full transition-colors"
+            className="flex items-center gap-2 text-primary hover:text-primary/80 font-medium mb-2"
           >
-            <X className="w-5 h-5" />
+            ← Kembali ke Daftar Unit
           </button>
+          <h2 className="text-2xl font-bold text-foreground">{unit.namaUnit}</h2>
         </div>
         
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <h3 className="font-semibold mb-2">Spesifikasi Unit</h3>
@@ -72,19 +72,13 @@ export const UnitDetailModal = ({ isOpen, onClose, unit, onView360 }: UnitDetail
             </div>
           </div>
           
-          <div className="flex gap-3 pt-4">
+          <div className="flex justify-center pt-4">
             <button
               onClick={onView360}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
-              <Eye className="w-4 h-4" />
-              <span className="text-sm font-medium">Lihat 360°</span>
-            </button>
-            <button
-              onClick={onClose}
-              className="px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors"
-            >
-              Kembali
+              <Eye className="w-5 h-5" />
+              <span className="font-medium">Lihat 360°</span>
             </button>
           </div>
         </div>

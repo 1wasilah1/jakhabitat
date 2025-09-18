@@ -120,14 +120,14 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
     const loadPhotos = async () => {
       try {
         // Get proper unit ID by fetching units first
-        const unitsResponse = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-unit');
+        const unitsResponse = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-harga');
         const unitsResult = await unitsResponse.json();
         
         let unitId = 1; // default
         if (unitsResult.success) {
           const unit = unitsResult.data.find(u => u.namaUnit === selectedTower);
           if (unit) {
-            unitId = unit.id;
+            unitId = unit.unitId;
           }
         }
         
