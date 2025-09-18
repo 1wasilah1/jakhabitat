@@ -430,7 +430,14 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                                   const installment = (unit.hargaJual * 0.8 * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
                                   
                                   return (
-                                    <div key={unit.id} className="flex justify-between items-center p-3 bg-muted/30 rounded hover:bg-muted/50 transition-colors">
+                                    <div 
+                                      key={unit.id} 
+                                      onClick={() => {
+                                        setSelectedUnit(unit);
+                                        setShowUnitDetail(true);
+                                      }}
+                                      className="flex justify-between items-center p-3 bg-muted/30 rounded hover:bg-muted/50 transition-colors cursor-pointer"
+                                    >
                                       <div className="flex-1">
                                         <div className="font-medium text-sm">{unit.namaUnit}</div>
                                         <div className="text-xs text-muted-foreground mt-1">
