@@ -4,6 +4,7 @@ import buildingExterior from '@/assets/building-exterior.jpg';
 import roomInterior from '@/assets/room-interior.jpg';
 import { Tour360Modal } from './Tour360Modal';
 import { PriceModal } from './PriceModal';
+import { UnitDetailModal } from './UnitDetailModal';
 
 const Tour360 = lazy(() => import('./Tour360').then(module => ({ default: module.Tour360 })));
 
@@ -83,6 +84,8 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
   const [salaryInput, setSalaryInput] = useState('');
   const [otherLoansInput, setOtherLoansInput] = useState('');
   const [allUnits, setAllUnits] = useState([]);
+  const [selectedUnit, setSelectedUnit] = useState(null);
+  const [showUnitDetail, setShowUnitDetail] = useState(false);
   
   if (!isOpen) return null;
 
@@ -393,14 +396,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                                     {formatCurrency(simulationResult.maxPrice)}
                                   </span>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span>Status:</span>
-                                  <span className={`font-medium ${
-                                    simulationResult.affordable ? 'text-green-600' : 'text-red-600'
-                                  }`}>
-                                    {simulationResult.affordable ? 'Terjangkau' : 'Perlu Penyesuaian'}
-                                  </span>
-                                </div>
+
                               </div>
                             </div>
                             
@@ -449,10 +445,13 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                                           {formatCurrency(unit.hargaJual)}
                                         </div>
                                         <button 
-                                          onClick={() => setSelectedTower(unit.namaUnit)}
+                                          onClick={() => {
+                                            setSelectedUnit(unit);
+                                            setShowUnitDetail(true);
+                                          }}
                                           className="text-xs text-primary hover:underline mt-1"
                                         >
-                                          Lihat Unit
+                                          Lihat Detail
                                         </button>
                                       </div>
                                     </div>
@@ -665,6 +664,17 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
         selectedTower={selectedTower}
         selectedArea={selectedArea}
         onBackToUnit={() => setShowPriceModal(false)}
+      />
+      
+      {/* Unit Detail Modal */}
+      <UnitDetailModal 
+        isOpen={showUnitDetail}
+        onClose={() => setShowUnitDetail(false)}
+        unit={selectedUnit}
+        onView360={() => {
+          setShowUnitDetail(false);
+          setShow360Modal(true);
+        }}
       />
     </div>
   );
