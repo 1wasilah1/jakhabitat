@@ -12,6 +12,7 @@ function PanoramaSphere({ roomImage, hotspots, onHotspotClick, onHotspotHover }:
   onHotspotClick?: (destination: string) => void;
   onHotspotHover?: (hotspotId: number | null, screenPosition?: {x: number, y: number}) => void;
 }) {
+  console.log('Loading texture for:', roomImage);
   const texture = useLoader(THREE.TextureLoader, roomImage);
   const { camera, size, gl } = useThree();
   
@@ -308,6 +309,7 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-white/60">Loading panorama...</div>
+              <div className="text-white/40 text-xs mt-2">Debug: {photos.length} photos loaded</div>
             </div>
           )}
 
