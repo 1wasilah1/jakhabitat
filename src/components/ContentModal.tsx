@@ -129,10 +129,10 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
     loadAllUnits();
   }, [isOpen, sectionId]);
   
-  // Load all units from master unit API
+  // Load all units from master harga API
   const loadAllUnits = async () => {
     try {
-      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-unit');
+      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-harga');
       const result = await response.json();
       if (result.success) {
         setAllUnits(result.data);
@@ -431,32 +431,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                               </div>
                             )}
                             
-                            {/* Property Price with 5% Interest */}
-                            {simulationResult.affordable && (
-                              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                <h4 className="font-semibold mb-3 text-blue-800">Harga Properti dengan Bunga 5%:</h4>
-                                <div className="space-y-2 text-sm">
-                                  <div className="flex justify-between">
-                                    <span>Cicilan Bulanan (5%):</span>
-                                    <span className="font-medium text-blue-600">
-                                      {formatCurrency(simulationResult.installmentWith5Percent)}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span>Maksimal Harga (5%):</span>
-                                    <span className="font-medium text-blue-600">
-                                      {formatCurrency(simulationResult.maxPriceWith5Percent)}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span>Selisih Harga:</span>
-                                    <span className="font-medium text-green-600">
-                                      +{formatCurrency(simulationResult.maxPriceWith5Percent - simulationResult.maxPrice)}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
+
                           </div>
                         )}
                       </div>
@@ -597,22 +572,20 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                                 </div>
                               </div>
                               
-                              {/* Available Units from Master Unit API */}
+                              {/* Available Units from Master Harga API */}
                               {allUnits.length > 0 && (
                                 <div className="p-4 bg-background rounded-lg border">
                                   <h4 className="font-semibold mb-3">Unit yang Tersedia:</h4>
                                   <div className="space-y-2">
                                     {allUnits.filter(unit => {
-                                      const price = unit.luas * 25000000;
                                       const locationMatch = !simulationInputs.location || 
                                         (unit.lokasi && unit.lokasi.toLowerCase().includes(simulationInputs.location.toLowerCase()));
-                                      return price <= simulationResult.maxPrice && locationMatch;
-                                    }).sort((a, b) => (a.luas * 25000000) - (b.luas * 25000000))
+                                      return unit.hargaJual <= simulationResult.maxPrice && locationMatch;
+                                    }).sort((a, b) => a.hargaJual - b.hargaJual)
                                       .slice(0, 4).map((unit, index) => {
-                                      const price = unit.luas * 25000000;
                                       const monthlyRate = 0.065 / 12;
                                       const numPayments = simulationInputs.term * 12;
-                                      const installment = (price * 0.8 * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+                                      const installment = (unit.hargaJual * 0.8 * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
                                       
                                       return (
                                         <div key={unit.id} className="flex justify-between items-center p-3 bg-muted/30 rounded hover:bg-muted/50 transition-colors">
@@ -627,7 +600,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                                           </div>
                                           <div className="text-right ml-3">
                                             <div className="text-sm font-bold text-primary">
-                                              {formatCurrency(price)}
+                                              {formatCurrency(unit.hargaJual)}
                                             </div>
                                             <button 
                                               onClick={() => setSelectedTower(unit.namaUnit)}
@@ -642,10 +615,9 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                                   </div>
                                   
                                   {allUnits.filter(unit => {
-                                    const price = unit.luas * 25000000;
                                     const locationMatch = !simulationInputs.location || 
                                       (unit.lokasi && unit.lokasi.toLowerCase().includes(simulationInputs.location.toLowerCase()));
-                                    return price <= simulationResult.maxPrice && locationMatch;
+                                    return unit.hargaJual <= simulationResult.maxPrice && locationMatch;
                                   }).length === 0 && (
                                     <div className="text-center py-4 text-muted-foreground text-sm">
                                       <p>Tidak ada unit yang sesuai budget</p>

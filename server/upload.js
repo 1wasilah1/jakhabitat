@@ -351,6 +351,16 @@ app.get('/master-harga', authenticateToken, async (req, res) => {
   }
 });
 
+app.get('/public/master-harga', async (req, res) => {
+  try {
+    const harga = await getHarga();
+    res.json({ success: true, data: harga });
+  } catch (error) {
+    console.error('Get public harga error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.put('/master-harga/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
