@@ -134,17 +134,25 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
       const availableIncome = simulationInputs.salary * maxInstallmentRatio - simulationInputs.otherLoans;
       
       if (availableIncome > 0) {
-        // Calculate maximum loan amount
+        // Calculate maximum loan amount with 6.5% interest
         const monthlyRate = interestRate / 12;
         const numPayments = simulationInputs.term * 12;
         const maxLoan = availableIncome * ((Math.pow(1 + monthlyRate, numPayments) - 1) / (monthlyRate * Math.pow(1 + monthlyRate, numPayments)));
         
+        // Calculate with 5% interest
+        const interestRate5 = 0.05;
+        const monthlyRate5 = interestRate5 / 12;
+        const maxLoan5 = availableIncome * ((Math.pow(1 + monthlyRate5, numPayments) - 1) / (monthlyRate5 * Math.pow(1 + monthlyRate5, numPayments)));
+        
         // Assume 20% down payment
         const maxPrice = maxLoan / 0.8;
+        const maxPrice5 = maxLoan5 / 0.8;
         
         setSimulationResult({
           maxInstallment: availableIncome,
           maxPrice: maxPrice,
+          maxPriceWith5Percent: maxPrice5,
+          installmentWith5Percent: availableIncome,
           affordable: maxPrice >= 500000000 // 500M minimum
         });
         
@@ -372,24 +380,222 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                                 </div>
                               </div>
                             )}
+                            
+                            {/* Property Price with 5% Interest */}
+                            {simulationResult.affordable && (
+                              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <h4 className="font-semibold mb-3 text-blue-800">Harga Properti dengan Bunga 5%:</h4>
+                                <div className="space-y-2 text-sm">
+                                  <div className="flex justify-between">
+                                    <span>Cicilan Bulanan (5%):</span>
+                                    <span className="font-medium text-blue-600">
+                                      {formatCurrency(simulationResult.installmentWith5Percent)}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Maksimal Harga (5%):</span>
+                                    <span className="font-medium text-blue-600">
+                                      {formatCurrency(simulationResult.maxPriceWith5Percent)}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Selisih Harga:</span>
+                                    <span className="font-medium text-green-600">
+                                      +{formatCurrency(simulationResult.maxPriceWith5Percent - simulationResult.maxPrice)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
                     </div>
                     
-                    {/* Images */}
+                    {/* Matching Property Prices */}
                     <div className="space-y-4">
-                      {content.images.map((image, index) => (
-                        <div key={index} className="aspect-video bg-muted rounded-lg overflow-hidden">
-                          <img 
-                            src={image} 
-                            alt={`${title} ${index + 1}`}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            loading="lazy"
-                            decoding="async"
-                          />
+                      <h3 className="text-lg font-semibold">Harga Properti yang Cocok</h3>
+                      
+                      {simulationInputs.salary > 0 ? (
+                        <div className="space-y-4">
+                          {/* Input Summary */}
+                          <div className="p-4 bg-muted/50 rounded-lg border">
+                            <h4 className="font-medium mb-3">Berdasarkan Input Anda:</h4>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span>Gaji Bulanan:</span>
+                                <span className="font-medium">{formatCurrency(simulationInputs.salary)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Tenor:</span>
+                                <span className="font-medium">{simulationInputs.term} Tahun</span>
+                              </div>
+                              {simulationInputs.otherLoans > 0 && (
+                                <div className="flex justify-between">
+                                  <span>Cicilan Lain:</span>
+                                  <span className="font-medium">{formatCurrency(simulationInputs.otherLoans)}</span>
+                                </div>
+                              )}
+                              {simulationInputs.location && (
+                                <div className="flex justify-between">
+                                  <span>Lokasi:</span>
+                                  <span className="font-medium">{simulationInputs.location}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Property Options */}
+                          {simulationResult && (
+                            <div className="space-y-3">
+                              {/* Conservative Option */}
+                              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                                <div className="flex justify-between items-start mb-2">
+                                  <div>
+                                    <h4 className="font-semibold text-green-800">Pilihan Konservatif</h4>
+                                    <p className="text-sm text-green-600">70% dari kemampuan maksimal</p>
+                                  </div>
+                                  <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded font-medium">
+                                    Aman
+                                  </span>
+                                </div>
+                                <div className="space-y-1 text-sm">
+                                  <div className="flex justify-between">
+                                    <span>Harga Properti:</span>
+                                    <span className="font-bold text-green-700">
+                                      {formatCurrency(simulationResult.maxPrice * 0.7)}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Cicilan Bulanan:</span>
+                                    <span className="font-medium">
+                                      {formatCurrency(simulationResult.maxInstallment * 0.7)}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Uang Muka (20%):</span>
+                                    <span className="font-medium">
+                                      {formatCurrency(simulationResult.maxPrice * 0.7 * 0.2)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Optimal Option */}
+                              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <div className="flex justify-between items-start mb-2">
+                                  <div>
+                                    <h4 className="font-semibold text-blue-800">Pilihan Optimal</h4>
+                                    <p className="text-sm text-blue-600">85% dari kemampuan maksimal</p>
+                                  </div>
+                                  <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded font-medium">
+                                    Ideal
+                                  </span>
+                                </div>
+                                <div className="space-y-1 text-sm">
+                                  <div className="flex justify-between">
+                                    <span>Harga Properti:</span>
+                                    <span className="font-bold text-blue-700">
+                                      {formatCurrency(simulationResult.maxPrice * 0.85)}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Cicilan Bulanan:</span>
+                                    <span className="font-medium">
+                                      {formatCurrency(simulationResult.maxInstallment * 0.85)}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Uang Muka (20%):</span>
+                                    <span className="font-medium">
+                                      {formatCurrency(simulationResult.maxPrice * 0.85 * 0.2)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Maximum Option */}
+                              <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                                <div className="flex justify-between items-start mb-2">
+                                  <div>
+                                    <h4 className="font-semibold text-orange-800">Pilihan Maksimal</h4>
+                                    <p className="text-sm text-orange-600">100% kemampuan maksimal</p>
+                                  </div>
+                                  <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded font-medium">
+                                    Berisiko
+                                  </span>
+                                </div>
+                                <div className="space-y-1 text-sm">
+                                  <div className="flex justify-between">
+                                    <span>Harga Properti:</span>
+                                    <span className="font-bold text-orange-700">
+                                      {formatCurrency(simulationResult.maxPrice)}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Cicilan Bulanan:</span>
+                                    <span className="font-medium">
+                                      {formatCurrency(simulationResult.maxInstallment)}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Uang Muka (20%):</span>
+                                    <span className="font-medium">
+                                      {formatCurrency(simulationResult.maxPrice * 0.2)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Available Units */}
+                              {towers.length > 0 && (
+                                <div className="p-4 bg-background rounded-lg border">
+                                  <h4 className="font-semibold mb-3">Unit yang Tersedia:</h4>
+                                  <div className="space-y-2">
+                                    {towers.filter(tower => {
+                                      const match = tower.description.match(/(\d+)\s*m²/);
+                                      const luas = match ? parseInt(match[1]) : 45;
+                                      const price = luas * 25000000;
+                                      return price <= simulationResult.maxPrice;
+                                    }).slice(0, 3).map((tower, index) => {
+                                      const match = tower.description.match(/(\d+)\s*m²/);
+                                      const luas = match ? parseInt(match[1]) : 45;
+                                      const price = luas * 25000000;
+                                      
+                                      return (
+                                        <div key={index} className="flex justify-between items-center p-2 bg-muted/30 rounded">
+                                          <div>
+                                            <div className="font-medium text-sm">{tower.name}</div>
+                                            <div className="text-xs text-muted-foreground">
+                                              {tower.description}
+                                            </div>
+                                          </div>
+                                          <div className="text-right">
+                                            <div className="text-sm font-bold text-primary">
+                                              {formatCurrency(price)}
+                                            </div>
+                                            <button 
+                                              onClick={() => setSelectedTower(tower.name)}
+                                              className="text-xs text-primary hover:underline"
+                                            >
+                                              Lihat Unit
+                                            </button>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
-                      ))}
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <p>Masukkan gaji untuk melihat harga yang cocok</p>
+                          <p className="text-sm mt-1">Simulasi akan muncul otomatis</p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
