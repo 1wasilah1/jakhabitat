@@ -473,7 +473,6 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                             </div>
                           )}
                         </div>
-                        </div>
                       ) : (
                         <div className="text-center py-8 text-muted-foreground">
                           <p>Masukkan gaji untuk melihat unit yang tersedia</p>
