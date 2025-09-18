@@ -404,32 +404,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                               </div>
                             </div>
                             
-                            {/* Unit Recommendations */}
-                            {recommendedUnits.length > 0 && (
-                              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                                <h4 className="font-semibold mb-3 text-green-800">Unit yang Cocok:</h4>
-                                <div className="space-y-2">
-                                  {recommendedUnits.map((unit, index) => (
-                                    <div key={index} className="flex justify-between items-center p-2 bg-white rounded border">
-                                      <div>
-                                        <div className="font-medium text-sm">{unit.namaUnit}</div>
-                                        <div className="text-xs text-gray-600">
-                                          {unit.tipeUnit} • {unit.luas}m² • {unit.lokasi}
-                                        </div>
-                                      </div>
-                                      <div className="text-right">
-                                        <div className="text-sm font-medium text-green-600">
-                                          {formatCurrency(unit.estimatedPrice)}
-                                        </div>
-                                        <div className="text-xs text-gray-500">
-                                          ~{formatCurrency(unit.estimatedInstallment)}/bln
-                                        </div>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
+
                             
 
                           </div>
@@ -437,140 +412,14 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                       </div>
                     </div>
                     
-                    {/* Matching Property Prices */}
+                    {/* Unit yang Tersedia */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Harga Properti yang Cocok</h3>
+                      <h3 className="text-lg font-semibold">Unit yang Tersedia</h3>
                       
                       {simulationInputs.salary > 0 ? (
                         <div className="space-y-4">
-                          {/* Input Summary */}
-                          <div className="p-4 bg-muted/50 rounded-lg border">
-                            <h4 className="font-medium mb-3">Berdasarkan Input Anda:</h4>
-                            <div className="space-y-2 text-sm">
-                              <div className="flex justify-between">
-                                <span>Gaji Bulanan:</span>
-                                <span className="font-medium">{formatCurrency(simulationInputs.salary)}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span>Tenor:</span>
-                                <span className="font-medium">{simulationInputs.term} Tahun</span>
-                              </div>
-                              {simulationInputs.otherLoans > 0 && (
-                                <div className="flex justify-between">
-                                  <span>Cicilan Lain:</span>
-                                  <span className="font-medium">{formatCurrency(simulationInputs.otherLoans)}</span>
-                                </div>
-                              )}
-                              {simulationInputs.location && (
-                                <div className="flex justify-between">
-                                  <span>Lokasi:</span>
-                                  <span className="font-medium">{simulationInputs.location}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          
                           {/* Property Options */}
                           {simulationResult && (
-                            <div className="space-y-3">
-                              {/* Conservative Option */}
-                              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                                <div className="flex justify-between items-start mb-2">
-                                  <div>
-                                    <h4 className="font-semibold text-green-800">Pilihan Konservatif</h4>
-                                    <p className="text-sm text-green-600">70% dari kemampuan maksimal</p>
-                                  </div>
-                                  <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded font-medium">
-                                    Aman
-                                  </span>
-                                </div>
-                                <div className="space-y-1 text-sm">
-                                  <div className="flex justify-between">
-                                    <span>Harga Properti:</span>
-                                    <span className="font-bold text-green-700">
-                                      {formatCurrency(simulationResult.maxPrice * 0.7)}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span>Cicilan Bulanan:</span>
-                                    <span className="font-medium">
-                                      {formatCurrency(simulationResult.maxInstallment * 0.7)}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span>Uang Muka (20%):</span>
-                                    <span className="font-medium">
-                                      {formatCurrency(simulationResult.maxPrice * 0.7 * 0.2)}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              {/* Optimal Option */}
-                              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                <div className="flex justify-between items-start mb-2">
-                                  <div>
-                                    <h4 className="font-semibold text-blue-800">Pilihan Optimal</h4>
-                                    <p className="text-sm text-blue-600">85% dari kemampuan maksimal</p>
-                                  </div>
-                                  <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded font-medium">
-                                    Ideal
-                                  </span>
-                                </div>
-                                <div className="space-y-1 text-sm">
-                                  <div className="flex justify-between">
-                                    <span>Harga Properti:</span>
-                                    <span className="font-bold text-blue-700">
-                                      {formatCurrency(simulationResult.maxPrice * 0.85)}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span>Cicilan Bulanan:</span>
-                                    <span className="font-medium">
-                                      {formatCurrency(simulationResult.maxInstallment * 0.85)}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span>Uang Muka (20%):</span>
-                                    <span className="font-medium">
-                                      {formatCurrency(simulationResult.maxPrice * 0.85 * 0.2)}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              {/* Maximum Option */}
-                              <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                                <div className="flex justify-between items-start mb-2">
-                                  <div>
-                                    <h4 className="font-semibold text-orange-800">Pilihan Maksimal</h4>
-                                    <p className="text-sm text-orange-600">100% kemampuan maksimal</p>
-                                  </div>
-                                  <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded font-medium">
-                                    Berisiko
-                                  </span>
-                                </div>
-                                <div className="space-y-1 text-sm">
-                                  <div className="flex justify-between">
-                                    <span>Harga Properti:</span>
-                                    <span className="font-bold text-orange-700">
-                                      {formatCurrency(simulationResult.maxPrice)}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span>Cicilan Bulanan:</span>
-                                    <span className="font-medium">
-                                      {formatCurrency(simulationResult.maxInstallment)}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span>Uang Muka (20%):</span>
-                                    <span className="font-medium">
-                                      {formatCurrency(simulationResult.maxPrice * 0.2)}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
                               
                               {/* Available Units from Master Harga API */}
                               {allUnits.length > 0 && (
@@ -631,7 +480,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                         </div>
                       ) : (
                         <div className="text-center py-8 text-muted-foreground">
-                          <p>Masukkan gaji untuk melihat harga yang cocok</p>
+                          <p>Masukkan gaji untuk melihat unit yang tersedia</p>
                           <p className="text-sm mt-1">Simulasi akan muncul otomatis</p>
                         </div>
                       )}
