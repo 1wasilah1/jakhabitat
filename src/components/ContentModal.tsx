@@ -420,60 +420,59 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                         <div className="space-y-4">
                           {/* Available Units from Master Harga API */}
                           {simulationResult && allUnits.length > 0 && (
-                                <div className="p-4 bg-background rounded-lg border">
-                                  <h4 className="font-semibold mb-3">Unit yang Tersedia:</h4>
-                                  <div className="space-y-2">
-                                    {allUnits.filter(unit => {
-                                      const locationMatch = !simulationInputs.location || 
-                                        (unit.lokasi && unit.lokasi.toLowerCase().includes(simulationInputs.location.toLowerCase()));
-                                      return unit.hargaJual <= simulationResult.maxPrice && locationMatch;
-                                    }).sort((a, b) => a.hargaJual - b.hargaJual)
-                                      .slice(0, 4).map((unit, index) => {
-                                      const monthlyRate = 0.065 / 12;
-                                      const numPayments = simulationInputs.term * 12;
-                                      const installment = (unit.hargaJual * 0.8 * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
-                                      
-                                      return (
-                                        <div key={unit.id} className="flex justify-between items-center p-3 bg-muted/30 rounded hover:bg-muted/50 transition-colors">
-                                          <div className="flex-1">
-                                            <div className="font-medium text-sm">{unit.namaUnit}</div>
-                                            <div className="text-xs text-muted-foreground mt-1">
-                                              {unit.tipeUnit} • {unit.luas}m² • {unit.lokasi}
-                                            </div>
-                                            <div className="text-xs text-green-600 mt-1">
-                                              ~{formatCurrency(installment)}/bulan
-                                            </div>
-                                          </div>
-                                          <div className="text-right ml-3">
-                                            <div className="text-sm font-bold text-primary">
-                                              {formatCurrency(unit.hargaJual)}
-                                            </div>
-                                            <button 
-                                              onClick={() => setSelectedTower(unit.namaUnit)}
-                                              className="text-xs text-primary hover:underline mt-1"
-                                            >
-                                              Lihat Unit
-                                            </button>
-                                          </div>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
+                            <div className="p-4 bg-background rounded-lg border">
+                              <h4 className="font-semibold mb-3">Unit yang Tersedia:</h4>
+                              <div className="space-y-2">
+                                {allUnits.filter(unit => {
+                                  const locationMatch = !simulationInputs.location || 
+                                    (unit.lokasi && unit.lokasi.toLowerCase().includes(simulationInputs.location.toLowerCase()));
+                                  return unit.hargaJual <= simulationResult.maxPrice && locationMatch;
+                                }).sort((a, b) => a.hargaJual - b.hargaJual)
+                                  .slice(0, 4).map((unit, index) => {
+                                  const monthlyRate = 0.065 / 12;
+                                  const numPayments = simulationInputs.term * 12;
+                                  const installment = (unit.hargaJual * 0.8 * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
                                   
-                                  {allUnits.filter(unit => {
-                                    const locationMatch = !simulationInputs.location || 
-                                      (unit.lokasi && unit.lokasi.toLowerCase().includes(simulationInputs.location.toLowerCase()));
-                                    return unit.hargaJual <= simulationResult.maxPrice && locationMatch;
-                                  }).length === 0 && (
-                                    <div className="text-center py-4 text-muted-foreground text-sm">
-                                      <p>Tidak ada unit yang sesuai budget</p>
-                                      <p className="text-xs mt-1">Coba tingkatkan gaji atau perpanjang tenor</p>
+                                  return (
+                                    <div key={unit.id} className="flex justify-between items-center p-3 bg-muted/30 rounded hover:bg-muted/50 transition-colors">
+                                      <div className="flex-1">
+                                        <div className="font-medium text-sm">{unit.namaUnit}</div>
+                                        <div className="text-xs text-muted-foreground mt-1">
+                                          {unit.tipeUnit} • {unit.luas}m² • {unit.lokasi}
+                                        </div>
+                                        <div className="text-xs text-green-600 mt-1">
+                                          ~{formatCurrency(installment)}/bulan
+                                        </div>
+                                      </div>
+                                      <div className="text-right ml-3">
+                                        <div className="text-sm font-bold text-primary">
+                                          {formatCurrency(unit.hargaJual)}
+                                        </div>
+                                        <button 
+                                          onClick={() => setSelectedTower(unit.namaUnit)}
+                                          className="text-xs text-primary hover:underline mt-1"
+                                        >
+                                          Lihat Unit
+                                        </button>
+                                      </div>
                                     </div>
-                                  )}
+                                  );
+                                })}
+                              </div>
+                              
+                              {allUnits.filter(unit => {
+                                const locationMatch = !simulationInputs.location || 
+                                  (unit.lokasi && unit.lokasi.toLowerCase().includes(simulationInputs.location.toLowerCase()));
+                                return unit.hargaJual <= simulationResult.maxPrice && locationMatch;
+                              }).length === 0 && (
+                                <div className="text-center py-4 text-muted-foreground text-sm">
+                                  <p>Tidak ada unit yang sesuai budget</p>
+                                  <p className="text-xs mt-1">Coba tingkatkan gaji atau perpanjang tenor</p>
                                 </div>
                               )}
                             </div>
                           )}
+                        </div>
                         </div>
                       ) : (
                         <div className="text-center py-8 text-muted-foreground">
