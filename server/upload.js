@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
+import sharp from 'sharp';
 // import fetch from 'node-fetch'; // Disabled for testing
 import { initDatabase, insertPhoto, getPhotos, deletePhoto, insertHotspot, getHotspots, deleteHotspotsByPhoto } from './database.js';
 import { initMasterTables, createUnit, getUnits, updateUnit, deleteUnit, createHarga, getHarga, updateHarga, deleteHarga } from './masterData.js';
@@ -112,10 +113,11 @@ app.get('/panoramas', authenticateToken, async (req, res) => {
   }
 });
 
-// Serve individual image
-app.get('/image/:filename', (req, res) => {
+// Serve individual image with Sharp optimization
+app.get('/image/:filename', async (req, res) => {
   try {
     const { filename } = req.params;
+    const { w, h, q, f } = req.query; // width, height, quality, format
     const baseDir = '/home/wasilah/migration/images/jakhabitat/360';
     
     // Function to recursively search for file
@@ -141,12 +143,62 @@ app.get('/image/:filename', (req, res) => {
     
     const imagePath = findFile(baseDir);
     
-    if (imagePath && fs.existsSync(imagePath)) {
-      res.sendFile(imagePath);
-    } else {
+    if (!imagePath || !fs.existsSync(imagePath)) {
       console.log(`Image not found: ${filename}`);
-      res.status(404).json({ error: 'Image not found' });
+      return res.status(404).json({ error: 'Image not found' });
     }
+    
+    // If no optimization params, serve original
+    if (!w && !h && !q && !f) {
+      return res.sendFile(imagePath);
+    }
+    
+    // Sharp optimization
+    let sharpInstance = sharp(imagePath);
+    
+    // Resize if width or height specified
+    if (w || h) {
+      const width = w ? parseInt(w) : null;
+      const height = h ? parseInt(h) : null;
+      sharpInstance = sharpInstance.resize(width, height, {
+        fit: 'cover',
+        withoutEnlargement: true
+      });
+    }
+    
+    // Set quality
+    const quality = q ? Math.min(100, Math.max(10, parseInt(q))) : 80;
+    
+    // Set format
+    const format = f || 'webp';
+    switch (format) {
+      case 'webp':
+        sharpInstance = sharpInstance.webp({ quality });
+        res.type('image/webp');
+        break;
+      case 'jpeg':
+      case 'jpg':
+        sharpInstance = sharpInstance.jpeg({ quality });
+        res.type('image/jpeg');
+        break;
+      case 'png':
+        sharpInstance = sharpInstance.png({ quality });
+        res.type('image/png');
+        break;
+      default:
+        sharpInstance = sharpInstance.webp({ quality });
+        res.type('image/webp');
+    }
+    
+    // Set cache headers
+    res.set({
+      'Cache-Control': 'public, max-age=31536000', // 1 year
+      'ETag': `"${filename}-${w || 'auto'}-${h || 'auto'}-${quality}-${format}"`
+    });
+    
+    // Stream optimized image
+    sharpInstance.pipe(res);
+    
   } catch (error) {
     console.error('Image serve error:', error);
     res.status(500).json({ error: error.message });

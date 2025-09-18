@@ -13,7 +13,11 @@ function PanoramaSphere({ roomImage, hotspots, onHotspotClick, onHotspotHover }:
   onHotspotHover?: (hotspotId: number | null, screenPosition?: {x: number, y: number}) => void;
 }) {
   const texture = useLoader(THREE.TextureLoader, roomImage);
-  const { camera, size } = useThree();
+  const { camera, size, gl } = useThree();
+  
+  // Optimize renderer settings
+  gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  gl.antialias = false;
   
   // Convert 2D coordinates to 3D sphere positions
   const convertTo3D = (x: number, y: number, radius = 25) => {
@@ -37,7 +41,7 @@ function PanoramaSphere({ roomImage, hotspots, onHotspotClick, onHotspotHover }:
   return (
     <group>
       <mesh scale={[-50, 50, 50]}>
-        <sphereGeometry args={[1, 64, 32]} />
+        <sphereGeometry args={[1, 32, 16]} />
         <meshBasicMaterial map={texture} side={THREE.BackSide} />
       </mesh>
       
@@ -63,7 +67,7 @@ function PanoramaSphere({ roomImage, hotspots, onHotspotClick, onHotspotHover }:
             }}
             onPointerLeave={() => onHotspotHover && onHotspotHover(null)}
           >
-            <sphereGeometry args={[5]} />
+            <sphereGeometry args={[5, 8, 6]} />
             <meshBasicMaterial transparent opacity={0} />
           </mesh>
         );
@@ -274,13 +278,17 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
                     enablePan={false}
                     enableRotate={true}
                     enableDamping={true}
-                    dampingFactor={0.05}
+                    dampingFactor={0.1}
                     minDistance={0.1}
-                    maxDistance={1}
+                    maxDistance={0.5}
                     autoRotate={false}
                     target={[0, 0, -1]}
-                    minPolarAngle={Math.PI * 0.1}
-                    maxPolarAngle={Math.PI * 0.9}
+                    minPolarAngle={Math.PI * 0.2}
+                    maxPolarAngle={Math.PI * 0.8}
+                    rotateSpeed={0.5}
+                    zoomSpeed={0.5}
+                    maxAzimuthAngle={Math.PI * 2}
+                    minAzimuthAngle={-Math.PI * 2}
                   />
                 </Canvas>
               </Suspense>
