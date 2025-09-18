@@ -1,4 +1,4 @@
-import { X, Eye, DollarSign } from 'lucide-react';
+import { X, Eye, DollarSign, Calculator } from 'lucide-react';
 import { useState, Suspense, lazy, useEffect } from 'react';
 import buildingExterior from '@/assets/building-exterior.jpg';
 import roomInterior from '@/assets/room-interior.jpg';
@@ -72,6 +72,14 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
   const [panoramaPhotos, setPanoramaPhotos] = useState([]);
   const [show360Modal, setShow360Modal] = useState(false);
   const [showPriceModal, setShowPriceModal] = useState(false);
+  const [simulationInputs, setSimulationInputs] = useState({
+    salary: 0,
+    term: 15,
+    otherLoans: 0,
+    location: ''
+  });
+  const [simulationResult, setSimulationResult] = useState(null);
+  const [recommendedUnits, setRecommendedUnits] = useState([]);
   
   if (!isOpen) return null;
 
@@ -116,6 +124,80 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
     
     loadUnits();
   }, [isOpen, sectionId]);
+  
+  // Calculate loan simulation and find recommended units
+  useEffect(() => {
+    if (simulationInputs.salary > 0) {
+      const maxInstallmentRatio = 0.3; // 30% of salary
+      const interestRate = 0.065; // 6.5% annual
+      
+      const availableIncome = simulationInputs.salary * maxInstallmentRatio - simulationInputs.otherLoans;
+      
+      if (availableIncome > 0) {
+        // Calculate maximum loan amount
+        const monthlyRate = interestRate / 12;
+        const numPayments = simulationInputs.term * 12;
+        const maxLoan = availableIncome * ((Math.pow(1 + monthlyRate, numPayments) - 1) / (monthlyRate * Math.pow(1 + monthlyRate, numPayments)));
+        
+        // Assume 20% down payment
+        const maxPrice = maxLoan / 0.8;
+        
+        setSimulationResult({
+          maxInstallment: availableIncome,
+          maxPrice: maxPrice,
+          affordable: maxPrice >= 500000000 // 500M minimum
+        });
+        
+        // Find recommended units
+        const pricePerSqm = 25000000; // 25M per m2
+        let filteredTowers = towers;
+        
+        // Filter by location if specified
+        if (simulationInputs.location) {
+          filteredTowers = towers.filter(tower => 
+            tower.name.toLowerCase().includes(simulationInputs.location.toLowerCase())
+          );
+        }
+        
+        // Create unit recommendations with estimated prices
+        const recommendations = filteredTowers.map(tower => {
+          // Extract unit info from description
+          const match = tower.description.match(/(\d+)\s*m²/);
+          const luas = match ? parseInt(match[1]) : 45; // default 45m2
+          const estimatedPrice = luas * pricePerSqm;
+          const estimatedInstallment = (estimatedPrice * 0.8 * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+          
+          return {
+            namaUnit: tower.name,
+            tipeUnit: tower.description.split(' - ')[0] || '1 BR',
+            luas: luas,
+            lokasi: simulationInputs.location || 'Jakarta',
+            estimatedPrice: estimatedPrice,
+            estimatedInstallment: estimatedInstallment
+          };
+        }).filter(unit => unit.estimatedPrice <= maxPrice).slice(0, 3);
+        
+        setRecommendedUnits(recommendations);
+      } else {
+        setSimulationResult({
+          maxInstallment: 0,
+          maxPrice: 0,
+          affordable: false
+        });
+        setRecommendedUnits([]);
+      }
+    } else {
+      setRecommendedUnits([]);
+    }
+  }, [simulationInputs, towers]);
+  
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
   
   // Load panorama photos for selected tower
   const loadPanoramaPhotos = async (unitId) => {
@@ -172,19 +254,143 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
             <>
               {!selectedTower ? (
                 <>
-                  {/* Main Images Gallery */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {content.images.map((image, index) => (
-                      <div key={index} className="aspect-video bg-muted rounded-lg overflow-hidden">
-                        <img 
-                          src={image} 
-                          alt={`${title} ${index + 1}`}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                          decoding="async"
-                        />
+                  {/* Loan Simulation & Images */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Loan Simulation Form */}
+                    <div className="bg-gradient-to-br from-primary/10 to-secondary/10 p-6 rounded-lg border">
+                      <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <Calculator className="w-5 h-5" />
+                        Simulasi Cicilan Cepat
+                      </h3>
+                      
+                      <div className="space-y-4">
+                        {/* Salary Input */}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Gaji Bulanan</label>
+                          <input
+                            type="number"
+                            placeholder="Contoh: 15000000"
+                            className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            onChange={(e) => setSimulationInputs(prev => ({...prev, salary: parseInt(e.target.value) || 0}))}
+                          />
+                        </div>
+                        
+                        {/* Loan Term */}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Tenor (Tahun)</label>
+                          <select 
+                            className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            onChange={(e) => setSimulationInputs(prev => ({...prev, term: parseInt(e.target.value)}))}
+                          >
+                            <option value="5">5 Tahun</option>
+                            <option value="10">10 Tahun</option>
+                            <option value="15" selected>15 Tahun</option>
+                            <option value="20">20 Tahun</option>
+                            <option value="25">25 Tahun</option>
+                          </select>
+                        </div>
+                        
+                        {/* Other Loans */}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Cicilan Lain (Opsional)</label>
+                          <input
+                            type="number"
+                            placeholder="Contoh: 2000000"
+                            className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            onChange={(e) => setSimulationInputs(prev => ({...prev, otherLoans: parseInt(e.target.value) || 0}))}
+                          />
+                        </div>
+                        
+                        {/* Location Preference */}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Lokasi Pilihan</label>
+                          <select 
+                            className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            onChange={(e) => setSimulationInputs(prev => ({...prev, location: e.target.value}))}
+                          >
+                            <option value="">Semua Lokasi</option>
+                            <option value="Jakarta">Jakarta</option>
+                            <option value="Bogor">Bogor</option>
+                            <option value="Depok">Depok</option>
+                            <option value="Tangerang">Tangerang</option>
+                            <option value="Bekasi">Bekasi</option>
+                          </select>
+                        </div>
+                        
+                        {/* Results */}
+                        {simulationResult && (
+                          <div className="mt-6 space-y-4">
+                            <div className="p-4 bg-background rounded-lg border">
+                              <h4 className="font-semibold mb-3">Hasil Simulasi:</h4>
+                              <div className="space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                  <span>Maksimal Cicilan:</span>
+                                  <span className="font-medium text-green-600">
+                                    {formatCurrency(simulationResult.maxInstallment)}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>Maksimal Harga Unit:</span>
+                                  <span className="font-medium text-primary">
+                                    {formatCurrency(simulationResult.maxPrice)}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>Status:</span>
+                                  <span className={`font-medium ${
+                                    simulationResult.affordable ? 'text-green-600' : 'text-red-600'
+                                  }`}>
+                                    {simulationResult.affordable ? 'Terjangkau' : 'Perlu Penyesuaian'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Unit Recommendations */}
+                            {recommendedUnits.length > 0 && (
+                              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                                <h4 className="font-semibold mb-3 text-green-800">Unit yang Cocok:</h4>
+                                <div className="space-y-2">
+                                  {recommendedUnits.map((unit, index) => (
+                                    <div key={index} className="flex justify-between items-center p-2 bg-white rounded border">
+                                      <div>
+                                        <div className="font-medium text-sm">{unit.namaUnit}</div>
+                                        <div className="text-xs text-gray-600">
+                                          {unit.tipeUnit} • {unit.luas}m² • {unit.lokasi}
+                                        </div>
+                                      </div>
+                                      <div className="text-right">
+                                        <div className="text-sm font-medium text-green-600">
+                                          {formatCurrency(unit.estimatedPrice)}
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                          ~{formatCurrency(unit.estimatedInstallment)}/bln
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    ))}
+                    </div>
+                    
+                    {/* Images */}
+                    <div className="space-y-4">
+                      {content.images.map((image, index) => (
+                        <div key={index} className="aspect-video bg-muted rounded-lg overflow-hidden">
+                          <img 
+                            src={image} 
+                            alt={`${title} ${index + 1}`}
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Description */}
