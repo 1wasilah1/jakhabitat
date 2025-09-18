@@ -80,6 +80,9 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
   });
   const [simulationResult, setSimulationResult] = useState(null);
   const [recommendedUnits, setRecommendedUnits] = useState([]);
+  const [salaryInput, setSalaryInput] = useState('');
+  const [otherLoansInput, setOtherLoansInput] = useState('');
+  const [allUnits, setAllUnits] = useState([]);
   
   if (!isOpen) return null;
 
@@ -123,7 +126,21 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
     };
     
     loadUnits();
+    loadAllUnits();
   }, [isOpen, sectionId]);
+  
+  // Load all units from master unit API
+  const loadAllUnits = async () => {
+    try {
+      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-unit');
+      const result = await response.json();
+      if (result.success) {
+        setAllUnits(result.data);
+      }
+    } catch (error) {
+      console.error('Error loading all units:', error);
+    }
+  };
   
   // Calculate loan simulation and find recommended units
   useEffect(() => {
@@ -207,6 +224,31 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
     }).format(amount);
   };
   
+  const formatInputCurrency = (value) => {
+    if (!value) return '';
+    const number = parseInt(value.replace(/\D/g, ''));
+    return new Intl.NumberFormat('id-ID').format(number);
+  };
+  
+  const parseCurrency = (value) => {
+    if (!value) return 0;
+    return parseInt(value.replace(/\D/g, '')) || 0;
+  };
+  
+  const handleSalaryChange = (e) => {
+    const rawValue = e.target.value;
+    const numericValue = parseCurrency(rawValue);
+    setSalaryInput(formatInputCurrency(rawValue));
+    setSimulationInputs(prev => ({...prev, salary: numericValue}));
+  };
+  
+  const handleOtherLoansChange = (e) => {
+    const rawValue = e.target.value;
+    const numericValue = parseCurrency(rawValue);
+    setOtherLoansInput(formatInputCurrency(rawValue));
+    setSimulationInputs(prev => ({...prev, otherLoans: numericValue}));
+  };
+  
   // Load panorama photos for selected tower
   const loadPanoramaPhotos = async (unitId) => {
     try {
@@ -275,12 +317,16 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                         {/* Salary Input */}
                         <div>
                           <label className="block text-sm font-medium mb-2">Gaji Bulanan</label>
-                          <input
-                            type="number"
-                            placeholder="Contoh: 15000000"
-                            className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                            onChange={(e) => setSimulationInputs(prev => ({...prev, salary: parseInt(e.target.value) || 0}))}
-                          />
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">Rp</span>
+                            <input
+                              type="text"
+                              value={salaryInput}
+                              placeholder="15.000.000"
+                              className="w-full pl-8 pr-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                              onChange={handleSalaryChange}
+                            />
+                          </div>
                         </div>
                         
                         {/* Loan Term */}
@@ -301,12 +347,16 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                         {/* Other Loans */}
                         <div>
                           <label className="block text-sm font-medium mb-2">Cicilan Lain (Opsional)</label>
-                          <input
-                            type="number"
-                            placeholder="Contoh: 2000000"
-                            className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                            onChange={(e) => setSimulationInputs(prev => ({...prev, otherLoans: parseInt(e.target.value) || 0}))}
-                          />
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">Rp</span>
+                            <input
+                              type="text"
+                              value={otherLoansInput}
+                              placeholder="2.000.000"
+                              className="w-full pl-8 pr-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                              onChange={handleOtherLoansChange}
+                            />
+                          </div>
                         </div>
                         
                         {/* Location Preference */}
@@ -547,36 +597,41 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                                 </div>
                               </div>
                               
-                              {/* Available Units */}
-                              {towers.length > 0 && (
+                              {/* Available Units from Master Unit API */}
+                              {allUnits.length > 0 && (
                                 <div className="p-4 bg-background rounded-lg border">
                                   <h4 className="font-semibold mb-3">Unit yang Tersedia:</h4>
                                   <div className="space-y-2">
-                                    {towers.filter(tower => {
-                                      const match = tower.description.match(/(\d+)\s*m²/);
-                                      const luas = match ? parseInt(match[1]) : 45;
-                                      const price = luas * 25000000;
-                                      return price <= simulationResult.maxPrice;
-                                    }).slice(0, 3).map((tower, index) => {
-                                      const match = tower.description.match(/(\d+)\s*m²/);
-                                      const luas = match ? parseInt(match[1]) : 45;
-                                      const price = luas * 25000000;
+                                    {allUnits.filter(unit => {
+                                      const price = unit.luas * 25000000;
+                                      const locationMatch = !simulationInputs.location || 
+                                        (unit.lokasi && unit.lokasi.toLowerCase().includes(simulationInputs.location.toLowerCase()));
+                                      return price <= simulationResult.maxPrice && locationMatch;
+                                    }).sort((a, b) => (a.luas * 25000000) - (b.luas * 25000000))
+                                      .slice(0, 4).map((unit, index) => {
+                                      const price = unit.luas * 25000000;
+                                      const monthlyRate = 0.065 / 12;
+                                      const numPayments = simulationInputs.term * 12;
+                                      const installment = (price * 0.8 * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
                                       
                                       return (
-                                        <div key={index} className="flex justify-between items-center p-2 bg-muted/30 rounded">
-                                          <div>
-                                            <div className="font-medium text-sm">{tower.name}</div>
-                                            <div className="text-xs text-muted-foreground">
-                                              {tower.description}
+                                        <div key={unit.id} className="flex justify-between items-center p-3 bg-muted/30 rounded hover:bg-muted/50 transition-colors">
+                                          <div className="flex-1">
+                                            <div className="font-medium text-sm">{unit.namaUnit}</div>
+                                            <div className="text-xs text-muted-foreground mt-1">
+                                              {unit.tipeUnit} • {unit.luas}m² • {unit.lokasi}
+                                            </div>
+                                            <div className="text-xs text-green-600 mt-1">
+                                              ~{formatCurrency(installment)}/bulan
                                             </div>
                                           </div>
-                                          <div className="text-right">
+                                          <div className="text-right ml-3">
                                             <div className="text-sm font-bold text-primary">
                                               {formatCurrency(price)}
                                             </div>
                                             <button 
-                                              onClick={() => setSelectedTower(tower.name)}
-                                              className="text-xs text-primary hover:underline"
+                                              onClick={() => setSelectedTower(unit.namaUnit)}
+                                              className="text-xs text-primary hover:underline mt-1"
                                             >
                                               Lihat Unit
                                             </button>
@@ -585,6 +640,18 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                                       );
                                     })}
                                   </div>
+                                  
+                                  {allUnits.filter(unit => {
+                                    const price = unit.luas * 25000000;
+                                    const locationMatch = !simulationInputs.location || 
+                                      (unit.lokasi && unit.lokasi.toLowerCase().includes(simulationInputs.location.toLowerCase()));
+                                    return price <= simulationResult.maxPrice && locationMatch;
+                                  }).length === 0 && (
+                                    <div className="text-center py-4 text-muted-foreground text-sm">
+                                      <p>Tidak ada unit yang sesuai budget</p>
+                                      <p className="text-xs mt-1">Coba tingkatkan gaji atau perpanjang tenor</p>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
