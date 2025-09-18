@@ -278,17 +278,15 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
                     enablePan={false}
                     enableRotate={true}
                     enableDamping={true}
-                    dampingFactor={0.1}
+                    dampingFactor={0.05}
                     minDistance={0.1}
-                    maxDistance={0.5}
+                    maxDistance={1}
                     autoRotate={false}
                     target={[0, 0, -1]}
-                    minPolarAngle={Math.PI * 0.2}
-                    maxPolarAngle={Math.PI * 0.8}
-                    rotateSpeed={0.5}
-                    zoomSpeed={0.5}
-                    maxAzimuthAngle={Math.PI * 2}
-                    minAzimuthAngle={-Math.PI * 2}
+                    minPolarAngle={Math.PI * 0.1}
+                    maxPolarAngle={Math.PI * 0.9}
+                    rotateSpeed={1}
+                    zoomSpeed={1}
                   />
                 </Canvas>
               </Suspense>
