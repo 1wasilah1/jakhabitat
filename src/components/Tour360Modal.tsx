@@ -139,7 +139,11 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
         const result = await response.json();
         console.log('Panoramas result:', result);
         
-        if (result.success && result.photos.length > 0) {
+        console.log('API response success:', result.success);
+        console.log('Photos array:', result.photos);
+        console.log('Photos length:', result.photos?.length);
+        
+        if (result.success && result.photos && result.photos.length > 0) {
           const defaultPhoto = result.photos.find(photo => photo.isDefault);
           const firstPhoto = defaultPhoto || result.photos[0];
           console.log('Setting current photo:', firstPhoto);
@@ -151,7 +155,7 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
             loadHotspots(firstPhoto.id);
           }
         } else {
-          console.log('No photos found or API error');
+          console.log('No photos found or API error:', result);
         }
       } catch (error) {
         console.error('Error loading photos:', error);
