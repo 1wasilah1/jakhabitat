@@ -139,6 +139,7 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
         if (result.success && result.photos.length > 0) {
           const defaultPhoto = result.photos.find(photo => photo.isDefault);
           const firstPhoto = defaultPhoto || result.photos[0];
+          console.log('Setting current photo:', firstPhoto);
           setCurrentPhoto(firstPhoto);
           setPhotos(result.photos);
           
@@ -146,6 +147,8 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
           if (firstPhoto) {
             loadHotspots(firstPhoto.id);
           }
+        } else {
+          console.log('No photos found or API error');
         }
       } catch (error) {
         console.error('Error loading photos:', error);
@@ -295,7 +298,9 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
                 src={`https://dprkp.jakarta.go.id/api/jakhabitat/image/${currentPhoto.filename}`}
                 alt={currentPhoto.originalName}
                 className="w-full h-full object-contain"
+                onLoad={() => console.log('Image loaded successfully:', currentPhoto.filename)}
                 onError={(e) => {
+                  console.log('Image load error for:', currentPhoto.filename);
                   e.target.src = roomInterior;
                 }}
               />
