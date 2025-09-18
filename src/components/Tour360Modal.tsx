@@ -123,10 +123,12 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
         // Get proper unit ID by fetching units first
         const unitsResponse = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-harga');
         const unitsResult = await unitsResponse.json();
+        console.log('Units result:', unitsResult);
         
-        let unitId = 1; // default
+        let unitId = 21; // default to the unit ID from your data
         if (unitsResult.success) {
           const unit = unitsResult.data.find(u => u.namaUnit === selectedTower);
+          console.log('Found unit:', unit, 'for tower:', selectedTower);
           if (unit) {
             unitId = unit.unitId;
           }
