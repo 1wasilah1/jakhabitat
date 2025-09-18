@@ -116,19 +116,39 @@ app.get('/panoramas', authenticateToken, async (req, res) => {
 app.get('/image/:filename', (req, res) => {
   try {
     const { filename } = req.params;
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
+    const baseDir = '/home/wasilah/migration/images/jakhabitat/360';
     
-    const imagePath = `/home/wasilah/migration/images/jakhabitat/360/${year}/${month}/${day}/${filename}`;
+    // Function to recursively search for file
+    const findFile = (dir) => {
+      if (!fs.existsSync(dir)) return null;
+      
+      const items = fs.readdirSync(dir);
+      
+      for (const item of items) {
+        const fullPath = path.join(dir, item);
+        const stat = fs.statSync(fullPath);
+        
+        if (stat.isDirectory()) {
+          const found = findFile(fullPath);
+          if (found) return found;
+        } else if (item === filename) {
+          return fullPath;
+        }
+      }
+      
+      return null;
+    };
     
-    if (fs.existsSync(imagePath)) {
+    const imagePath = findFile(baseDir);
+    
+    if (imagePath && fs.existsSync(imagePath)) {
       res.sendFile(imagePath);
     } else {
+      console.log(`Image not found: ${filename}`);
       res.status(404).json({ error: 'Image not found' });
     }
   } catch (error) {
+    console.error('Image serve error:', error);
     res.status(500).json({ error: error.message });
   }
 });
