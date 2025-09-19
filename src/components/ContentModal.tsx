@@ -494,23 +494,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
                     <p className="text-muted-foreground leading-relaxed">{content.description}</p>
                   </div>
 
-                  {/* Tower Selection */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-foreground">Pilih Tower</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {towers.map((tower, index) => (
-                        <div 
-                          key={index}
-                          onClick={() => setSelectedTower(tower.name)}
-                          className="p-6 border border-border rounded-lg hover:bg-muted cursor-pointer transition-colors group"
-                        >
-                          <h4 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary">{tower.name}</h4>
-                          <p className="text-muted-foreground text-sm">{tower.description}</p>
-                          <div className="mt-4 text-primary text-sm font-medium">Klik untuk melihat galeri foto 360° →</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+
                 </>
               ) : (
                 <>
