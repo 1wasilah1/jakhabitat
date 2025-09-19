@@ -680,6 +680,7 @@ export const ContentModal = ({ isOpen, onClose, sectionId, title }: ContentModal
         unit={selectedUnit}
         onView360={() => {
           setShowUnitDetail(false);
+          setSelectedTower(selectedUnit?.namaUnit || '');
           setShow360Modal(true);
         }}
       />
