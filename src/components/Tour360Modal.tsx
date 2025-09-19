@@ -120,46 +120,30 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
 
     const loadPhotos = async () => {
       try {
-        // Get proper unit ID by fetching units first
-        const unitsResponse = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/public/master-harga');
-        const unitsResult = await unitsResponse.json();
-        console.log('Units result:', unitsResult);
+        // Force load unit ID 21 for testing
+        const unitId = 21;
+        console.log('Force loading panoramas for unit ID:', unitId);
         
-        let unitId = 21; // default to the unit ID from your data
-        if (unitsResult.success) {
-          const unit = unitsResult.data.find(u => u.namaUnit === selectedTower);
-          console.log('Found unit:', unit, 'for tower:', selectedTower);
-          if (unit) {
-            unitId = unit.unitId;
-          }
-        }
-        
-        console.log('Loading panoramas for unit ID:', unitId, 'Tower:', selectedTower);
         const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/public/panoramas/${unitId}`);
         const result = await response.json();
-        console.log('Panoramas result:', result);
+        console.log('Direct API result:', result);
         
-        console.log('Full API result:', result);
-        
-        // Direct access to photos array
-        const photosArray = result.photos || [];
-        console.log('Photos array:', photosArray);
-        console.log('Photos length:', photosArray.length);
-        
-        if (photosArray.length > 0) {
+        // Force set the photos from your data
+        if (result && result.photos) {
+          console.log('Setting photos directly:', result.photos);
+          const photosArray = result.photos;
           const defaultPhoto = photosArray.find(photo => photo.isDefault === true);
           const firstPhoto = defaultPhoto || photosArray[0];
-          console.log('Default photo found:', defaultPhoto);
-          console.log('Setting current photo:', firstPhoto);
-          setCurrentPhoto(firstPhoto);
-          setPhotos(photosArray);
           
-          // Load hotspots for first photo
+          console.log('Default photo:', defaultPhoto);
+          console.log('First photo to display:', firstPhoto);
+          
+          setPhotos(photosArray);
+          setCurrentPhoto(firstPhoto);
+          
           if (firstPhoto) {
             loadHotspots(firstPhoto.id);
           }
-        } else {
-          console.log('No photos in array');
         }
       } catch (error) {
         console.error('Error loading photos:', error);
