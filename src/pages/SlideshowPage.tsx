@@ -1,4 +1,4 @@
-import { ImageSlideshow } from '@/components/ImageSlideshow';
+import HeroSlideshow from '@/components/HeroSlideshow';
 import buildingExterior from '@/assets/building-exterior.jpg';
 import roomInterior from '@/assets/room-interior.jpg';
 
@@ -12,9 +12,9 @@ const SlideshowPage = () => {
 
   return (
     <div className="w-full h-screen">
-      <ImageSlideshow 
+      <HeroSlideshow 
         images={images}
-        autoPlay={true}
+        autoPlay={false}
         interval={4000}
       />
     </div>
