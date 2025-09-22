@@ -221,6 +221,14 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
         {/* Floating Navigation */}
         <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-20">
           <div className="flex items-center gap-2">
+            {/* Jakhabitat Logo */}
+            <div className="bg-black/50 backdrop-blur rounded-lg p-2">
+              <img 
+                src="/JAKHABITAT-LOGO putih-01.png" 
+                alt="Jakhabitat Logo" 
+                className="h-8 w-auto"
+              />
+            </div>
             <button
               onClick={onBackToGallery}
               className="flex items-center gap-2 bg-black/50 hover:bg-black/70 text-white px-3 py-2 rounded-lg transition-colors backdrop-blur"

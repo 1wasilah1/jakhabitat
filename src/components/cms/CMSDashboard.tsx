@@ -7,6 +7,7 @@ import MediaManager from './MediaManager';
 
 const menuItems = [
   { id: 'content', label: 'Konten', icon: FileText },
+  { id: 'slideshow-cards', label: 'Slideshow Cards', icon: Image },
   { id: 'master-unit', label: 'Master Unit', icon: Building },
   { id: 'master-harga', label: 'Master Harga', icon: BarChart3 },
   { id: 'media', label: 'Media', icon: Image },
@@ -44,12 +45,32 @@ export const CMSDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [showPriceForm, setShowPriceForm] = useState(false);
   const [editingPrice, setEditingPrice] = useState(null);
+  const [slideshowCards, setSlideshowCards] = useState([]);
+  const [showCardForm, setShowCardForm] = useState(false);
+  const [editingCard, setEditingCard] = useState(null);
+  const [cardForm, setCardForm] = useState({
+    title: '',
+    description: '',
+    imageUrl: '',
+    order: 1
+  });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [showHotspotEditor, setShowHotspotEditor] = useState(false);
+  const [hotspots, setHotspots] = useState([]);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [showIconSelector, setShowIconSelector] = useState(false);
+  const [pendingHotspot, setPendingHotspot] = useState(null);
+  const [availableIcons, setAvailableIcons] = useState([]);
+  const [showImageSelector, setShowImageSelector] = useState(false);
   const { user, logout, authState } = useAuth();
 
-  // Load units on component mount
+  // Load data on component mount
   React.useEffect(() => {
     if (activeMenu === 'master-unit') {
       loadUnits();
+    } else if (activeMenu === 'slideshow-cards') {
+      loadSlideshowCards();
     }
   }, [activeMenu]);
 
@@ -169,6 +190,288 @@ export const CMSDashboard = () => {
       console.error('Error deleting unit:', error);
       alert('Terjadi kesalahan saat menghapus unit');
     }
+  };
+
+  const loadSlideshowCards = async () => {
+    try {
+      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards', {
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        setSlideshowCards(result.data);
+      }
+    } catch (error) {
+      console.error('Error loading slideshow cards:', error);
+    }
+  };
+
+  const handleFileUpload = async (file) => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+        body: formData,
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        setCardForm({...cardForm, imageUrl: `https://dprkp.jakarta.go.id/api/jakhabitat/image/${result.filename}`});
+        alert('Foto berhasil diupload!');
+      } else {
+        alert('Error upload: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert('Terjadi kesalahan saat upload foto');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleCardSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      // Upload file first if selected
+      if (selectedFile) {
+        await handleFileUpload(selectedFile);
+      }
+      
+      const url = editingCard 
+        ? `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/${editingCard.id}`
+        : 'https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards';
+      
+      const method = editingCard ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+        body: JSON.stringify(cardForm),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(editingCard ? 'Card berhasil diupdate!' : 'Card berhasil ditambahkan!');
+        setShowCardForm(false);
+        setEditingCard(null);
+        setCardForm({ title: '', description: '', imageUrl: '', order: 1 });
+        setSelectedFile(null);
+        loadSlideshowCards();
+      } else {
+        alert('Error: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error saving card:', error);
+      alert('Terjadi kesalahan saat menyimpan card');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditCard = (card) => {
+    setEditingCard(card);
+    setCardForm({
+      title: card.title || '',
+      description: card.description || '',
+      imageUrl: card.imageUrl || '',
+      order: card.order || 1
+    });
+    setShowCardForm(true);
+  };
+
+  const handleDeleteCard = async (id) => {
+    if (!confirm('Yakin ingin menghapus card ini?')) return;
+    
+    try {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('Card berhasil dihapus!');
+        loadSlideshowCards();
+      } else {
+        alert('Error: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error deleting card:', error);
+      alert('Terjadi kesalahan saat menghapus card');
+    }
+  };
+
+  const loadHotspots = async (cardId) => {
+    try {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-hotspots/${cardId}`, {
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        setHotspots(result.data || []);
+      }
+    } catch (error) {
+      console.error('Error loading hotspots:', error);
+    }
+  };
+
+  const handleImageClick = (e, card) => {
+    const rect = e.target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const type = prompt('Pilih tipe hotspot:\n1. Tulisan (ketik: text)\n2. Icon (ketik: icon)\n3. Link ke gambar lain (ketik: link)');
+    
+    if (type === 'text') {
+      const text = prompt('Masukkan tulisan:');
+      if (text) {
+        const newHotspot = {
+          cardId: card.id,
+          x: Math.round(x),
+          y: Math.round(y),
+          text,
+          type: 'text'
+        };
+        saveHotspot(newHotspot);
+      }
+    } else if (type === 'icon') {
+      setPendingHotspot({
+        cardId: card.id,
+        x: Math.round(x),
+        y: Math.round(y),
+        type: 'icon'
+      });
+      setShowIconSelector(true);
+    } else if (type === 'link') {
+      setPendingHotspot({
+        cardId: card.id,
+        x: Math.round(x),
+        y: Math.round(y),
+        type: 'link'
+      });
+      setShowImageSelector(true);
+    }
+  };
+
+  const saveHotspot = async (hotspot) => {
+    try {
+      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-hotspots', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+        body: JSON.stringify(hotspot),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('Hotspot berhasil ditambahkan!');
+        loadHotspots(hotspot.cardId);
+      } else {
+        alert('Error: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error saving hotspot:', error);
+      alert('Terjadi kesalahan saat menyimpan hotspot');
+    }
+  };
+
+  const deleteHotspot = async (id) => {
+    if (!confirm('Yakin ingin menghapus hotspot ini?')) return;
+    
+    try {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-hotspots/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('Hotspot berhasil dihapus!');
+        loadHotspots(selectedCard.id);
+      } else {
+        alert('Error: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error deleting hotspot:', error);
+      alert('Terjadi kesalahan saat menghapus hotspot');
+    }
+  };
+
+  const openHotspotEditor = (card) => {
+    setSelectedCard(card);
+    setShowHotspotEditor(true);
+    loadHotspots(card.id);
+    loadAvailableIcons();
+  };
+
+  const loadAvailableIcons = async () => {
+    try {
+      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/icons', {
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        setAvailableIcons(result.data || []);
+      }
+    } catch (error) {
+      console.error('Error loading icons:', error);
+    }
+  };
+
+  const selectIcon = (iconFilename) => {
+    if (!pendingHotspot) return;
+    
+    const newHotspot = {
+      ...pendingHotspot,
+      iconUrl: `https://dprkp.jakarta.go.id/api/jakhabitat/image/${iconFilename}`,
+      label: iconFilename
+    };
+    
+    saveHotspot(newHotspot);
+    setShowIconSelector(false);
+    setPendingHotspot(null);
+  };
+
+  const selectImage = (cardId) => {
+    if (!pendingHotspot) return;
+    
+    const newHotspot = {
+      ...pendingHotspot,
+      targetCardId: cardId,
+      label: `Link ke card ${cardId}`
+    };
+    
+    saveHotspot(newHotspot);
+    setShowImageSelector(false);
+    setPendingHotspot(null);
   };
 
   const handleLogout = () => {
@@ -478,6 +781,380 @@ export const CMSDashboard = () => {
                         )}
                       </tbody>
                     </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeMenu === 'slideshow-cards' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Slideshow Cards</h2>
+                  <button
+                    onClick={() => setShowCardForm(true)}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center gap-2"
+                  >
+                    <Image className="h-4 w-4" />
+                    Tambah Card
+                  </button>
+                </div>
+                
+                {showCardForm && (
+                  <div className="bg-white rounded-lg shadow p-6 mb-6">
+                    <h3 className="text-lg font-semibold mb-4">
+                      {editingCard ? 'Edit Card' : 'Tambah Card Baru'}
+                    </h3>
+                    <form onSubmit={handleCardSubmit}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Judul</label>
+                          <input 
+                            type="text" 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                            placeholder="Judul card"
+                            value={cardForm.title}
+                            onChange={(e) => setCardForm({...cardForm, title: e.target.value})}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Urutan</label>
+                          <input 
+                            type="number" 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                            placeholder="1"
+                            value={cardForm.order}
+                            onChange={(e) => setCardForm({...cardForm, order: parseInt(e.target.value)})}
+                            required
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Gambar</label>
+                          <div className="space-y-3">
+                            <div>
+                              <input 
+                                type="file" 
+                                accept="image/*"
+                                onChange={(e) => setSelectedFile(e.target.files[0])}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">Upload foto baru (JPG, PNG, max 5MB)</p>
+                            </div>
+                            <div className="text-center text-gray-500">atau</div>
+                            <div>
+                              <input 
+                                type="url" 
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                                placeholder="https://example.com/image.jpg"
+                                value={cardForm.imageUrl}
+                                onChange={(e) => setCardForm({...cardForm, imageUrl: e.target.value})}
+                              />
+                              <p className="text-xs text-gray-500 mt-1">Masukkan URL gambar</p>
+                            </div>
+                            {cardForm.imageUrl && (
+                              <div className="mt-2">
+                                <img src={cardForm.imageUrl} alt="Preview" className="h-32 w-48 object-cover rounded border" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+                          <textarea 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                            rows={3} 
+                            placeholder="Deskripsi card..."
+                            value={cardForm.description}
+                            onChange={(e) => setCardForm({...cardForm, description: e.target.value})}
+                          ></textarea>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-4">
+                        <button 
+                          type="submit"
+                          className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                          disabled={loading || uploading}
+                        >
+                          {uploading ? 'Mengupload...' : loading ? 'Menyimpan...' : (editingCard ? 'Update' : 'Simpan')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowCardForm(false);
+                            setEditingCard(null);
+                            setCardForm({ title: '', description: '', imageUrl: '', order: 1 });
+                            setSelectedFile(null);
+                          }}
+                          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                        >
+                          Batal
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+                
+                <div className="bg-white rounded-lg shadow">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Urutan</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gambar</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {slideshowCards.length === 0 ? (
+                          <tr>
+                            <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                              Belum ada data card
+                            </td>
+                          </tr>
+                        ) : (
+                          slideshowCards.map((card) => (
+                            <tr key={card.id}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{card.order}</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{card.title}</td>
+                              <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{card.description}</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <img src={card.imageUrl} alt={card.title} className="h-12 w-20 object-cover rounded" />
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button 
+                                  onClick={() => handleEditCard(card)}
+                                  className="text-indigo-600 hover:text-indigo-900 mr-3"
+                                >
+                                  Edit
+                                </button>
+                                <button 
+                                  onClick={() => openHotspotEditor(card)}
+                                  className="text-green-600 hover:text-green-900 mr-3"
+                                >
+                                  Hotspot
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteCard(card.id)}
+                                  className="text-red-600 hover:text-red-900"
+                                >
+                                  Hapus
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Hotspot Editor Modal */}
+            {showHotspotEditor && selectedCard && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold">Editor Hotspot - {selectedCard.title}</h3>
+                      <button
+                        onClick={() => setShowHotspotEditor(false)}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Image Editor */}
+                      <div>
+                        <h4 className="font-medium mb-2">Klik pada gambar untuk menambah hotspot:</h4>
+                        <div className="relative border rounded-lg overflow-hidden">
+                          <img 
+                            src={selectedCard.imageUrl} 
+                            alt={selectedCard.title}
+                            className="w-full h-auto cursor-crosshair"
+                            onClick={(e) => handleImageClick(e, selectedCard)}
+                          />
+                          {/* Render existing hotspots */}
+                          {hotspots.map((hotspot, index) => (
+                            <div
+                              key={index}
+                              className="absolute w-6 h-6 bg-blue-500 rounded-full border-2 border-white cursor-pointer transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center text-white text-xs font-bold"
+                              style={{ left: `${hotspot.x}px`, top: `${hotspot.y}px` }}
+                              title={hotspot.label}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm(`Hapus hotspot "${hotspot.label}"?`)) {
+                                  deleteHotspot(hotspot.id);
+                                }
+                              }}
+                            >
+                              {index + 1}
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">
+                          Klik pada gambar untuk menambah hotspot baru. Klik pada hotspot yang ada untuk menghapus.
+                        </p>
+                      </div>
+                      
+                      {/* Hotspot List */}
+                      <div>
+                        <h4 className="font-medium mb-2">Daftar Hotspot ({hotspots.length}):</h4>
+                        <div className="space-y-2 max-h-96 overflow-y-auto">
+                          {hotspots.length === 0 ? (
+                            <p className="text-gray-500 text-sm">Belum ada hotspot</p>
+                          ) : (
+                            hotspots.map((hotspot, index) => (
+                              <div key={index} className="bg-gray-50 p-3 rounded border">
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <div className="font-medium text-sm">{hotspot.label}</div>
+                                    <div className="text-xs text-gray-500">Posisi: ({hotspot.x}, {hotspot.y})</div>
+                                    <div className="text-xs text-gray-500">Link: {hotspot.href}</div>
+                                    <div className="text-xs text-gray-500">Icon: {hotspot.icon}</div>
+                                  </div>
+                                  <button
+                                    onClick={() => deleteHotspot(hotspot.id)}
+                                    className="text-red-500 hover:text-red-700 text-xs"
+                                  >
+                                    Hapus
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 flex justify-end">
+                      <button
+                        onClick={() => setShowHotspotEditor(false)}
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                      >
+                        Selesai
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Icon Selector Modal */}
+            {showIconSelector && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold">Pilih Icon</h3>
+                      <button
+                        onClick={() => {
+                          setShowIconSelector(false);
+                          setPendingHotspot(null);
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    
+                    {availableIcons.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        Belum ada icon yang tersedia. Upload icon terlebih dahulu di menu Media.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-4 md:grid-cols-6 gap-4">
+                        {availableIcons.map((icon, index) => (
+                          <div 
+                            key={index}
+                            className="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:bg-gray-200 border-2 border-transparent hover:border-blue-500 transition-all"
+                            onClick={() => selectIcon(icon.filename)}
+                          >
+                            <img
+                              src={`https://dprkp.jakarta.go.id/api/jakhabitat/image/${icon.filename}`}
+                              alt={icon.originalName}
+                              className="w-full h-full object-contain p-2"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className="mt-6 flex justify-end">
+                      <button
+                        onClick={() => {
+                          setShowIconSelector(false);
+                          setPendingHotspot(null);
+                        }}
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                      >
+                        Batal
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Image Selector Modal */}
+            {showImageSelector && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold">Pilih Gambar Tujuan</h3>
+                      <button
+                        onClick={() => {
+                          setShowImageSelector(false);
+                          setPendingHotspot(null);
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    
+                    {slideshowCards.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        Belum ada card slideshow yang tersedia.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {slideshowCards.filter(card => card.id !== selectedCard?.id).map((card) => (
+                          <div 
+                            key={card.id}
+                            className="cursor-pointer border-2 border-transparent hover:border-blue-500 rounded-lg overflow-hidden transition-all"
+                            onClick={() => selectImage(card.id)}
+                          >
+                            <img
+                              src={card.imageUrl}
+                              alt={card.title}
+                              className="w-full h-32 object-cover"
+                            />
+                            <div className="p-2">
+                              <div className="font-medium text-sm">{card.title}</div>
+                              <div className="text-xs text-gray-500">{card.description}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className="mt-6 flex justify-end">
+                      <button
+                        onClick={() => {
+                          setShowImageSelector(false);
+                          setPendingHotspot(null);
+                        }}
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                      >
+                        Batal
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

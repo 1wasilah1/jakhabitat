@@ -7,6 +7,8 @@ import sharp from 'sharp';
 // import fetch from 'node-fetch'; // Disabled for testing
 import { initDatabase, insertPhoto, getPhotos, deletePhoto, insertHotspot, getHotspots, deleteHotspotsByPhoto } from './database.js';
 import { initMasterTables, createUnit, getUnits, updateUnit, deleteUnit, createHarga, getHarga, updateHarga, deleteHarga } from './masterData.js';
+import { initSlideshowTables } from './slideshowCards.js';
+import slideshowRoutes from './slideshowRoutes.js';
 
 const app = express();
 app.use(cors());
@@ -19,7 +21,10 @@ const storage = multer.diskStorage({
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const date = String(now.getDate()).padStart(2, '0');
     
-    const uploadDir = `/home/wasilah/migration/images/jakhabitat/360/${year}/${month}/${date}`;
+    // Different paths for different file types
+    const fileType = req.body.type || 'panorama';
+    const subDir = fileType === 'icon' ? 'icons' : '360';
+    const uploadDir = `/home/wasilah/migration/images/jakhabitat/${subDir}/${year}/${month}/${date}`;
     
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
@@ -50,6 +55,9 @@ const upload = multer({
 
 app.use(express.json());
 
+// Use slideshow routes
+app.use('/', slideshowRoutes);
+
 // Serve uploaded images from jakhabitat directory
 app.use('/images', express.static('/home/wasilah/migration/images/jakhabitat'));
 
@@ -71,7 +79,40 @@ app.get('/', (req, res) => {
   res.json({ message: 'Jakhabitat API Server', status: 'running' });
 });
 
-// Upload panorama endpoint
+// General upload endpoint
+app.post('/upload', authenticateToken, upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const fileType = req.body.type || 'panorama';
+    
+    // Save to database
+    await insertPhoto({
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      filePath: req.file.path,
+      fileSize: req.file.size,
+      mimeType: req.file.mimetype,
+      category: fileType,
+      unitId: req.body.unitId || null,
+      roomCategory: req.body.category || null,
+      isDefault: req.body.isDefault === 'true'
+    });
+
+    res.json({
+      success: true,
+      message: `${fileType} uploaded successfully`,
+      filename: req.file.filename,
+      path: req.file.path
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Legacy panorama upload endpoint
 app.post('/upload/panorama', authenticateToken, upload.single('panorama'), async (req, res) => {
   try {
     if (!req.file) {
@@ -118,7 +159,7 @@ app.get('/image/:filename', async (req, res) => {
   try {
     const { filename } = req.params;
     const { w, h, q, f } = req.query; // width, height, quality, format
-    const baseDir = '/home/wasilah/migration/images/jakhabitat/360';
+    const baseDir = '/home/wasilah/migration/images/jakhabitat';
     
     // Function to recursively search for file
     const findFile = (dir) => {
@@ -425,11 +466,12 @@ app.get('/public/panoramas/:unitId', async (req, res) => {
 const PORT = process.env.PORT || 6000;
 
 // Initialize database and start server
-Promise.all([initDatabase(), initMasterTables()]).then(() => {
+Promise.all([initDatabase(), initMasterTables(), initSlideshowTables()]).then(() => {
   app.listen(PORT, () => {
     console.log(`Jakhabitat API Server running on port ${PORT}`);
     console.log('Available endpoints:');
     console.log('GET  / - Server status');
+    console.log('POST /upload - General upload');
     console.log('POST /upload/panorama - Upload panorama');
     console.log('GET  /panoramas - List panoramas');
     console.log('DELETE /panoramas/:id - Delete panorama');
@@ -441,6 +483,15 @@ Promise.all([initDatabase(), initMasterTables()]).then(() => {
     console.log('GET  /master-harga - List harga');
     console.log('PUT  /master-harga/:id - Update harga');
     console.log('DELETE /master-harga/:id - Delete harga');
+    console.log('GET  /slideshow-cards - List slideshow cards');
+    console.log('POST /slideshow-cards - Create slideshow card');
+    console.log('PUT  /slideshow-cards/:id - Update slideshow card');
+    console.log('DELETE /slideshow-cards/:id - Delete slideshow card');
+    console.log('GET  /slideshow-hotspots/:cardId - List slideshow hotspots');
+    console.log('POST /slideshow-hotspots - Create slideshow hotspot');
+    console.log('DELETE /slideshow-hotspots/:id - Delete slideshow hotspot');
+    console.log('GET  /icons - List icons');
+    console.log('DELETE /icons/:filename - Delete icon');
     console.log('GET  /public/master-unit - Public units list');
     console.log('GET  /public/panoramas/:unitId - Public panoramas by unit');
   });

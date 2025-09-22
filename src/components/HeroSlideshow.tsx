@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Maximize2, Search, DollarSign, Phone, MapPin, FileText, HelpCircle, Gift, List, Home } from "lucide-react";
-import { Canvas, useLoader } from "@react-three/fiber";
+import { Canvas, useLoader, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -26,14 +26,68 @@ interface HeroSlideshowProps {
 // Small helper to wrap index within [0, length)
 const wrapIndex = (i: number, length: number) => (i + length) % length;
 
-// Simple equirectangular 360 sphere
-const PanoramaSphere: React.FC<{ src: string }> = ({ src }) => {
+// Simple equirectangular 360 sphere with hotspots
+const PanoramaSphere: React.FC<{ src: string; hotspots?: Array<{x: number, y: number, label: string, href: string, icon: string}>, onHotspotUpdate?: (positions: any[]) => void }> = ({ src, hotspots = [], onHotspotUpdate }) => {
   const texture = useLoader(THREE.TextureLoader, src);
+  const { camera, size } = useThree();
+  
+  // Convert 2D coordinates to 3D sphere positions
+  const convertTo3D = (x: number, y: number, radius = 25) => {
+    const xPercent = x / window.innerWidth;
+    const yPercent = y / window.innerHeight;
+    
+    const phi = xPercent * Math.PI * 2;
+    const theta = (1 - yPercent) * Math.PI;
+    
+    return [
+      -radius * Math.sin(theta) * Math.cos(phi),
+      radius * Math.cos(theta),
+      radius * Math.sin(theta) * Math.sin(phi)
+    ];
+  };
+  
+  // Update screen positions for HTML overlay
+  React.useEffect(() => {
+    if (onHotspotUpdate) {
+      const positions = hotspots.map(hotspot => {
+        const [x, y, z] = convertTo3D(hotspot.x, hotspot.y);
+        const vector = new THREE.Vector3(x, y, z);
+        vector.project(camera);
+        
+        const screenX = (vector.x * 0.5 + 0.5) * size.width;
+        const screenY = (vector.y * -0.5 + 0.5) * size.height;
+        
+        return {
+          ...hotspot,
+          screenPos: { x: screenX, y: screenY }
+        };
+      });
+      onHotspotUpdate(positions);
+    }
+  });
+  
   return (
-    <mesh scale={[-50, 50, 50]}>
-      <sphereGeometry args={[1, 64, 32]} />
-      <meshBasicMaterial map={texture} side={THREE.BackSide} />
-    </mesh>
+    <group>
+      <mesh scale={[-50, 50, 50]}>
+        <sphereGeometry args={[1, 64, 32]} />
+        <meshBasicMaterial map={texture} side={THREE.BackSide} />
+      </mesh>
+      
+      {/* Invisible 3D Hotspots for interaction */}
+      {hotspots.map((hotspot, index) => {
+        const [x, y, z] = convertTo3D(hotspot.x, hotspot.y);
+        return (
+          <mesh
+            key={index}
+            position={[x, y, z]}
+            onClick={() => window.open(hotspot.href, '_self')}
+          >
+            <sphereGeometry args={[2]} />
+            <meshBasicMaterial transparent opacity={0} />
+          </mesh>
+        );
+      })}
+    </group>
   );
 };
 
@@ -47,6 +101,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(!!document.fullscreenElement);
+  const [hotspotPositions, setHotspotPositions] = useState([]);
 
   // Keep local state in sync with actual fullscreen status
   useEffect(() => {
@@ -189,11 +244,10 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
       <div className="pointer-events-none absolute top-0 left-0 right-0 z-[60] flex flex-col items-center justify-start pt-6 md:pt-8 px-4">
         <div className="absolute left-4 top-6 md:left-6 md:top-8 pointer-events-none">
           <img
-            src="https://dprkp.jakarta.go.id/jakhabitat/JAKHABITAT-LOGO-01.png"
+            src="/JAKHABITAT-LOGO putih-01.png"
             alt="JAKHABITAT"
             className="h-16 md:h-24 lg:h-28 w-auto select-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
             draggable={false}
-            referrerPolicy="no-referrer"
             onError={(e) => {
               const fallback = '/JAKHABITAT-LOGO-01.png';
               if (e.currentTarget.src !== (window.location.origin + fallback)) {
@@ -291,7 +345,20 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
                       onPointerUp={onCanvasPointerUp}
                       onPointerCancel={onCanvasPointerUp}
                     >
-                      <PanoramaSphere src={images[key]} />
+                      <PanoramaSphere 
+                        src={images[key]} 
+                        hotspots={isFullscreen ? [
+                          { x: 338, y: 156, label: 'Unit & Tour', href: '#unit-tour', icon: 'Home' },
+                          { x: 520, y: 200, label: 'HTM... Apaan tuh?', href: '#htm', icon: 'DollarSign' },
+                          { x: 720, y: 260, label: 'Kontak Kami!', href: '#kontak', icon: 'Phone' },
+                          { x: 860, y: 320, label: 'Lokasi', href: '#lokasi', icon: 'MapPin' },
+                          { x: 1040, y: 160, label: 'E-Brochure', href: '#ebrochure', icon: 'FileText' },
+                          { x: 1200, y: 220, label: 'Cara Daftarnya?', href: '#cara-daftar', icon: 'List' },
+                          { x: 1340, y: 280, label: 'FAQ', href: '#faq', icon: 'HelpCircle' },
+                          { x: 1480, y: 340, label: 'Benefitnya apa aja nih?', href: '#benefit', icon: 'Gift' }
+                        ] : []}
+                        onHotspotUpdate={setHotspotPositions}
+                      />
                       <OrbitControls
                         enableZoom={true}
                         enablePan={false}
@@ -325,43 +392,34 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
                       >
                         <Maximize2 className="w-4 h-4" />
                       </button>
-
-                      {/* Fullscreen-only hotspots pinned to screen coords */}
-                      {isFullscreen && (
-                        <div className="pointer-events-none fixed inset-0 z-20">
-                          {(fullscreenHotspots ?? [
-                            { key: 'unit-tour', label: 'Unit & Tour', href: '#unit-tour', x: 338, y: 156 },
-                            { key: 'htm', label: 'HTM... Apaan tuh?', href: '#htm', x: 520, y: 200 },
-                            { key: 'kontak', label: 'Kontak Kami!', href: '#kontak', x: 720, y: 260 },
-                            { key: 'lokasi', label: 'Lokasi', href: '#lokasi', x: 860, y: 320 },
-                            { key: 'ebrochure', label: 'E-Brochure', href: '#ebrochure', x: 1040, y: 160 },
-                            { key: 'cara-daftar', label: 'Cara Daftarnya?', href: '#cara-daftar', x: 1200, y: 220 },
-                            { key: 'faq', label: 'FAQ', href: '#faq', x: 1340, y: 280 },
-                            { key: 'benefit', label: 'Benefitnya apa aja nih?', href: '#benefit', x: 1480, y: 340 },
-                          ]).map((hs) => {
-                            const Icon =
-                              hs.key === 'unit-tour' ? Home :
-                              hs.key === 'htm' ? DollarSign :
-                              hs.key === 'kontak' ? Phone :
-                              hs.key === 'lokasi' ? MapPin :
-                              hs.key === 'ebrochure' ? FileText :
-                              hs.key === 'cara-daftar' ? List :
-                              hs.key === 'faq' ? HelpCircle :
-                              Gift; // benefit
-                            return (
-                              <a
-                                key={hs.key}
-                                href={hs.href ?? `#${hs.key}`}
-                                className="pointer-events-auto absolute inline-flex items-center gap-2 bg-black/65 hover:bg-black/80 text-white px-3 py-2 rounded-full shadow-md text-[11px] md:text-xs"
-                                style={{ left: `${hs.x}px`, top: `${hs.y}px` }}
-                              >
-                                <Icon className="w-4 h-4" />
-                                <span className="whitespace-nowrap">{hs.label}</span>
-                              </a>
-                            );
-                          })}
-                        </div>
-                      )}
+                      
+                      {/* Icon Hotspots Overlay */}
+                      {isFullscreen && hotspotPositions.map((hotspot, index) => {
+                        const Icon = 
+                          hotspot.icon === 'Home' ? Home :
+                          hotspot.icon === 'DollarSign' ? DollarSign :
+                          hotspot.icon === 'Phone' ? Phone :
+                          hotspot.icon === 'MapPin' ? MapPin :
+                          hotspot.icon === 'FileText' ? FileText :
+                          hotspot.icon === 'List' ? List :
+                          hotspot.icon === 'HelpCircle' ? HelpCircle :
+                          Gift;
+                        return (
+                          <a
+                            key={index}
+                            href={hotspot.href}
+                            className="absolute inline-flex items-center gap-2 bg-black/65 hover:bg-black/80 text-white px-3 py-2 rounded-full shadow-md text-xs z-20"
+                            style={{ 
+                              left: `${hotspot.screenPos.x}px`, 
+                              top: `${hotspot.screenPos.y}px`,
+                              transform: 'translate(-50%, -50%)'
+                            }}
+                          >
+                            <Icon className="w-4 h-4" />
+                            <span className="whitespace-nowrap">{hotspot.label}</span>
+                          </a>
+                        );
+                      })}
                     </>
                   )}
                 </div>
