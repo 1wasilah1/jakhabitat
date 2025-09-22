@@ -258,7 +258,14 @@ export const Tour360 = ({ selectedTower, selectedArea, onUnitsLoaded }: { select
           
           <div className="absolute inset-0 bg-black/30"></div>
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 text-white text-center">
-            <h2 className="text-2xl font-bold mb-1">360° VIRTUAL TOUR</h2>
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <img 
+                src="/JAKHABITAT-LOGO putih-01.png" 
+                alt="Jakhabitat Logo" 
+                className="h-10 w-auto"
+              />
+              <h2 className="text-2xl font-bold">360° VIRTUAL TOUR</h2>
+            </div>
             <p className="text-white/80 text-sm">Jelajahi setiap ruangan dengan teknologi immersive 3D</p>
           </div>
           
@@ -299,8 +306,15 @@ export const Tour360 = ({ selectedTower, selectedArea, onUnitsLoaded }: { select
         />
       </Canvas>
       
-          {/* Back to Room Selector */}
-          <div className="absolute top-4 left-4 z-20">
+          {/* Back to Room Selector with Logo */}
+          <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
+            <div className="bg-black/50 backdrop-blur rounded-lg p-2">
+              <img 
+                src="/JAKHABITAT-LOGO putih-01.png" 
+                alt="Jakhabitat Logo" 
+                className="h-6 w-auto"
+              />
+            </div>
             <button
               onClick={() => setShowRoomSelector(true)}
               className="bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors flex items-center gap-2"
@@ -311,17 +325,17 @@ export const Tour360 = ({ selectedTower, selectedArea, onUnitsLoaded }: { select
           </div>
           
           {/* Debug Mode Toggle */}
-          <div className="absolute top-4 left-20 z-20">
+          <div className="absolute top-16 left-4 z-20">
             <button
               onClick={() => setDebugMode(!debugMode)}
-              className={`px-3 py-1 rounded text-xs transition-colors ${
+              className={`px-3 py-1 rounded text-xs transition-colors backdrop-blur ${
                 debugMode ? 'bg-red-500 text-white' : 'bg-black/50 text-white hover:bg-black/70'
               }`}
             >
               {debugMode ? 'Debug ON' : 'Debug OFF'}
             </button>
             {clickCoordinates && debugMode && (
-              <div className="mt-2 bg-black/80 text-white px-2 py-1 rounded text-xs">
+              <div className="mt-2 bg-black/80 text-white px-2 py-1 rounded text-xs backdrop-blur">
                 x: {clickCoordinates.x}, y: {clickCoordinates.y}
               </div>
             )}

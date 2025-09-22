@@ -5,6 +5,9 @@ const MediaManager = ({ authState }) => {
   const [panoramas, setPanoramas] = useState([]);
   const [groupedPanoramas, setGroupedPanoramas] = useState({});
   const [expandedUnits, setExpandedUnits] = useState({});
+  const [activeTab, setActiveTab] = useState('panoramas');
+  const [icons, setIcons] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedPanorama, setSelectedPanorama] = useState(null);
   const [hotspots, setHotspots] = useState([]);
@@ -19,6 +22,7 @@ const MediaManager = ({ authState }) => {
 
   useEffect(() => {
     loadPanoramas();
+    loadIcons();
   }, []);
 
   useEffect(() => {
@@ -255,109 +259,290 @@ const MediaManager = ({ authState }) => {
     setShowHotspotContextMenu(false);
   };
 
+  const loadIcons = async () => {
+    try {
+      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/icons', {
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        setIcons(result.data || []);
+      }
+    } catch (error) {
+      console.error('Error loading icons:', error);
+    }
+  };
+
+  const handleIconUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'icon');
+      
+      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+        body: formData,
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('Icon berhasil diupload!');
+        loadIcons();
+        e.target.value = '';
+      } else {
+        alert('Error upload: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error uploading icon:', error);
+      alert('Terjadi kesalahan saat upload icon');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeleteIcon = async (filename) => {
+    if (!confirm('Yakin ingin menghapus icon ini?')) return;
+    
+    try {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/icons/${filename}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        alert('Icon berhasil dihapus!');
+        loadIcons();
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Gagal menghapus icon');
+    }
+  };
+
+  const copyIconUrl = (filename) => {
+    const url = `https://dprkp.jakarta.go.id/api/jakhabitat/image/${filename}`;
+    navigator.clipboard.writeText(url);
+    alert('URL icon berhasil disalin!');
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Manajemen Media</h2>
       
+      {/* Tabs */}
+      <div className="mb-6">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setActiveTab('panoramas')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'panoramas'
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Panorama 360°
+            </button>
+            <button
+              onClick={() => setActiveTab('icons')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'icons'
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Icons & Images
+            </button>
+          </nav>
+        </div>
+      </div>
+      
       <div className="bg-white rounded-lg shadow">
         <div className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Panorama 360° by Unit</h3>
-            <div className="text-sm text-gray-500">
-              Total: {panoramas.length} foto dari {Object.keys(groupedPanoramas).length} unit
-            </div>
-          </div>
+          {activeTab === 'panoramas' && (
+            <>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Panorama 360° by Unit</h3>
+                <div className="text-sm text-gray-500">
+                  Total: {panoramas.length} foto dari {Object.keys(groupedPanoramas).length} unit
+                </div>
+              </div>
           
-          {Object.keys(groupedPanoramas).length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              Belum ada media yang diupload
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {Object.entries(groupedPanoramas).map(([unitKey, unitData]) => (
-                <div key={unitKey} className="border rounded-lg">
-                  <div 
-                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50"
-                    onClick={() => toggleUnit(unitKey)}
-                  >
-                    <div className="flex items-center space-x-3">
-                      {expandedUnits[unitKey] ? (
-                        <ChevronDown className="h-5 w-5 text-gray-400" />
-                      ) : (
-                        <ChevronRight className="h-5 w-5 text-gray-400" />
-                      )}
-                      <div>
-                        <h4 className="font-medium text-gray-900">{unitData.unitName}</h4>
-                        <p className="text-sm text-gray-500">{unitData.unitDetails}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                        {unitData.photos.length} foto
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {expandedUnits[unitKey] && (
-                    <div className="border-t bg-gray-50">
-                      <div className="p-4">
-                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                          {unitData.photos.map((photo) => (
-                            <div key={photo.id} className="relative group">
-                              <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
-                                <img
-                                  src={`https://dprkp.jakarta.go.id/api/jakhabitat/image/${photo.filename}`}
-                                  alt={photo.originalName}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
-                                  }}
-                                />
-                              </div>
-                              
-                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                <div className="flex space-x-2">
-                                  <button
-                                    onClick={() => {
-                                      setSelectedPanorama(photo);
-                                      setShowDetailModal(true);
-                                      loadHotspots(photo.id);
-                                    }}
-                                    className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-100"
-                                  >
-                                    <Eye className="h-4 w-4" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDelete(photo.id)}
-                                    className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </button>
-                                </div>
-                              </div>
-                              
-                              <div className="mt-2">
-                                <div className="text-center mb-1">
-                                  <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                                    {String(photo.roomCategory || 'N/A').replace('_', ' ')}
-                                  </span>
-                                </div>
-                                <p className="text-xs text-gray-500 truncate text-center">
-                                  {photo.originalName}
-                                </p>
-                                <p className="text-xs text-gray-400 text-center">
-                                  {photo.fileSize ? `${Math.round(Number(photo.fileSize) / 1024)} KB` : 'N/A'}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
+              {Object.keys(groupedPanoramas).length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  Belum ada media yang diupload
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {Object.entries(groupedPanoramas).map(([unitKey, unitData]) => (
+                    <div key={unitKey} className="border rounded-lg">
+                      <div 
+                        className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50"
+                        onClick={() => toggleUnit(unitKey)}
+                      >
+                        <div className="flex items-center space-x-3">
+                          {expandedUnits[unitKey] ? (
+                            <ChevronDown className="h-5 w-5 text-gray-400" />
+                          ) : (
+                            <ChevronRight className="h-5 w-5 text-gray-400" />
+                          )}
+                          <div>
+                            <h4 className="font-medium text-gray-900">{unitData.unitName}</h4>
+                            <p className="text-sm text-gray-500">{unitData.unitDetails}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                            {unitData.photos.length} foto
+                          </span>
                         </div>
                       </div>
+                      
+                      {expandedUnits[unitKey] && (
+                        <div className="border-t bg-gray-50">
+                          <div className="p-4">
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                              {unitData.photos.map((photo) => (
+                                <div key={photo.id} className="relative group">
+                                  <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                                    <img
+                                      src={`https://dprkp.jakarta.go.id/api/jakhabitat/image/${photo.filename}`}
+                                      alt={photo.originalName}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
+                                      }}
+                                    />
+                                  </div>
+                                  
+                                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                    <div className="flex space-x-2">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedPanorama(photo);
+                                          setShowDetailModal(true);
+                                          loadHotspots(photo.id);
+                                        }}
+                                        className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-100"
+                                      >
+                                        <Eye className="h-4 w-4" />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDelete(photo.id)}
+                                        className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="mt-2">
+                                    <div className="text-center mb-1">
+                                      <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                        {String(photo.roomCategory || 'N/A').replace('_', ' ')}
+                                      </span>
+                                    </div>
+                                    <p className="text-xs text-gray-500 truncate text-center">
+                                      {photo.originalName}
+                                    </p>
+                                    <p className="text-xs text-gray-400 text-center">
+                                      {photo.fileSize ? `${Math.round(Number(photo.fileSize) / 1024)} KB` : 'N/A'}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  ))}
                 </div>
-              ))}
-            </div>
+              )}
+            </>
+          )}
+          
+          {activeTab === 'icons' && (
+            <>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Icons & Images</h3>
+                <div className="flex items-center gap-4">
+                  <div className="text-sm text-gray-500">
+                    Total: {icons.length} files
+                  </div>
+                  <label className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 cursor-pointer">
+                    {uploading ? 'Uploading...' : 'Upload Icon/Image'}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleIconUpload}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
+              </div>
+              
+              {icons.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  Belum ada icon/image yang diupload
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {icons.map((icon, index) => (
+                    <div key={index} className="relative group">
+                      <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                        <img
+                          src={`https://dprkp.jakarta.go.id/api/jakhabitat/image/${icon.filename}`}
+                          alt={icon.originalName}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => copyIconUrl(icon.filename)}
+                            className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-100"
+                            title="Copy URL"
+                          >
+                            📋
+                          </button>
+                          <button
+                            onClick={() => handleDeleteIcon(icon.filename)}
+                            className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-2">
+                        <p className="text-xs text-gray-500 truncate text-center">
+                          {icon.originalName}
+                        </p>
+                        <p className="text-xs text-gray-400 text-center">
+                          {icon.fileSize ? `${Math.round(Number(icon.fileSize) / 1024)} KB` : 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
