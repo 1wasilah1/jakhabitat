@@ -109,6 +109,11 @@ export async function getSlideshowCards() {
 export async function insertSlideshowCard(cardData) {
   let connection;
   try {
+    // Validate required fields
+    if (!cardData.title || !cardData.imageUrl) {
+      throw new Error('Title and imageUrl are required');
+    }
+    
     connection = await oracledb.getConnection(dbConfig);
     
     const result = await connection.execute(
@@ -117,7 +122,7 @@ export async function insertSlideshowCard(cardData) {
        VALUES (:title, :description, :imageUrl, :orderNum)`,
       {
         title: cardData.title,
-        description: cardData.description,
+        description: cardData.description || '',
         imageUrl: cardData.imageUrl,
         orderNum: cardData.order || 1
       },
@@ -137,6 +142,11 @@ export async function insertSlideshowCard(cardData) {
 export async function updateSlideshowCard(id, cardData) {
   let connection;
   try {
+    // Validate required fields
+    if (!cardData.title || !cardData.imageUrl) {
+      throw new Error('Title and imageUrl are required');
+    }
+    
     connection = await oracledb.getConnection(dbConfig);
     
     const result = await connection.execute(
@@ -147,7 +157,7 @@ export async function updateSlideshowCard(id, cardData) {
       {
         id: parseInt(id),
         title: cardData.title,
-        description: cardData.description,
+        description: cardData.description || '',
         imageUrl: cardData.imageUrl,
         orderNum: cardData.order || 1
       },

@@ -213,6 +213,7 @@ export const CMSDashboard = () => {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('type', 'slideshow');
       
       const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/upload', {
         method: 'POST',
@@ -225,14 +226,16 @@ export const CMSDashboard = () => {
       const result = await response.json();
       
       if (result.success) {
-        setCardForm({...cardForm, imageUrl: `https://dprkp.jakarta.go.id/api/jakhabitat/image/${result.filename}`});
-        alert('Foto berhasil diupload!');
+        const imageUrl = `https://dprkp.jakarta.go.id/api/jakhabitat/image/${result.filename}`;
+        setCardForm(prev => ({...prev, imageUrl}));
+        console.log('File uploaded, imageUrl set to:', imageUrl);
       } else {
-        alert('Error upload: ' + result.error);
+        throw new Error(result.error || 'Upload failed');
       }
     } catch (error) {
       console.error('Error uploading file:', error);
-      alert('Terjadi kesalahan saat upload foto');
+      alert('Terjadi kesalahan saat upload foto: ' + error.message);
+      throw error;
     } finally {
       setUploading(false);
     }
@@ -243,9 +246,23 @@ export const CMSDashboard = () => {
     setLoading(true);
     
     try {
+      // Validate required fields
+      if (!cardForm.title || (!cardForm.imageUrl && !selectedFile)) {
+        alert('Judul dan gambar wajib diisi!');
+        setLoading(false);
+        return;
+      }
+      
       // Upload file first if selected
       if (selectedFile) {
         await handleFileUpload(selectedFile);
+      }
+      
+      // Ensure imageUrl is not empty
+      if (!cardForm.imageUrl) {
+        alert('Gambar belum diupload atau URL belum diisi!');
+        setLoading(false);
+        return;
       }
       
       const url = editingCard 
@@ -253,6 +270,8 @@ export const CMSDashboard = () => {
         : 'https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards';
       
       const method = editingCard ? 'PUT' : 'POST';
+      
+      console.log('Sending card data:', cardForm);
       
       const response = await fetch(url, {
         method,
