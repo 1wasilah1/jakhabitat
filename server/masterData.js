@@ -197,24 +197,32 @@ export async function deleteUnit(id) {
     
     console.log('Deleting unit with ID:', id);
     
-    // Delete related harga records first
+    // Delete hotspots from slideshow cards first
     await connection.execute(
-      `DELETE FROM WEBSITE_JAKHABITAT_MASTER_HARGA WHERE UNIT_ID = :id`,
-      { id },
+      `DELETE FROM WEBSITE_JAKHABITAT_SLIDESHOW_HOTSPOTS 
+       WHERE CARD_ID IN (SELECT ID FROM WEBSITE_JAKHABITAT_SLIDESHOW_CARDS WHERE UNIT_ID = :id)`,
+      { id: parseInt(id) },
       { autoCommit: false, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     // Delete slideshow cards that reference this unit
     await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_SLIDESHOW_CARDS WHERE UNIT_ID = :id`,
-      { id },
+      { id: parseInt(id) },
+      { autoCommit: false, outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    
+    // Delete related harga records
+    await connection.execute(
+      `DELETE FROM WEBSITE_JAKHABITAT_MASTER_HARGA WHERE UNIT_ID = :id`,
+      { id: parseInt(id) },
       { autoCommit: false, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
     // Then delete the unit
     const result = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_MASTER_UNIT WHERE ID = :id`,
-      { id },
+      { id: parseInt(id) },
       { autoCommit: false, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
