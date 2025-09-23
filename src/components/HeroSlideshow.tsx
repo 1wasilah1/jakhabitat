@@ -112,7 +112,8 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
         const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards');
         const result = await response.json();
         if (result.success) {
-          const sortedCards = result.data.sort((a, b) => a.order - b.order);
+          const cardTypeOnly = result.data.filter(card => card.type === 'card');
+          const sortedCards = cardTypeOnly.sort((a, b) => a.order - b.order);
           setSlideshowCards(sortedCards);
           // Set initial index to card with order 1
           const order1Index = sortedCards.findIndex(card => card.order === 1);
