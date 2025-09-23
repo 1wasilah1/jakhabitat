@@ -247,6 +247,7 @@ export async function getSlideshowHotspots(cardId) {
         href: row.HREF ? String(row.HREF) : null,
         icon: row.ICON ? String(row.ICON) : null,
         text: row.TEXT_CONTENT ? String(row.TEXT_CONTENT) : null,
+        content: row.TARGET_CARD_ID ? String(row.TARGET_CARD_ID) : (row.TEXT_CONTENT ? String(row.TEXT_CONTENT) : null),
         iconUrl: row.ICON_URL ? String(row.ICON_URL) : null,
         targetCardId: row.TARGET_CARD_ID ? Number(row.TARGET_CARD_ID) : null,
         createdAt: row.CREATED_AT ? new Date(row.CREATED_AT).toISOString() : null
@@ -280,9 +281,9 @@ export async function insertSlideshowHotspot(hotspotData) {
         label: hotspotData.label || null,
         href: hotspotData.href || null,
         icon: hotspotData.icon || null,
-        text: hotspotData.text || null,
+        text: hotspotData.text || hotspotData.content || null,
         iconUrl: hotspotData.iconUrl || null,
-        targetCardId: hotspotData.targetCardId || null
+        targetCardId: hotspotData.targetCardId || hotspotData.content || null
       },
       { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
