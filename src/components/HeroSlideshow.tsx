@@ -479,11 +479,13 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
                             }}
                           >
                             {hotspot.icon === 'Custom' && hotspot.iconUrl ? (
-                              <img src={hotspot.iconUrl} alt="" className="w-4 h-4" />
+                              <img src={hotspot.iconUrl} alt="" className="w-8 h-8" />
                             ) : (
-                              <Icon className="w-4 h-4" />
+                              <>
+                                <Icon className="w-4 h-4" />
+                                <span className="whitespace-nowrap">{hotspot.label}</span>
+                              </>
                             )}
-                            <span className="whitespace-nowrap">{hotspot.label}</span>
                           </button>
                         );
                       })}
