@@ -63,6 +63,9 @@ export const CMSDashboard = () => {
   const [pendingHotspot, setPendingHotspot] = useState(null);
   const [availableIcons, setAvailableIcons] = useState([]);
   const [showImageSelector, setShowImageSelector] = useState(false);
+  const [showHotspotTypeModal, setShowHotspotTypeModal] = useState(false);
+  const [showTextModal, setShowTextModal] = useState(false);
+  const [textInput, setTextInput] = useState('');
   const { user, logout, authState } = useAuth();
 
   // Load data on component mount
@@ -359,37 +362,46 @@ export const CMSDashboard = () => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    const type = prompt('Pilih tipe hotspot:\n1. Tulisan (ketik: text)\n2. Icon (ketik: icon)\n3. Link ke gambar lain (ketik: link)');
+    setPendingHotspot({
+      cardId: card.id,
+      x: Math.round(x),
+      y: Math.round(y)
+    });
+    
+    setShowHotspotTypeModal(true);
+  };
+
+  const selectHotspotType = (type) => {
+    setShowHotspotTypeModal(false);
     
     if (type === 'text') {
-      const text = prompt('Masukkan tulisan:');
-      if (text) {
-        const newHotspot = {
-          cardId: card.id,
-          x: Math.round(x),
-          y: Math.round(y),
-          text,
-          type: 'text'
-        };
-        saveHotspot(newHotspot);
-      }
+      setTextInput('');
+      setShowTextModal(true);
     } else if (type === 'icon') {
-      setPendingHotspot({
-        cardId: card.id,
-        x: Math.round(x),
-        y: Math.round(y),
-        type: 'icon'
-      });
+      setPendingHotspot(prev => ({...prev, type: 'icon'}));
       setShowIconSelector(true);
     } else if (type === 'link') {
-      setPendingHotspot({
-        cardId: card.id,
-        x: Math.round(x),
-        y: Math.round(y),
-        type: 'link'
-      });
+      setPendingHotspot(prev => ({...prev, type: 'link'}));
       setShowImageSelector(true);
     }
+  };
+
+  const saveTextHotspot = () => {
+    if (!textInput.trim()) {
+      alert('Tulisan tidak boleh kosong!');
+      return;
+    }
+    
+    const newHotspot = {
+      ...pendingHotspot,
+      text: textInput.trim(),
+      type: 'text'
+    };
+    
+    saveHotspot(newHotspot);
+    setShowTextModal(false);
+    setTextInput('');
+    setPendingHotspot(null);
   };
 
   const saveHotspot = async (hotspot) => {
@@ -1113,6 +1125,112 @@ export const CMSDashboard = () => {
                       >
                         Batal
                       </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Hotspot Type Selection Modal */}
+            {showHotspotTypeModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold">Pilih Tipe Hotspot</h3>
+                      <button
+                        onClick={() => {
+                          setShowHotspotTypeModal(false);
+                          setPendingHotspot(null);
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <button
+                        onClick={() => selectHotspotType('text')}
+                        className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="font-medium">Tulisan</div>
+                        <div className="text-sm text-gray-500">Tampilkan teks di atas gambar</div>
+                      </button>
+                      
+                      <button
+                        onClick={() => selectHotspotType('icon')}
+                        className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="font-medium">Icon</div>
+                        <div className="text-sm text-gray-500">Tampilkan icon yang sudah diupload</div>
+                      </button>
+                      
+                      <button
+                        onClick={() => selectHotspotType('link')}
+                        className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="font-medium">Link ke Gambar Lain</div>
+                        <div className="text-sm text-gray-500">Pindah ke slideshow card lain</div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Text Input Modal */}
+            {showTextModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold">Masukkan Tulisan</h3>
+                      <button
+                        onClick={() => {
+                          setShowTextModal(false);
+                          setTextInput('');
+                          setPendingHotspot(null);
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Tulisan yang akan ditampilkan:
+                        </label>
+                        <input
+                          type="text"
+                          value={textInput}
+                          onChange={(e) => setTextInput(e.target.value)}
+                          placeholder="Masukkan tulisan..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          autoFocus
+                        />
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <button
+                          onClick={saveTextHotspot}
+                          className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                        >
+                          Simpan
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowTextModal(false);
+                            setTextInput('');
+                            setPendingHotspot(null);
+                          }}
+                          className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                        >
+                          Batal
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
