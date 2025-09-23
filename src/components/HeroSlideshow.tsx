@@ -100,6 +100,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
   fullscreenHotspots,
 }) => {
   const [slideshowCards, setSlideshowCards] = useState([]);
+  const [allCards, setAllCards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(!!document.fullscreenElement);
   const [hotspotPositions, setHotspotPositions] = useState([]);
@@ -112,6 +113,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
         const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards');
         const result = await response.json();
         if (result.success) {
+          setAllCards(result.data);
           const cardTypeOnly = result.data.filter(card => card.type === 'card');
           const sortedCards = cardTypeOnly.sort((a, b) => a.order - b.order);
           setSlideshowCards(sortedCards);
@@ -131,9 +133,10 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
   // Load hotspots for current card
   useEffect(() => {
     const loadHotspots = async () => {
-      if (slideshowCards.length === 0) return;
-      const currentCard = slideshowCards[currentIndex];
-      if (!currentCard) return;
+      const displayCards = slideshowCards.length > 0 ? slideshowCards : images;
+      if (displayCards.length === 0) return;
+      const currentCard = displayCards[currentIndex];
+      if (!currentCard || !currentCard.id) return;
       
       try {
         const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-hotspots/${currentCard.id}`);
@@ -413,9 +416,20 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
                                 'Gift',
                           iconUrl: hotspot.iconUrl,
                           onClick: hotspot.type === 'link' ? () => {
-                            const targetCardIndex = slideshowCards.findIndex(card => card.id == hotspot.content);
-                            if (targetCardIndex !== -1) {
-                              setCurrentIndex(targetCardIndex);
+                            const targetCard = allCards.find(card => card.id == hotspot.content);
+                            if (targetCard) {
+                              if (targetCard.type === 'media') {
+                                // For media type, replace current view with media
+                                const tempCards = [...slideshowCards];
+                                tempCards[currentIndex] = targetCard;
+                                setSlideshowCards(tempCards);
+                              } else {
+                                // For card type, navigate normally
+                                const targetCardIndex = slideshowCards.findIndex(card => card.id == targetCard.id);
+                                if (targetCardIndex !== -1) {
+                                  setCurrentIndex(targetCardIndex);
+                                }
+                              }
                               document.exitFullscreen();
                             }
                           } : undefined
