@@ -65,7 +65,9 @@ export const CMSDashboard = () => {
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [showHotspotTypeModal, setShowHotspotTypeModal] = useState(false);
   const [showTextModal, setShowTextModal] = useState(false);
+  const [showPageModal, setShowPageModal] = useState(false);
   const [textInput, setTextInput] = useState('');
+  const [selectedPage, setSelectedPage] = useState('');
   const { user, logout, authState } = useAuth();
 
   // Load data on component mount
@@ -383,6 +385,9 @@ export const CMSDashboard = () => {
     } else if (type === 'link') {
       setPendingHotspot(prev => ({...prev, type: 'link'}));
       setShowImageSelector(true);
+    } else if (type === 'page') {
+      setSelectedPage('');
+      setShowPageModal(true);
     }
   };
 
@@ -1173,6 +1178,14 @@ export const CMSDashboard = () => {
                         <div className="font-medium">Link ke Gambar Lain</div>
                         <div className="text-sm text-gray-500">Pindah ke slideshow card lain</div>
                       </button>
+                      
+                      <button
+                        onClick={() => selectHotspotType('page')}
+                        className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="font-medium">Link ke Halaman</div>
+                        <div className="text-sm text-gray-500">Pindah ke halaman kontak atau HTM info</div>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1285,6 +1298,74 @@ export const CMSDashboard = () => {
                       <button
                         onClick={() => {
                           setShowImageSelector(false);
+                          setPendingHotspot(null);
+                        }}
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                      >
+                        Batal
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Page Selector Modal */}
+            {showPageModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold">Pilih Halaman Tujuan</h3>
+                      <button
+                        onClick={() => {
+                          setShowPageModal(false);
+                          setSelectedPage('');
+                          setPendingHotspot(null);
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {[
+                        { id: 'kontak', label: 'Kontak', desc: 'Halaman informasi kontak' },
+                        { id: 'htm-info', label: 'HTM Info', desc: 'Halaman informasi HTM' },
+                        { id: 'lokasi', label: 'Lokasi', desc: 'Halaman informasi lokasi' },
+                        { id: 'brochure', label: 'E-Brochure', desc: 'Halaman e-brochure' },
+                        { id: 'register', label: 'Cara Daftar', desc: 'Halaman cara pendaftaran' },
+                        { id: 'faq', label: 'FAQ', desc: 'Halaman frequently asked questions' },
+                        { id: 'benefits', label: 'Benefits', desc: 'Halaman keuntungan dan manfaat' }
+                      ].map(page => (
+                        <button
+                          key={page.id}
+                          onClick={() => {
+                            const newHotspot = {
+                              ...pendingHotspot,
+                              type: 'page',
+                              targetPage: page.id,
+                              label: page.label
+                            };
+                            saveHotspot(newHotspot);
+                            setShowPageModal(false);
+                            setSelectedPage('');
+                            setPendingHotspot(null);
+                          }}
+                          className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="font-medium">{page.label}</div>
+                          <div className="text-sm text-gray-500">{page.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <div className="mt-6 flex justify-end">
+                      <button
+                        onClick={() => {
+                          setShowPageModal(false);
+                          setSelectedPage('');
                           setPendingHotspot(null);
                         }}
                         className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
