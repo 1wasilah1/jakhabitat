@@ -14,6 +14,8 @@ CREATE TABLE WEBSITE_JAKHABITAT_SLIDESHOW_CARDS (
   DESCRIPTION CLOB,
   IMAGE_URL VARCHAR2(500) NOT NULL,
   ORDER_NUM NUMBER DEFAULT 1,
+  UNIT_ID NUMBER,
+  TYPE VARCHAR2(20) DEFAULT 'card',
   CREATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UPDATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
@@ -81,7 +83,7 @@ export async function getSlideshowCards() {
     connection = await oracledb.getConnection(dbConfig);
     
     const result = await connection.execute(
-      `SELECT ID, TITLE, DESCRIPTION, IMAGE_URL, ORDER_NUM, CREATED_AT, UPDATED_AT
+      `SELECT ID, TITLE, DESCRIPTION, IMAGE_URL, ORDER_NUM, UNIT_ID, TYPE, CREATED_AT, UPDATED_AT
        FROM WEBSITE_JAKHABITAT_SLIDESHOW_CARDS 
        ORDER BY ORDER_NUM ASC, CREATED_AT DESC`,
       {},
@@ -96,6 +98,8 @@ export async function getSlideshowCards() {
         description: String(row.DESCRIPTION || ''),
         imageUrl: String(row.IMAGE_URL || ''),
         order: Number(row.ORDER_NUM || 1),
+        unitId: row.UNIT_ID ? Number(row.UNIT_ID) : null,
+        type: String(row.TYPE || 'card'),
         createdAt: row.CREATED_AT ? new Date(row.CREATED_AT).toISOString() : null,
         updatedAt: row.UPDATED_AT ? new Date(row.UPDATED_AT).toISOString() : null
       });
@@ -123,13 +127,15 @@ export async function insertSlideshowCard(cardData) {
     
     const result = await connection.execute(
       `INSERT INTO WEBSITE_JAKHABITAT_SLIDESHOW_CARDS 
-       (TITLE, DESCRIPTION, IMAGE_URL, ORDER_NUM) 
-       VALUES (:title, :description, :imageUrl, :orderNum)`,
+       (TITLE, DESCRIPTION, IMAGE_URL, ORDER_NUM, UNIT_ID, TYPE) 
+       VALUES (:title, :description, :imageUrl, :orderNum, :unitId, :type)`,
       {
         title: cardData.title,
         description: cardData.description || '',
         imageUrl: cardData.imageUrl,
-        orderNum: cardData.order || 1
+        orderNum: cardData.order || 1,
+        unitId: cardData.unitId || null,
+        type: cardData.type || 'card'
       },
       { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -157,14 +163,16 @@ export async function updateSlideshowCard(id, cardData) {
     const result = await connection.execute(
       `UPDATE WEBSITE_JAKHABITAT_SLIDESHOW_CARDS 
        SET TITLE = :title, DESCRIPTION = :description, IMAGE_URL = :imageUrl, 
-           ORDER_NUM = :orderNum, UPDATED_AT = CURRENT_TIMESTAMP
+           ORDER_NUM = :orderNum, UNIT_ID = :unitId, TYPE = :type, UPDATED_AT = CURRENT_TIMESTAMP
        WHERE ID = :id`,
       {
         id: parseInt(id),
         title: cardData.title,
         description: cardData.description || '',
         imageUrl: cardData.imageUrl,
-        orderNum: cardData.order || 1
+        orderNum: cardData.order || 1,
+        unitId: cardData.unitId || null,
+        type: cardData.type || 'card'
       },
       { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
