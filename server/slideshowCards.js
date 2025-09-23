@@ -206,11 +206,13 @@ export async function deleteSlideshowCard(id) {
     console.log('Deleting slideshow card with ID:', id);
     
     // Delete hotspots first due to foreign key constraint
-    await connection.execute(
+    const hotspotsResult = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_SLIDESHOW_HOTSPOTS WHERE CARD_ID = :id`,
       { id: parseInt(id) },
       { autoCommit: false, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
+    
+    console.log('Deleted hotspots:', hotspotsResult.rowsAffected);
     
     // Then delete the card
     const result = await connection.execute(
