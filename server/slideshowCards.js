@@ -88,15 +88,18 @@ export async function getSlideshowCards() {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    return result.rows.map(row => ({
-      id: row.ID,
-      title: row.TITLE,
-      description: row.DESCRIPTION,
-      imageUrl: row.IMAGE_URL,
-      order: row.ORDER_NUM,
-      createdAt: row.CREATED_AT,
-      updatedAt: row.UPDATED_AT
-    }));
+    return result.rows.map(row => {
+      const cleanRow = JSON.parse(JSON.stringify(row));
+      return {
+        id: cleanRow.ID,
+        title: cleanRow.TITLE,
+        description: cleanRow.DESCRIPTION,
+        imageUrl: cleanRow.IMAGE_URL,
+        order: cleanRow.ORDER_NUM,
+        createdAt: cleanRow.CREATED_AT,
+        updatedAt: cleanRow.UPDATED_AT
+      };
+    });
   } catch (error) {
     throw error;
   } finally {
@@ -211,20 +214,23 @@ export async function getSlideshowHotspots(cardId) {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    return result.rows.map(row => ({
-      id: row.ID,
-      cardId: row.CARD_ID,
-      x: row.X_COORDINATE,
-      y: row.Y_COORDINATE,
-      type: row.TYPE,
-      label: row.LABEL,
-      href: row.HREF,
-      icon: row.ICON,
-      text: row.TEXT_CONTENT,
-      iconUrl: row.ICON_URL,
-      targetCardId: row.TARGET_CARD_ID,
-      createdAt: row.CREATED_AT
-    }));
+    return result.rows.map(row => {
+      const cleanRow = JSON.parse(JSON.stringify(row));
+      return {
+        id: cleanRow.ID,
+        cardId: cleanRow.CARD_ID,
+        x: cleanRow.X_COORDINATE,
+        y: cleanRow.Y_COORDINATE,
+        type: cleanRow.TYPE,
+        label: cleanRow.LABEL,
+        href: cleanRow.HREF,
+        icon: cleanRow.ICON,
+        text: cleanRow.TEXT_CONTENT,
+        iconUrl: cleanRow.ICON_URL,
+        targetCardId: cleanRow.TARGET_CARD_ID,
+        createdAt: cleanRow.CREATED_AT
+      };
+    });
   } catch (error) {
     throw error;
   } finally {
@@ -304,13 +310,16 @@ export async function getIcons() {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    return result.rows.map(row => ({
-      id: row.ID,
-      filename: row.FILENAME,
-      originalName: row.ORIGINAL_NAME,
-      fileSize: row.FILE_SIZE,
-      createdAt: row.CREATED_AT
-    }));
+    return result.rows.map(row => {
+      const cleanRow = JSON.parse(JSON.stringify(row));
+      return {
+        id: cleanRow.ID,
+        filename: cleanRow.FILENAME,
+        originalName: cleanRow.ORIGINAL_NAME,
+        fileSize: cleanRow.FILE_SIZE,
+        createdAt: cleanRow.CREATED_AT
+      };
+    });
   } catch (error) {
     throw error;
   } finally {
