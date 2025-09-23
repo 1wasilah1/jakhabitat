@@ -203,14 +203,36 @@ export async function deleteSlideshowCard(id) {
   try {
     connection = await oracledb.getConnection(dbConfig);
     
+    console.log('Deleting slideshow card with ID:', id);
+    
+    // Delete hotspots first due to foreign key constraint
+    await connection.execute(
+      `DELETE FROM WEBSITE_JAKHABITAT_SLIDESHOW_HOTSPOTS WHERE CARD_ID = :id`,
+      { id: parseInt(id) },
+      { autoCommit: false, outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    
+    // Then delete the card
     const result = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_SLIDESHOW_CARDS WHERE ID = :id`,
       { id: parseInt(id) },
-      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      { autoCommit: false, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
+    
+    await connection.commit();
+    
+    console.log('Delete result:', result.rowsAffected);
+    
+    if (result.rowsAffected === 0) {
+      throw new Error('Card not found or already deleted');
+    }
     
     return result;
   } catch (error) {
+    console.error('Delete slideshow card error:', error);
+    if (connection) {
+      await connection.rollback();
+    }
     throw error;
   } finally {
     if (connection) {

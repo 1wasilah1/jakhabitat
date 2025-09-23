@@ -195,14 +195,43 @@ export async function deleteUnit(id) {
   try {
     connection = await oracledb.getConnection(dbConfig);
     
+    console.log('Deleting unit with ID:', id);
+    
+    // Delete related harga records first
+    await connection.execute(
+      `DELETE FROM WEBSITE_JAKHABITAT_MASTER_HARGA WHERE UNIT_ID = :id`,
+      { id },
+      { autoCommit: false, outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    
+    // Delete slideshow cards that reference this unit
+    await connection.execute(
+      `DELETE FROM WEBSITE_JAKHABITAT_SLIDESHOW_CARDS WHERE UNIT_ID = :id`,
+      { id },
+      { autoCommit: false, outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    
+    // Then delete the unit
     const result = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_MASTER_UNIT WHERE ID = :id`,
       { id },
-      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      { autoCommit: false, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
+    
+    await connection.commit();
+    
+    console.log('Delete unit result:', result.rowsAffected);
+    
+    if (result.rowsAffected === 0) {
+      throw new Error('Unit not found or already deleted');
+    }
     
     return result;
   } catch (error) {
+    console.error('Delete unit error:', error);
+    if (connection) {
+      await connection.rollback();
+    }
     throw error;
   } finally {
     if (connection) {
@@ -329,14 +358,23 @@ export async function deleteHarga(id) {
   try {
     connection = await oracledb.getConnection(dbConfig);
     
+    console.log('Deleting harga with ID:', id);
+    
     const result = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_MASTER_HARGA WHERE ID = :id`,
-      { id },
+      { id: parseInt(id) },
       { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
+    console.log('Delete harga result:', result.rowsAffected);
+    
+    if (result.rowsAffected === 0) {
+      throw new Error('Harga not found or already deleted');
+    }
+    
     return result;
   } catch (error) {
+    console.error('Delete harga error:', error);
     throw error;
   } finally {
     if (connection) {

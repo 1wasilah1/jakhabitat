@@ -71,6 +71,7 @@ export const CMSDashboard = () => {
   const [showPageModal, setShowPageModal] = useState(false);
   const [textInput, setTextInput] = useState('');
   const [selectedPage, setSelectedPage] = useState('');
+  const [analyticsData, setAnalyticsData] = useState(null);
   const { user, logout, authState } = useAuth();
 
   // Load data on component mount
@@ -80,6 +81,8 @@ export const CMSDashboard = () => {
     } else if (activeMenu === 'slideshow-cards') {
       loadSlideshowCards();
       loadUnits();
+    } else if (activeMenu === 'analytics') {
+      loadAnalyticsData();
     }
   }, [activeMenu]);
 
@@ -516,6 +519,22 @@ export const CMSDashboard = () => {
     saveHotspot(newHotspot);
     setShowImageSelector(false);
     setPendingHotspot(null);
+  };
+
+  const loadAnalyticsData = async () => {
+    try {
+      const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/analytics/data', {
+        headers: {
+          'Authorization': `Bearer ${authState.accessToken}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        setAnalyticsData(result.data);
+      }
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+    }
   };
 
   const handleLogout = () => {
@@ -1441,10 +1460,114 @@ export const CMSDashboard = () => {
             {activeMenu === 'analytics' && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Analitik</h2>
-                <div className="bg-white rounded-lg shadow p-6">
-                  <p className="text-gray-600">
-                    Lihat statistik pengunjung dan performa website.
-                  </p>
+                
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                  <div className="bg-white rounded-lg shadow p-6">
+                    <div className="flex items-center">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <Users className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">Total Pengunjung</p>
+                        <p className="text-2xl font-semibold text-gray-900">{analyticsData?.uniqueVisitors || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg shadow p-6">
+                    <div className="flex items-center">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <BarChart3 className="h-6 w-6 text-green-600" />
+                      </div>
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">Halaman Dilihat</p>
+                        <p className="text-2xl font-semibold text-gray-900">{analyticsData?.totalViews || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg shadow p-6">
+                    <div className="flex items-center">
+                      <div className="p-2 bg-yellow-100 rounded-lg">
+                        <Image className="h-6 w-6 text-yellow-600" />
+                      </div>
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">Slideshow Views</p>
+                        <p className="text-2xl font-semibold text-gray-900">890</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg shadow p-6">
+                    <div className="flex items-center">
+                      <div className="p-2 bg-purple-100 rounded-lg">
+                        <Building className="h-6 w-6 text-purple-600" />
+                      </div>
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">Unit Dilihat</p>
+                        <p className="text-2xl font-semibold text-gray-900">456</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Charts */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-white rounded-lg shadow p-6">
+                    <h3 className="text-lg font-semibold mb-4">Pengunjung Harian</h3>
+                    <div className="h-64 flex items-end justify-between space-x-2">
+                      {(analyticsData?.dailyViews || [{views: 0}]).slice(-7).map((day, index) => (
+                        <div key={index} className="flex flex-col items-center">
+                          <div 
+                            className="bg-blue-500 w-8 rounded-t" 
+                            style={{ height: `${Math.max((day.views || 0) / Math.max(...(analyticsData?.dailyViews || [{views: 1}]).map(d => d.views || 1)) * 100, 5)}%` }}
+                          ></div>
+                          <span className="text-xs text-gray-500 mt-2">
+                            {day.date ? new Date(day.date).toLocaleDateString('id', { weekday: 'short' }) : ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'][index]}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg shadow p-6">
+                    <h3 className="text-lg font-semibold mb-4">Halaman Populer</h3>
+                    <div className="space-y-4">
+                      {(analyticsData?.popularPages || []).map((item, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-sm font-medium">{item.page}</span>
+                              <span className="text-sm text-gray-500">{item.views}</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-blue-500 h-2 rounded-full" 
+                                style={{ width: `${Math.max((item.views || 0) / Math.max(...(analyticsData?.popularPages || [{views: 1}]).map(p => p.views || 1)) * 100, 5)}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Recent Activity */}
+                <div className="mt-6 bg-white rounded-lg shadow p-6">
+                  <h3 className="text-lg font-semibold mb-4">Aktivitas Terbaru</h3>
+                  <div className="space-y-3">
+                    {(analyticsData?.recentActivity || []).map((activity, index) => (
+                      <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                        <div>
+                          <p className="text-sm font-medium">{activity.type}: {activity.data}</p>
+                          <p className="text-xs text-gray-500">{activity.time ? new Date(activity.time).toLocaleString('id') : ''}</p>
+                        </div>
+                        <span className="text-xs text-gray-400">{activity.ip}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
