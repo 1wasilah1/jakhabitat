@@ -54,6 +54,17 @@ export async function initSlideshowTables() {
     if (cardsTableCheck.rows[0].COUNT === 0) {
       await connection.execute(createSlideshowCardsTableSQL);
       console.log('Table WEBSITE_JAKHABITAT_SLIDESHOW_CARDS created successfully');
+    } else {
+      // Add missing columns if table exists
+      try {
+        await connection.execute(`ALTER TABLE WEBSITE_JAKHABITAT_SLIDESHOW_CARDS ADD (UNIT_ID NUMBER)`);
+        console.log('Added UNIT_ID column');
+      } catch (e) { /* Column already exists */ }
+      
+      try {
+        await connection.execute(`ALTER TABLE WEBSITE_JAKHABITAT_SLIDESHOW_CARDS ADD (TYPE VARCHAR2(20) DEFAULT 'card')`);
+        console.log('Added TYPE column');
+      } catch (e) { /* Column already exists */ }
     }
     
     // Check and create slideshow hotspots table
