@@ -99,9 +99,53 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
   placeholderSearch = "Cari unit, fasilitas, lokasi...",
   fullscreenHotspots,
 }) => {
+  const [slideshowCards, setSlideshowCards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(!!document.fullscreenElement);
   const [hotspotPositions, setHotspotPositions] = useState([]);
+  const [cardHotspots, setCardHotspots] = useState([]);
+
+  // Load slideshow cards from API
+  useEffect(() => {
+    const loadSlideshowCards = async () => {
+      try {
+        const response = await fetch('https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards');
+        const result = await response.json();
+        if (result.success) {
+          const sortedCards = result.data.sort((a, b) => a.order - b.order);
+          setSlideshowCards(sortedCards);
+          // Set initial index to card with order 1
+          const order1Index = sortedCards.findIndex(card => card.order === 1);
+          if (order1Index !== -1) {
+            setCurrentIndex(order1Index);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading slideshow cards:', error);
+      }
+    };
+    loadSlideshowCards();
+  }, []);
+
+  // Load hotspots for current card
+  useEffect(() => {
+    const loadHotspots = async () => {
+      if (slideshowCards.length === 0) return;
+      const currentCard = slideshowCards[currentIndex];
+      if (!currentCard) return;
+      
+      try {
+        const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-hotspots/${currentCard.id}`);
+        const result = await response.json();
+        if (result.success) {
+          setCardHotspots(result.data || []);
+        }
+      } catch (error) {
+        console.error('Error loading hotspots:', error);
+      }
+    };
+    loadHotspots();
+  }, [currentIndex, slideshowCards]);
 
   // Keep local state in sync with actual fullscreen status
   useEffect(() => {
@@ -120,22 +164,25 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!autoPlay || images.length <= 1) return;
+    const totalCards = slideshowCards.length || images.length;
+    if (!autoPlay || totalCards <= 1) return;
     const t = setInterval(() => {
       // Prevent auto-advance while in fullscreen
       if (isFullscreen) return;
-      setCurrentIndex((p) => (p + 1) % images.length);
+      setCurrentIndex((p) => (p + 1) % totalCards);
     }, interval);
     return () => clearInterval(t);
-  }, [autoPlay, images.length, interval, isFullscreen]);
+  }, [autoPlay, slideshowCards.length, images.length, interval, isFullscreen]);
 
   const goPrev = () => {
     if (isFullscreen) return; // block switching while fullscreen
-    setCurrentIndex((p) => (p - 1 + images.length) % images.length);
+    const totalCards = slideshowCards.length || images.length;
+    setCurrentIndex((p) => (p - 1 + totalCards) % totalCards);
   };
   const goNext = () => {
     if (isFullscreen) return; // block switching while fullscreen
-    setCurrentIndex((p) => (p + 1) % images.length);
+    const totalCards = slideshowCards.length || images.length;
+    setCurrentIndex((p) => (p + 1) % totalCards);
   };
 
   // Swipe/drag for active card (works with 360 Canvas)
@@ -215,13 +262,14 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
 
   // Compute 5 visible cards around the center (fan-out)
   const fanItems = useMemo(() => {
+    const totalCards = slideshowCards.length || images.length;
     const around = [-2, -1, 0, 1, 2];
     return around.map((offset) => ({
-      key: wrapIndex(currentIndex + offset, images.length),
+      key: wrapIndex(currentIndex + offset, totalCards),
       offset,
       isCenter: offset === 0,
     }));
-  }, [currentIndex, images.length]);
+  }, [currentIndex, slideshowCards.length, images.length]);
 
   // Styling map for perspective cards
   const pose = (offset: number) => {
@@ -235,7 +283,10 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
     return config[offset as -2 | -1 | 0 | 1 | 2];
   };
 
-  if (!images?.length) return null;
+  if (!images?.length && !slideshowCards?.length) return null;
+
+  const displayImages = slideshowCards.length > 0 ? slideshowCards.map(card => card.imageUrl) : images;
+  const totalCards = displayImages.length;
 
   return (
     <div className="relative w-full h-full bg-gray-200 overflow-hidden">
@@ -292,7 +343,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
       </div>
 
       {/* Navigation arrows */}
-      {images.length > 1 && (
+      {totalCards > 1 && (
         <>
           <button
             onClick={goPrev}
@@ -346,17 +397,19 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
                       onPointerCancel={onCanvasPointerUp}
                     >
                       <PanoramaSphere 
-                        src={images[key]} 
-                        hotspots={isFullscreen ? [
-                          { x: 338, y: 156, label: 'Unit & Tour', href: '#unit-tour', icon: 'Home' },
-                          { x: 520, y: 200, label: 'HTM... Apaan tuh?', href: '#htm', icon: 'DollarSign' },
-                          { x: 720, y: 260, label: 'Kontak Kami!', href: '#kontak', icon: 'Phone' },
-                          { x: 860, y: 320, label: 'Lokasi', href: '#lokasi', icon: 'MapPin' },
-                          { x: 1040, y: 160, label: 'E-Brochure', href: '#ebrochure', icon: 'FileText' },
-                          { x: 1200, y: 220, label: 'Cara Daftarnya?', href: '#cara-daftar', icon: 'List' },
-                          { x: 1340, y: 280, label: 'FAQ', href: '#faq', icon: 'HelpCircle' },
-                          { x: 1480, y: 340, label: 'Benefitnya apa aja nih?', href: '#benefit', icon: 'Gift' }
-                        ] : []}
+                        src={displayImages[key]} 
+                        hotspots={isFullscreen ? cardHotspots.map(hotspot => ({
+                          x: hotspot.x,
+                          y: hotspot.y,
+                          label: hotspot.label || hotspot.text || 'Hotspot',
+                          href: hotspot.type === 'page' ? `#${hotspot.targetPage}` : 
+                                hotspot.type === 'link' ? `#card-${hotspot.targetCardId}` :
+                                hotspot.href || '#',
+                          icon: hotspot.type === 'text' ? 'FileText' :
+                                hotspot.type === 'page' ? 'Home' :
+                                hotspot.type === 'link' ? 'Search' :
+                                'Gift'
+                        })) : []}
                         onHotspotUpdate={setHotspotPositions}
                       />
                       <OrbitControls
@@ -373,7 +426,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
                     </Canvas>
                   ) : (
                     <img
-                      src={images[key]}
+                      src={displayImages[key]}
                       alt={`Thumbnail ${key + 1}`}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
@@ -436,9 +489,9 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
       </div>
 
       {/* Dots indicator */}
-      {images.length > 1 && (
+      {totalCards > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-          {images.map((_, i) => (
+          {displayImages.map((_, i) => (
             <span
               key={i}
               className={`h-1.5 rounded-full transition-all ${
