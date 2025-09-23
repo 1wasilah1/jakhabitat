@@ -52,7 +52,9 @@ export const CMSDashboard = () => {
     title: '',
     description: '',
     imageUrl: '',
-    order: 1
+    order: 1,
+    unitId: '',
+    type: 'card'
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -76,6 +78,7 @@ export const CMSDashboard = () => {
       loadUnits();
     } else if (activeMenu === 'slideshow-cards') {
       loadSlideshowCards();
+      loadUnits();
     }
   }, [activeMenu]);
 
@@ -293,7 +296,7 @@ export const CMSDashboard = () => {
         alert(editingCard ? 'Card berhasil diupdate!' : 'Card berhasil ditambahkan!');
         setShowCardForm(false);
         setEditingCard(null);
-        setCardForm({ title: '', description: '', imageUrl: '', order: 1 });
+        setCardForm({ title: '', description: '', imageUrl: '', order: 1, unitId: '', type: 'card' });
         setSelectedFile(null);
         loadSlideshowCards();
       } else {
@@ -313,7 +316,9 @@ export const CMSDashboard = () => {
       title: card.title || '',
       description: card.description || '',
       imageUrl: card.imageUrl || '',
-      order: card.order || 1
+      order: card.order || 1,
+      unitId: card.unitId || '',
+      type: card.type || 'card'
     });
     setShowCardForm(true);
   };
@@ -864,6 +869,34 @@ export const CMSDashboard = () => {
                             required
                           />
                         </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Jenis</label>
+                          <select 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            value={cardForm.type}
+                            onChange={(e) => setCardForm({...cardForm, type: e.target.value})}
+                            required
+                          >
+                            <option value="card">Card (Tampil di slideshow)</option>
+                            <option value="media">Media (Hanya untuk hotspot link)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Unit</label>
+                          <select 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            value={cardForm.unitId}
+                            onChange={(e) => setCardForm({...cardForm, unitId: e.target.value})}
+                            required
+                          >
+                            <option value="">Pilih Unit...</option>
+                            {units.map(unit => (
+                              <option key={unit.id} value={unit.id}>
+                                {unit.namaUnit} - {unit.tipeUnit} ({unit.lokasi})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                         <div className="md:col-span-2">
                           <label className="block text-sm font-medium text-gray-700 mb-2">Gambar</label>
                           <div className="space-y-3">
@@ -918,7 +951,7 @@ export const CMSDashboard = () => {
                           onClick={() => {
                             setShowCardForm(false);
                             setEditingCard(null);
-                            setCardForm({ title: '', description: '', imageUrl: '', order: 1 });
+                            setCardForm({ title: '', description: '', imageUrl: '', order: 1, unitId: '', type: 'card' });
                             setSelectedFile(null);
                           }}
                           className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
