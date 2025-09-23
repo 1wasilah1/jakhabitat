@@ -46,6 +46,7 @@ export const CMSDashboard = () => {
   const [showPriceForm, setShowPriceForm] = useState(false);
   const [editingPrice, setEditingPrice] = useState(null);
   const [slideshowCards, setSlideshowCards] = useState([]);
+  const [allSlideshowCards, setAllSlideshowCards] = useState([]);
   const [showCardForm, setShowCardForm] = useState(false);
   const [editingCard, setEditingCard] = useState(null);
   const [cardForm, setCardForm] = useState({
@@ -209,7 +210,8 @@ export const CMSDashboard = () => {
       });
       const result = await response.json();
       if (result.success) {
-        setSlideshowCards(result.data);
+        setAllSlideshowCards(result.data);
+        setSlideshowCards(result.data.filter(card => card.type === 'card'));
       }
     } catch (error) {
       console.error('Error loading slideshow cards:', error);
@@ -506,7 +508,8 @@ export const CMSDashboard = () => {
     
     const newHotspot = {
       ...pendingHotspot,
-      targetCardId: cardId,
+      type: 'link',
+      content: cardId,
       label: `Link ke card ${cardId}`
     };
     
@@ -1307,7 +1310,7 @@ export const CMSDashboard = () => {
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {slideshowCards.filter(card => card.id !== selectedCard?.id).map((card) => (
+                        {allSlideshowCards.filter(card => card.id !== selectedCard?.id).map((card) => (
                           <div 
                             key={card.id}
                             className="cursor-pointer border-2 border-transparent hover:border-blue-500 rounded-lg overflow-hidden transition-all"
@@ -1320,7 +1323,7 @@ export const CMSDashboard = () => {
                             />
                             <div className="p-2">
                               <div className="font-medium text-sm">{card.title}</div>
-                              <div className="text-xs text-gray-500">{card.description}</div>
+                              <div className="text-xs text-gray-500">{card.type === 'media' ? '[Media] ' : ''}{card.description}</div>
                             </div>
                           </div>
                         ))}
