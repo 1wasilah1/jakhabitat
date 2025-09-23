@@ -27,7 +27,7 @@ interface HeroSlideshowProps {
 const wrapIndex = (i: number, length: number) => (i + length) % length;
 
 // Simple equirectangular 360 sphere with hotspots
-const PanoramaSphere: React.FC<{ src: string; hotspots?: Array<{x: number, y: number, label: string, href: string, icon: string}>, onHotspotUpdate?: (positions: any[]) => void }> = ({ src, hotspots = [], onHotspotUpdate }) => {
+const PanoramaSphere: React.FC<{ src: string; hotspots?: Array<{x: number, y: number, label: string, href: string, icon: string, onClick?: () => void}>, onHotspotUpdate?: (positions: any[]) => void }> = ({ src, hotspots = [], onHotspotUpdate }) => {
   const texture = useLoader(THREE.TextureLoader, src);
   const { camera, size } = useThree();
   
@@ -80,7 +80,7 @@ const PanoramaSphere: React.FC<{ src: string; hotspots?: Array<{x: number, y: nu
           <mesh
             key={index}
             position={[x, y, z]}
-            onClick={() => window.open(hotspot.href, '_self')}
+            onClick={() => hotspot.onClick ? hotspot.onClick() : window.open(hotspot.href, '_self')}
           >
             <sphereGeometry args={[2]} />
             <meshBasicMaterial transparent opacity={0} />
@@ -403,12 +403,21 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
                           y: hotspot.y,
                           label: hotspot.label || hotspot.text || 'Hotspot',
                           href: hotspot.type === 'page' ? `#${hotspot.targetPage}` : 
-                                hotspot.type === 'link' ? `#card-${hotspot.targetCardId}` :
+                                hotspot.type === 'link' ? `javascript:void(0)` :
                                 hotspot.href || '#',
                           icon: hotspot.type === 'text' ? 'FileText' :
                                 hotspot.type === 'page' ? 'Home' :
                                 hotspot.type === 'link' ? 'Search' :
-                                'Gift'
+                                hotspot.type === 'icon' ? 'Custom' :
+                                'Gift',
+                          iconUrl: hotspot.iconUrl,
+                          onClick: hotspot.type === 'link' ? () => {
+                            const targetCardIndex = slideshowCards.findIndex(card => card.id == hotspot.content);
+                            if (targetCardIndex !== -1) {
+                              setCurrentIndex(targetCardIndex);
+                              document.exitFullscreen();
+                            }
+                          } : undefined
                         })) : []}
                         onHotspotUpdate={setHotspotPositions}
                       />
@@ -456,21 +465,26 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
                           hotspot.icon === 'FileText' ? FileText :
                           hotspot.icon === 'List' ? List :
                           hotspot.icon === 'HelpCircle' ? HelpCircle :
+                          hotspot.icon === 'Search' ? Search :
                           Gift;
                         return (
-                          <a
+                          <button
                             key={index}
-                            href={hotspot.href}
-                            className="absolute inline-flex items-center gap-2 bg-black/65 hover:bg-black/80 text-white px-3 py-2 rounded-full shadow-md text-xs z-20"
+                            onClick={() => hotspot.onClick ? hotspot.onClick() : window.open(hotspot.href, '_self')}
+                            className="absolute inline-flex items-center gap-2 bg-black/65 hover:bg-black/80 text-white px-3 py-2 rounded-full shadow-md text-xs z-20 cursor-pointer"
                             style={{ 
                               left: `${hotspot.screenPos.x}px`, 
                               top: `${hotspot.screenPos.y}px`,
                               transform: 'translate(-50%, -50%)'
                             }}
                           >
-                            <Icon className="w-4 h-4" />
+                            {hotspot.icon === 'Custom' && hotspot.iconUrl ? (
+                              <img src={hotspot.iconUrl} alt="" className="w-4 h-4" />
+                            ) : (
+                              <Icon className="w-4 h-4" />
+                            )}
                             <span className="whitespace-nowrap">{hotspot.label}</span>
-                          </a>
+                          </button>
                         );
                       })}
                     </>
