@@ -88,18 +88,20 @@ export async function getSlideshowCards() {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    return result.rows.map(row => {
-      const cleanRow = JSON.parse(JSON.stringify(row));
-      return {
-        id: cleanRow.ID,
-        title: cleanRow.TITLE,
-        description: cleanRow.DESCRIPTION,
-        imageUrl: cleanRow.IMAGE_URL,
-        order: cleanRow.ORDER_NUM,
-        createdAt: cleanRow.CREATED_AT,
-        updatedAt: cleanRow.UPDATED_AT
-      };
-    });
+    const cards = [];
+    for (const row of result.rows) {
+      cards.push({
+        id: Number(row.ID),
+        title: String(row.TITLE || ''),
+        description: String(row.DESCRIPTION || ''),
+        imageUrl: String(row.IMAGE_URL || ''),
+        order: Number(row.ORDER_NUM || 1),
+        createdAt: row.CREATED_AT ? new Date(row.CREATED_AT).toISOString() : null,
+        updatedAt: row.UPDATED_AT ? new Date(row.UPDATED_AT).toISOString() : null
+      });
+    }
+    
+    return cards;
   } catch (error) {
     throw error;
   } finally {
@@ -214,23 +216,25 @@ export async function getSlideshowHotspots(cardId) {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    return result.rows.map(row => {
-      const cleanRow = JSON.parse(JSON.stringify(row));
-      return {
-        id: cleanRow.ID,
-        cardId: cleanRow.CARD_ID,
-        x: cleanRow.X_COORDINATE,
-        y: cleanRow.Y_COORDINATE,
-        type: cleanRow.TYPE,
-        label: cleanRow.LABEL,
-        href: cleanRow.HREF,
-        icon: cleanRow.ICON,
-        text: cleanRow.TEXT_CONTENT,
-        iconUrl: cleanRow.ICON_URL,
-        targetCardId: cleanRow.TARGET_CARD_ID,
-        createdAt: cleanRow.CREATED_AT
-      };
-    });
+    const hotspots = [];
+    for (const row of result.rows) {
+      hotspots.push({
+        id: Number(row.ID),
+        cardId: Number(row.CARD_ID),
+        x: Number(row.X_COORDINATE),
+        y: Number(row.Y_COORDINATE),
+        type: String(row.TYPE || 'link'),
+        label: row.LABEL ? String(row.LABEL) : null,
+        href: row.HREF ? String(row.HREF) : null,
+        icon: row.ICON ? String(row.ICON) : null,
+        text: row.TEXT_CONTENT ? String(row.TEXT_CONTENT) : null,
+        iconUrl: row.ICON_URL ? String(row.ICON_URL) : null,
+        targetCardId: row.TARGET_CARD_ID ? Number(row.TARGET_CARD_ID) : null,
+        createdAt: row.CREATED_AT ? new Date(row.CREATED_AT).toISOString() : null
+      });
+    }
+    
+    return hotspots;
   } catch (error) {
     throw error;
   } finally {
@@ -310,16 +314,18 @@ export async function getIcons() {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    return result.rows.map(row => {
-      const cleanRow = JSON.parse(JSON.stringify(row));
-      return {
-        id: cleanRow.ID,
-        filename: cleanRow.FILENAME,
-        originalName: cleanRow.ORIGINAL_NAME,
-        fileSize: cleanRow.FILE_SIZE,
-        createdAt: cleanRow.CREATED_AT
-      };
-    });
+    const icons = [];
+    for (const row of result.rows) {
+      icons.push({
+        id: Number(row.ID),
+        filename: String(row.FILENAME || ''),
+        originalName: String(row.ORIGINAL_NAME || ''),
+        fileSize: row.FILE_SIZE ? Number(row.FILE_SIZE) : null,
+        createdAt: row.CREATED_AT ? new Date(row.CREATED_AT).toISOString() : null
+      });
+    }
+    
+    return icons;
   } catch (error) {
     throw error;
   } finally {
