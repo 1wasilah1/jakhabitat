@@ -2,7 +2,9 @@ import oracledb from 'oracledb';
 import express from 'express';
 import cors from 'cors';
 import slideshowRoutes from './slideshowRoutes.js';
+import masterRoutes from './masterRoutes.js';
 import { initSlideshowTables } from './slideshowCards.js';
+import { initMasterTables } from './masterData.js';
 
 const app = express();
 app.use(cors());
@@ -10,9 +12,11 @@ app.use(express.json());
 
 // Initialize tables
 initSlideshowTables();
+initMasterTables();
 
 // Routes
 app.use('/api/jakhabitat', slideshowRoutes);
+app.use('/api/jakhabitat', masterRoutes);
 
 const dbConfig = {
   user: process.env.DB_USER || 'system',
