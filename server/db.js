@@ -1,10 +1,18 @@
 import oracledb from 'oracledb';
 import express from 'express';
 import cors from 'cors';
+import slideshowRoutes from './slideshowRoutes.js';
+import { initSlideshowTables } from './slideshowCards.js';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Initialize tables
+initSlideshowTables();
+
+// Routes
+app.use('/api/jakhabitat', slideshowRoutes);
 
 const dbConfig = {
   user: process.env.DB_USER || 'system',
@@ -47,4 +55,5 @@ app.post('/api/db/execute', async (req, res) => {
 const PORT = process.env.PORT || 6000;
 app.listen(PORT, () => {
   console.log(`Database server running on port ${PORT}`);
+  console.log('Slideshow routes available at /api/jakhabitat');
 });
