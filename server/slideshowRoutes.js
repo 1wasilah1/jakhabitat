@@ -46,10 +46,13 @@ router.put('/slideshow-cards/:id', async (req, res) => {
 
 router.delete('/slideshow-cards/:id', async (req, res) => {
   try {
+    console.log('DELETE request received for card ID:', req.params.id);
     const result = await deleteSlideshowCard(req.params.id);
+    console.log('Delete operation completed successfully');
     res.json({ success: true, data: result });
   } catch (error) {
     console.error('Error deleting slideshow card:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({ success: false, error: error.message });
   }
 });

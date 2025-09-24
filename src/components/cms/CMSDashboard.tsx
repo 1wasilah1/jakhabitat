@@ -332,6 +332,7 @@ export const CMSDashboard = () => {
     if (!confirm('Yakin ingin menghapus card ini?')) return;
     
     try {
+      console.log('Deleting card ID:', id);
       const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/${id}`, {
         method: 'DELETE',
         headers: {
@@ -339,17 +340,19 @@ export const CMSDashboard = () => {
         },
       });
       
+      console.log('Response status:', response.status);
       const result = await response.json();
+      console.log('Response result:', result);
       
-      if (result.success) {
+      if (response.ok && result.success) {
         alert('Card berhasil dihapus!');
         loadSlideshowCards();
       } else {
-        alert('Error: ' + result.error);
+        alert('Error: ' + (result.error || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error deleting card:', error);
-      alert('Terjadi kesalahan saat menghapus card');
+      alert('Terjadi kesalahan saat menghapus card: ' + error.message);
     }
   };
 
