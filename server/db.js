@@ -14,6 +14,11 @@ app.use(express.json());
 initSlideshowTables();
 initMasterTables();
 
+// Test route
+app.get('/api/jakhabitat/test', (req, res) => {
+  res.json({ success: true, message: 'Server is working' });
+});
+
 // Routes
 app.use('/api/jakhabitat', slideshowRoutes);
 app.use('/api/jakhabitat', masterRoutes);
