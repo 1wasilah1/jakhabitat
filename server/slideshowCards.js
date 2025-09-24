@@ -214,11 +214,7 @@ export async function deleteSlideshowCard(id) {
     
     console.log('Delete result:', result.rowsAffected);
     
-    if (result.rowsAffected === 0) {
-      throw new Error('Card not found or already deleted');
-    }
-    
-    return result;
+    return { rowsAffected: result.rowsAffected, success: true };
   } catch (error) {
     console.error('Delete slideshow card error:', error);
     throw error;

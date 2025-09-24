@@ -341,7 +341,16 @@ export const CMSDashboard = () => {
       });
       
       console.log('Response status:', response.status);
-      const result = await response.json();
+      const text = await response.text();
+      console.log('Response text:', text);
+      
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        result = { success: false, error: 'Invalid response format' };
+      }
       console.log('Response result:', result);
       
       if (response.ok && result.success) {
