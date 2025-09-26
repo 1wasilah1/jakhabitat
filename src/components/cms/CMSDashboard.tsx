@@ -332,36 +332,52 @@ export const CMSDashboard = () => {
     if (!confirm('Yakin ingin menghapus card ini?')) return;
     
     try {
-      console.log('Deleting card ID:', id);
-      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/${id}`, {
+      console.log('🔄 Step 1: Starting delete for card ID:', id);
+      
+      const url = `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/${id}`;
+      console.log('🔄 Step 2: Sending DELETE request to:', url);
+      
+      const response = await fetch(url, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
         },
       });
       
-      console.log('Response status:', response.status);
+      console.log('✅ Step 3: Response received. Status:', response.status, 'OK:', response.ok);
+      
       const text = await response.text();
-      console.log('Response text:', text);
+      console.log('✅ Step 4: Response text:', text);
+      
+      if (!text) {
+        console.error('❌ Step 4 ERROR: Empty response from server');
+        alert('Error: Server mengembalikan response kosong');
+        return;
+      }
       
       let result;
       try {
         result = JSON.parse(text);
+        console.log('✅ Step 5: JSON parsed successfully:', result);
       } catch (parseError) {
-        console.error('JSON parse error:', parseError);
-        result = { success: false, error: 'Invalid response format' };
+        console.error('❌ Step 5 ERROR: JSON parse failed:', parseError);
+        console.error('❌ Raw response text:', text);
+        alert('Error: Response bukan JSON valid. Raw response: ' + text.substring(0, 100));
+        return;
       }
-      console.log('Response result:', result);
       
       if (response.ok && result.success) {
+        console.log('✅ Step 6: Delete successful, reloading data');
         alert('Card berhasil dihapus!');
         loadSlideshowCards();
       } else {
+        console.error('❌ Step 6 ERROR: Delete failed:', result);
         alert('Error: ' + (result.error || 'Unknown error'));
       }
     } catch (error) {
-      console.error('Error deleting card:', error);
-      alert('Terjadi kesalahan saat menghapus card: ' + error.message);
+      console.error('❌ FATAL ERROR in handleDeleteCard:', error);
+      console.error('❌ Error stack:', error.stack);
+      alert('Terjadi kesalahan fatal: ' + error.message);
     }
   };
 
@@ -460,24 +476,52 @@ export const CMSDashboard = () => {
     if (!confirm('Yakin ingin menghapus hotspot ini?')) return;
     
     try {
-      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-hotspots/${id}`, {
+      console.log('🔄 HOTSPOT Step 1: Starting delete for hotspot ID:', id);
+      
+      const url = `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-hotspots/${id}`;
+      console.log('🔄 HOTSPOT Step 2: Sending DELETE request to:', url);
+      
+      const response = await fetch(url, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
         },
       });
       
-      const result = await response.json();
+      console.log('✅ HOTSPOT Step 3: Response received. Status:', response.status, 'OK:', response.ok);
       
-      if (result.success) {
+      const text = await response.text();
+      console.log('✅ HOTSPOT Step 4: Response text:', text);
+      
+      if (!text) {
+        console.error('❌ HOTSPOT Step 4 ERROR: Empty response from server');
+        alert('Error: Server mengembalikan response kosong untuk hotspot');
+        return;
+      }
+      
+      let result;
+      try {
+        result = JSON.parse(text);
+        console.log('✅ HOTSPOT Step 5: JSON parsed successfully:', result);
+      } catch (parseError) {
+        console.error('❌ HOTSPOT Step 5 ERROR: JSON parse failed:', parseError);
+        console.error('❌ HOTSPOT Raw response text:', text);
+        alert('Error: Hotspot response bukan JSON valid. Raw response: ' + text.substring(0, 100));
+        return;
+      }
+      
+      if (response.ok && result.success) {
+        console.log('✅ HOTSPOT Step 6: Delete successful, reloading hotspots');
         alert('Hotspot berhasil dihapus!');
         loadHotspots(selectedCard.id);
       } else {
-        alert('Error: ' + result.error);
+        console.error('❌ HOTSPOT Step 6 ERROR: Delete failed:', result);
+        alert('Error: ' + (result.error || 'Unknown error'));
       }
     } catch (error) {
-      console.error('Error deleting hotspot:', error);
-      alert('Terjadi kesalahan saat menghapus hotspot');
+      console.error('❌ HOTSPOT FATAL ERROR:', error);
+      console.error('❌ HOTSPOT Error stack:', error.stack);
+      alert('Terjadi kesalahan fatal saat menghapus hotspot: ' + error.message);
     }
   };
 
