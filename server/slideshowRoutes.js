@@ -44,7 +44,7 @@ router.put('/slideshow-cards/:id', async (req, res) => {
   }
 });
 
-router.delete('/slideshow-cards/:id', async (req, res) => {
+router.post('/slideshow-cards/:id/delete', async (req, res) => {
   try {
     console.log('DELETE request received for card ID:', req.params.id);
     const result = await deleteSlideshowCard(req.params.id);
@@ -78,7 +78,7 @@ router.post('/slideshow-hotspots', async (req, res) => {
   }
 });
 
-router.delete('/slideshow-hotspots/:id', async (req, res) => {
+router.post('/slideshow-hotspots/:id/delete', async (req, res) => {
   console.log('🔥 HOTSPOT DELETE ROUTE HIT - ID:', req.params.id);
   try {
     console.log('🔥 Calling deleteSlideshowHotspot function...');
