@@ -34,13 +34,13 @@ router.post('/slideshow-cards', async (req, res) => {
   }
 });
 
-router.put('/slideshow-cards/:id', async (req, res) => {
+router.post('/slideshow-cards/:id/edit', async (req, res) => {
   try {
     const result = await updateSlideshowCard(req.params.id, req.body);
-    res.json({ success: true, data: result });
+    res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
   } catch (error) {
     console.error('Error updating slideshow card:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).set('Content-Type', 'application/json').json({ success: false, error: error.message });
   }
 });
 
@@ -106,13 +106,13 @@ router.get('/icons', async (req, res) => {
   }
 });
 
-router.delete('/icons/:filename', async (req, res) => {
+router.post('/icons/:filename/delete', async (req, res) => {
   try {
     const result = await deleteIcon(req.params.filename);
-    res.json({ success: true, data: result });
+    res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
   } catch (error) {
     console.error('Error deleting icon:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).set('Content-Type', 'application/json').json({ success: false, error: error.message });
   }
 });
 

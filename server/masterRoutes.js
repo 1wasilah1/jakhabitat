@@ -43,13 +43,13 @@ router.put('/master-unit/:id', async (req, res) => {
   }
 });
 
-router.delete('/master-unit/:id', async (req, res) => {
+router.post('/master-unit/:id/delete', async (req, res) => {
   try {
     const result = await deleteUnit(req.params.id);
-    res.json({ success: true, data: result });
+    res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
   } catch (error) {
     console.error('Error deleting unit:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).set('Content-Type', 'application/json').json({ success: false, error: error.message });
   }
 });
 
@@ -84,13 +84,13 @@ router.put('/master-harga/:id', async (req, res) => {
   }
 });
 
-router.delete('/master-harga/:id', async (req, res) => {
+router.post('/master-harga/:id/delete', async (req, res) => {
   try {
     const result = await deleteHarga(req.params.id);
-    res.json({ success: true, data: result });
+    res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
   } catch (error) {
     console.error('Error deleting harga:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).set('Content-Type', 'application/json').json({ success: false, error: error.message });
   }
 });
 

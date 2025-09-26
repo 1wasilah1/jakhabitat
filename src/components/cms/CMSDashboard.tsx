@@ -108,10 +108,10 @@ export const CMSDashboard = () => {
     
     try {
       const url = editingUnit 
-        ? `https://dprkp.jakarta.go.id/api/jakhabitat/master-unit/${editingUnit.id}`
+        ? `https://dprkp.jakarta.go.id/api/jakhabitat/master-unit/${editingUnit.id}/edit`
         : 'https://dprkp.jakarta.go.id/api/jakhabitat/master-unit';
       
-      const method = editingUnit ? 'PUT' : 'POST';
+      const method = 'POST';
       
       const response = await fetch(url, {
         method,
@@ -183,10 +183,11 @@ export const CMSDashboard = () => {
     if (!confirm('Yakin ingin menghapus unit ini?')) return;
     
     try {
-      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/master-unit/${id}`, {
-        method: 'DELETE',
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/master-unit/${id}/delete`, {
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
+          'Content-Type': 'application/json'
         },
       });
       
@@ -279,10 +280,10 @@ export const CMSDashboard = () => {
       }
       
       const url = editingCard 
-        ? `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/${editingCard.id}`
+        ? `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/${editingCard.id}/edit`
         : 'https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards';
       
-      const method = editingCard ? 'PUT' : 'POST';
+      const method = 'POST';
       
       console.log('Sending card data:', cardForm);
       

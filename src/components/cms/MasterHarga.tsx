@@ -104,10 +104,10 @@ export const MasterHarga = () => {
     
     try {
       const url = editingPrice 
-        ? `https://dprkp.jakarta.go.id/api/jakhabitat/master-harga/${editingPrice.id}`
+        ? `https://dprkp.jakarta.go.id/api/jakhabitat/master-harga/${editingPrice.id}/edit`
         : 'https://dprkp.jakarta.go.id/api/jakhabitat/master-harga';
       
-      const method = editingPrice ? 'PUT' : 'POST';
+      const method = 'POST';
       
       const response = await fetch(url, {
         method,
@@ -185,10 +185,11 @@ export const MasterHarga = () => {
     if (!confirm('Yakin ingin menghapus harga ini?')) return;
     
     try {
-      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/master-harga/${id}`, {
-        method: 'DELETE',
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/master-harga/${id}/delete`, {
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
+          'Content-Type': 'application/json'
         },
       });
       
