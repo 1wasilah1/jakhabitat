@@ -205,18 +205,37 @@ export async function deleteSlideshowCard(id) {
     
     console.log('Deleting slideshow card with ID:', id);
     
-    // Simple delete with autoCommit
+    // Delete all related records in transaction
+    await connection.execute('BEGIN', [], { autoCommit: false });
+    
+    // Delete hotspots first
+    await connection.execute(
+      `DELETE FROM WEBSITE_JAKHABITAT_SLIDESHOW_HOTSPOTS WHERE CARD_ID = :id`,
+      { id: parseInt(id) },
+      { autoCommit: false }
+    );
+    
+    // Delete the card
     const result = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_SLIDESHOW_CARDS WHERE ID = :id`,
       { id: parseInt(id) },
-      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      { autoCommit: false }
     );
+    
+    await connection.commit();
     
     console.log('Delete result:', result.rowsAffected);
     
     return { rowsAffected: result.rowsAffected, success: true };
   } catch (error) {
     console.error('Delete slideshow card error:', error);
+    if (connection) {
+      try {
+        await connection.rollback();
+      } catch (rollbackError) {
+        console.error('Rollback error:', rollbackError);
+      }
+    }
     throw error;
   } finally {
     if (connection) {
