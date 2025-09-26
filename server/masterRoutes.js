@@ -33,13 +33,13 @@ router.post('/master-unit', async (req, res) => {
   }
 });
 
-router.put('/master-unit/:id', async (req, res) => {
+router.post('/master-unit/:id/edit', async (req, res) => {
   try {
     const result = await updateUnit(req.params.id, req.body);
-    res.json({ success: true, data: result });
+    res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
   } catch (error) {
     console.error('Error updating unit:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).set('Content-Type', 'application/json').json({ success: false, error: error.message });
   }
 });
 
@@ -74,13 +74,13 @@ router.post('/master-harga', async (req, res) => {
   }
 });
 
-router.put('/master-harga/:id', async (req, res) => {
+router.post('/master-harga/:id/edit', async (req, res) => {
   try {
     const result = await updateHarga(req.params.id, req.body);
-    res.json({ success: true, data: result });
+    res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
   } catch (error) {
     console.error('Error updating harga:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).set('Content-Type', 'application/json').json({ success: false, error: error.message });
   }
 });
 
