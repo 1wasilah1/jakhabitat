@@ -49,11 +49,11 @@ router.delete('/slideshow-cards/:id', async (req, res) => {
     console.log('DELETE request received for card ID:', req.params.id);
     const result = await deleteSlideshowCard(req.params.id);
     console.log('Delete operation completed successfully');
-    res.status(200).json({ success: true, data: result });
+    res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
   } catch (error) {
     console.error('Error deleting slideshow card:', error);
     console.error('Error stack:', error.stack);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).set('Content-Type', 'application/json').json({ success: false, error: error.message });
   }
 });
 
@@ -79,14 +79,19 @@ router.post('/slideshow-hotspots', async (req, res) => {
 });
 
 router.delete('/slideshow-hotspots/:id', async (req, res) => {
+  console.log('🔥 HOTSPOT DELETE ROUTE HIT - ID:', req.params.id);
   try {
-    console.log('DELETE hotspot request for ID:', req.params.id);
+    console.log('🔥 Calling deleteSlideshowHotspot function...');
     const result = await deleteSlideshowHotspot(req.params.id);
-    console.log('Hotspot delete completed');
-    res.status(200).json({ success: true, data: result });
+    console.log('🔥 Hotspot delete completed, result:', result);
+    const response = { success: true, data: result };
+    console.log('🔥 Sending response:', response);
+    res.status(200).set('Content-Type', 'application/json').json(response);
   } catch (error) {
-    console.error('Error deleting slideshow hotspot:', error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error('🔥 Error in hotspot delete route:', error);
+    const errorResponse = { success: false, error: error.message };
+    console.log('🔥 Sending error response:', errorResponse);
+    res.status(500).set('Content-Type', 'application/json').json(errorResponse);
   }
 });
 
