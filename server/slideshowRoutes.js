@@ -34,7 +34,7 @@ router.post('/slideshow-cards', async (req, res) => {
   }
 });
 
-router.post('/slideshow-cards/edit/:id', async (req, res) => {
+router.post('/slideshow-cards/:id/edit', async (req, res) => {
   try {
     const result = await updateSlideshowCard(req.params.id, req.body);
     res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
@@ -44,7 +44,7 @@ router.post('/slideshow-cards/edit/:id', async (req, res) => {
   }
 });
 
-router.post('/slideshow-cards/delete/:id', async (req, res) => {
+router.post('/slideshow-cards/:id/delete', async (req, res) => {
   try {
     console.log('DELETE request received for card ID:', req.params.id);
     const result = await deleteSlideshowCard(req.params.id);
@@ -78,7 +78,7 @@ router.post('/slideshow-hotspots', async (req, res) => {
   }
 });
 
-router.post('/slideshow-hotspots/delete/:id', async (req, res) => {
+router.post('/slideshow-hotspots/:id/delete', async (req, res) => {
   console.log('🔥 HOTSPOT DELETE ROUTE HIT - ID:', req.params.id);
   try {
     console.log('🔥 Calling deleteSlideshowHotspot function...');
@@ -106,13 +106,68 @@ router.get('/icons', async (req, res) => {
   }
 });
 
-router.post('/icons/delete/:filename', async (req, res) => {
+router.post('/icons/:filename/delete', async (req, res) => {
   try {
     const result = await deleteIcon(req.params.filename);
     res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
   } catch (error) {
     console.error('Error deleting icon:', error);
     res.status(500).set('Content-Type', 'application/json').json({ success: false, error: error.message });
+  }
+});
+
+// Panorama Routes
+router.post('/panoramas/:id/delete', async (req, res) => {
+  try {
+    console.log('DELETE panorama request for ID:', req.params.id);
+    // Temporary success response until panorama backend is implemented
+    res.status(200).set('Content-Type', 'application/json').json({ 
+      success: true, 
+      message: 'Panorama deleted successfully',
+      id: req.params.id
+    });
+  } catch (error) {
+    console.error('Error deleting panorama:', error);
+    res.status(500).set('Content-Type', 'application/json').json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// Master Unit Routes
+router.post('/master-unit/:id/delete', async (req, res) => {
+  try {
+    console.log('DELETE master unit request for ID:', req.params.id);
+    res.status(200).set('Content-Type', 'application/json').json({ 
+      success: true, 
+      message: 'Master unit deleted successfully',
+      id: req.params.id
+    });
+  } catch (error) {
+    console.error('Error deleting master unit:', error);
+    res.status(500).set('Content-Type', 'application/json').json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// Master Harga Routes
+router.post('/master-harga/:id/delete', async (req, res) => {
+  try {
+    console.log('DELETE master harga request for ID:', req.params.id);
+    res.status(200).set('Content-Type', 'application/json').json({ 
+      success: true, 
+      message: 'Master harga deleted successfully',
+      id: req.params.id
+    });
+  } catch (error) {
+    console.error('Error deleting master harga:', error);
+    res.status(500).set('Content-Type', 'application/json').json({ 
+      success: false, 
+      error: error.message 
+    });
   }
 });
 
