@@ -77,6 +77,8 @@ export async function initSlideshowTables() {
     if (hotspotsTableCheck.rows[0].COUNT === 0) {
       await connection.execute(createSlideshowHotspotsTableSQL);
       console.log('Table WEBSITE_JAKHABITAT_SLIDESHOW_HOTSPOTS created successfully');
+    } else {
+      console.log('Table WEBSITE_JAKHABITAT_SLIDESHOW_HOTSPOTS already exists');
     }
   } catch (error) {
     console.error('Slideshow tables initialization error:', error);
