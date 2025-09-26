@@ -23,6 +23,17 @@ app.get('/api/jakhabitat/test', (req, res) => {
 app.use('/api/jakhabitat', slideshowRoutes);
 app.use('/api/jakhabitat', masterRoutes);
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ success: false, error: 'Internal server error' });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ success: false, error: 'Route not found' });
+});
+
 const dbConfig = {
   user: process.env.DB_USER || 'system',
   password: process.env.DB_PASSWORD || 'Pusd4t1n2025',
