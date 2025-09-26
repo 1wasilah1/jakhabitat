@@ -14,6 +14,7 @@ import {
   deleteUnit,
   deleteHarga
 } from './masterData.js';
+import { deletePanorama } from './panoramaData.js';
 
 const router = express.Router();
 
@@ -124,11 +125,10 @@ router.post('/icons/:filename/delete', async (req, res) => {
 router.post('/panoramas/:id/delete', async (req, res) => {
   try {
     console.log('DELETE panorama request for ID:', req.params.id);
-    // Temporary success response until panorama backend is implemented
+    const result = await deletePanorama(req.params.id);
     res.status(200).set('Content-Type', 'application/json').json({ 
       success: true, 
-      message: 'Panorama deleted successfully',
-      id: req.params.id
+      data: result
     });
   } catch (error) {
     console.error('Error deleting panorama:', error);
