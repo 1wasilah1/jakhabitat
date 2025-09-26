@@ -13,6 +13,14 @@ export async function deletePanorama(id) {
     
     console.log('Deleting panorama with ID:', id);
     
+    // Delete hotspots first
+    await connection.execute(
+      `DELETE FROM WEBSITE_JAKHABITAT_HOTSPOTS WHERE PHOTO_ID = :id`,
+      { id: parseInt(id) },
+      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    
+    // Then delete the photo
     const result = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_FOTO WHERE ID = :id`,
       { id: parseInt(id) },
