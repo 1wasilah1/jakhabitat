@@ -6,24 +6,25 @@ const dbConfig = {
   connectString: process.env.DB_CONNECT_STRING || '10.15.38.162:1539/FREEPDB1',
 };
 
-export async function deletePanorama(id) {
+async function checkTables() {
   let connection;
   try {
     connection = await oracledb.getConnection(dbConfig);
     
-    console.log('Deleting panorama with ID:', id);
-    
     const result = await connection.execute(
-      `DELETE FROM WEBSITE_JAKHABITAT_FOTO WHERE ID = :id`,
-      { id: parseInt(id) },
-      { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      `SELECT table_name FROM user_tables WHERE table_name LIKE '%JAKHABITAT%' ORDER BY table_name`,
+      {},
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    console.log('Delete panorama result:', result.rowsAffected);
+    console.log('Tables found:');
+    result.rows.forEach(row => {
+      console.log('- ' + row.TABLE_NAME);
+    });
     
-    return { rowsAffected: result.rowsAffected, success: true };
+    return result.rows;
   } catch (error) {
-    console.error('Delete panorama error:', error);
+    console.error('Error checking tables:', error);
     throw error;
   } finally {
     if (connection) {
@@ -31,3 +32,5 @@ export async function deletePanorama(id) {
     }
   }
 }
+
+checkTables();
