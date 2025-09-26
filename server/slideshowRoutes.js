@@ -10,6 +10,10 @@ import {
   getIcons,
   deleteIcon
 } from './slideshowCards.js';
+import { 
+  deleteUnit,
+  deleteHarga
+} from './masterData.js';
 
 const router = express.Router();
 
@@ -139,10 +143,10 @@ router.post('/panoramas/:id/delete', async (req, res) => {
 router.post('/master-unit/:id/delete', async (req, res) => {
   try {
     console.log('DELETE master unit request for ID:', req.params.id);
+    const result = await deleteUnit(req.params.id);
     res.status(200).set('Content-Type', 'application/json').json({ 
       success: true, 
-      message: 'Master unit deleted successfully',
-      id: req.params.id
+      data: result
     });
   } catch (error) {
     console.error('Error deleting master unit:', error);
@@ -157,10 +161,10 @@ router.post('/master-unit/:id/delete', async (req, res) => {
 router.post('/master-harga/:id/delete', async (req, res) => {
   try {
     console.log('DELETE master harga request for ID:', req.params.id);
+    const result = await deleteHarga(req.params.id);
     res.status(200).set('Content-Type', 'application/json').json({ 
       success: true, 
-      message: 'Master harga deleted successfully',
-      id: req.params.id
+      data: result
     });
   } catch (error) {
     console.error('Error deleting master harga:', error);
