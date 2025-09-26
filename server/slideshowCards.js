@@ -328,14 +328,19 @@ export async function deleteSlideshowHotspot(id) {
   try {
     connection = await oracledb.getConnection(dbConfig);
     
+    console.log('Deleting hotspot with ID:', id);
+    
     const result = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_SLIDESHOW_HOTSPOTS WHERE ID = :id`,
       { id: parseInt(id) },
       { autoCommit: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     
-    return result;
+    console.log('Delete hotspot result:', result.rowsAffected);
+    
+    return { rowsAffected: result.rowsAffected, success: true };
   } catch (error) {
+    console.error('Delete hotspot error:', error);
     throw error;
   } finally {
     if (connection) {
