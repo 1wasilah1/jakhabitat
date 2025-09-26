@@ -77,5 +77,9 @@ app.post('/api/db/execute', async (req, res) => {
 const PORT = process.env.PORT || 6000;
 app.listen(PORT, () => {
   console.log(`Database server running on port ${PORT}`);
-  console.log('Slideshow routes available at /api/jakhabitat');
+  console.log('Routes loaded:');
+  console.log('- Slideshow routes: /api/jakhabitat/slideshow-*');
+  console.log('- Master routes: /api/jakhabitat/master-*');
+  console.log('- Panorama routes: /api/jakhabitat/panoramas/*');
+  console.log('- Test route: /api/jakhabitat/test');
 });
