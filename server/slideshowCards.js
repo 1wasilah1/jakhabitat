@@ -208,23 +208,20 @@ export async function deleteSlideshowCard(id) {
     console.log('Deleting slideshow card with ID:', id);
     
     // Delete all related records in transaction
-    await connection.execute('BEGIN', [], { autoCommit: false });
     
     // Delete hotspots first
     await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_SLIDESHOW_HOTSPOTS WHERE CARD_ID = :id`,
       { id: parseInt(id) },
-      { autoCommit: false }
+      { autoCommit: true }
     );
     
     // Delete the card
     const result = await connection.execute(
       `DELETE FROM WEBSITE_JAKHABITAT_SLIDESHOW_CARDS WHERE ID = :id`,
       { id: parseInt(id) },
-      { autoCommit: false }
+      { autoCommit: true }
     );
-    
-    await connection.commit();
     
     console.log('Delete result:', result.rowsAffected);
     
