@@ -34,7 +34,7 @@ router.post('/slideshow-cards', async (req, res) => {
   }
 });
 
-router.post('/slideshow-cards/:id/edit', async (req, res) => {
+router.post('/slideshow-cards/edit/:id', async (req, res) => {
   try {
     const result = await updateSlideshowCard(req.params.id, req.body);
     res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
@@ -44,7 +44,7 @@ router.post('/slideshow-cards/:id/edit', async (req, res) => {
   }
 });
 
-router.post('/slideshow-cards/:id/delete', async (req, res) => {
+router.post('/slideshow-cards/delete/:id', async (req, res) => {
   try {
     console.log('DELETE request received for card ID:', req.params.id);
     const result = await deleteSlideshowCard(req.params.id);
@@ -78,7 +78,7 @@ router.post('/slideshow-hotspots', async (req, res) => {
   }
 });
 
-router.post('/slideshow-hotspots/:id/delete', async (req, res) => {
+router.post('/slideshow-hotspots/delete/:id', async (req, res) => {
   console.log('🔥 HOTSPOT DELETE ROUTE HIT - ID:', req.params.id);
   try {
     console.log('🔥 Calling deleteSlideshowHotspot function...');
@@ -106,7 +106,7 @@ router.get('/icons', async (req, res) => {
   }
 });
 
-router.post('/icons/:filename/delete', async (req, res) => {
+router.post('/icons/delete/:filename', async (req, res) => {
   try {
     const result = await deleteIcon(req.params.filename);
     res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });

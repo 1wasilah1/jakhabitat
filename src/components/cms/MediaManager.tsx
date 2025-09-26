@@ -72,7 +72,7 @@ const MediaManager = ({ authState }) => {
     if (!confirm('Yakin ingin menghapus panorama ini?')) return;
     
     try {
-      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/panoramas/${id}/delete`, {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/panoramas/delete/${id}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
@@ -315,7 +315,7 @@ const MediaManager = ({ authState }) => {
     if (!confirm('Yakin ingin menghapus icon ini?')) return;
     
     try {
-      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/icons/${filename}/delete`, {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/icons/delete/${filename}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,

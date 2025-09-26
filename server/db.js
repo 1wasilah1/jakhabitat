@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import slideshowRoutes from './slideshowRoutes.js';
 import masterRoutes from './masterRoutes.js';
+import panoramaRoutes from './panoramaRoutes.js';
 import { initSlideshowTables } from './slideshowCards.js';
 import { initMasterTables } from './masterData.js';
 
@@ -22,6 +23,7 @@ app.get('/api/jakhabitat/test', (req, res) => {
 // Routes
 app.use('/api/jakhabitat', slideshowRoutes);
 app.use('/api/jakhabitat', masterRoutes);
+app.use('/api/jakhabitat', panoramaRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
