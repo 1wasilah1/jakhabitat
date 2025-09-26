@@ -334,13 +334,14 @@ export const CMSDashboard = () => {
     try {
       console.log('🔄 Step 1: Starting delete for card ID:', id);
       
-      const url = `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/${id}`;
-      console.log('🔄 Step 2: Sending DELETE request to:', url);
+      const url = `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/${id}/delete`;
+      console.log('🔄 Step 2: Sending POST request to:', url);
       
       const response = await fetch(url, {
-        method: 'DELETE',
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
+          'Content-Type': 'application/json'
         },
       });
       
@@ -478,13 +479,14 @@ export const CMSDashboard = () => {
     try {
       console.log('🔄 HOTSPOT Step 1: Starting delete for hotspot ID:', id);
       
-      const url = `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-hotspots/${id}`;
-      console.log('🔄 HOTSPOT Step 2: Sending DELETE request to:', url);
+      const url = `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-hotspots/${id}/delete`;
+      console.log('🔄 HOTSPOT Step 2: Sending POST request to:', url);
       
       const response = await fetch(url, {
-        method: 'DELETE',
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
+          'Content-Type': 'application/json'
         },
       });
       
