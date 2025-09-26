@@ -33,7 +33,7 @@ router.post('/master-unit', async (req, res) => {
   }
 });
 
-router.post('/master-unit/:id/edit', async (req, res) => {
+router.post('/master-unit/edit/:id', async (req, res) => {
   try {
     const result = await updateUnit(req.params.id, req.body);
     res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
@@ -43,7 +43,7 @@ router.post('/master-unit/:id/edit', async (req, res) => {
   }
 });
 
-router.post('/master-unit/:id/delete', async (req, res) => {
+router.post('/master-unit/delete/:id', async (req, res) => {
   try {
     const result = await deleteUnit(req.params.id);
     res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
@@ -74,7 +74,7 @@ router.post('/master-harga', async (req, res) => {
   }
 });
 
-router.post('/master-harga/:id/edit', async (req, res) => {
+router.post('/master-harga/edit/:id', async (req, res) => {
   try {
     const result = await updateHarga(req.params.id, req.body);
     res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });
@@ -84,7 +84,7 @@ router.post('/master-harga/:id/edit', async (req, res) => {
   }
 });
 
-router.post('/master-harga/:id/delete', async (req, res) => {
+router.post('/master-harga/delete/:id', async (req, res) => {
   try {
     const result = await deleteHarga(req.params.id);
     res.status(200).set('Content-Type', 'application/json').json({ success: true, data: result });

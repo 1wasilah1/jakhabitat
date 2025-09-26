@@ -108,7 +108,7 @@ export const CMSDashboard = () => {
     
     try {
       const url = editingUnit 
-        ? `https://dprkp.jakarta.go.id/api/jakhabitat/master-unit/${editingUnit.id}/edit`
+        ? `https://dprkp.jakarta.go.id/api/jakhabitat/master-unit/edit/${editingUnit.id}`
         : 'https://dprkp.jakarta.go.id/api/jakhabitat/master-unit';
       
       const method = 'POST';
@@ -183,7 +183,7 @@ export const CMSDashboard = () => {
     if (!confirm('Yakin ingin menghapus unit ini?')) return;
     
     try {
-      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/master-unit/${id}/delete`, {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/master-unit/delete/${id}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
@@ -280,7 +280,7 @@ export const CMSDashboard = () => {
       }
       
       const url = editingCard 
-        ? `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/${editingCard.id}/edit`
+        ? `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/edit/${editingCard.id}`
         : 'https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards';
       
       const method = 'POST';
@@ -335,7 +335,7 @@ export const CMSDashboard = () => {
     try {
       console.log('🔄 Step 1: Starting delete for card ID:', id);
       
-      const url = `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/${id}/delete`;
+      const url = `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-cards/delete/${id}`;
       console.log('🔄 Step 2: Sending POST request to:', url);
       
       const response = await fetch(url, {
@@ -480,7 +480,7 @@ export const CMSDashboard = () => {
     try {
       console.log('🔄 HOTSPOT Step 1: Starting delete for hotspot ID:', id);
       
-      const url = `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-hotspots/${id}/delete`;
+      const url = `https://dprkp.jakarta.go.id/api/jakhabitat/slideshow-hotspots/delete/${id}`;
       console.log('🔄 HOTSPOT Step 2: Sending POST request to:', url);
       
       const response = await fetch(url, {

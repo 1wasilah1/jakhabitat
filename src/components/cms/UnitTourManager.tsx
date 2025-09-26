@@ -103,7 +103,7 @@ const UnitTourManager = ({ authState, units }) => {
     
     try {
       console.log('Deleting panorama ID:', id);
-      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/panoramas/${id}/delete`, {
+      const response = await fetch(`https://dprkp.jakarta.go.id/api/jakhabitat/panoramas/delete/${id}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authState.accessToken}`,
