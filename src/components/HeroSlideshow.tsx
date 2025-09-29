@@ -296,7 +296,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
     <div className="relative w-full h-full bg-gray-200 overflow-hidden rounded-b-3xl">
       {/* Canopy shadow overlay */}
       <div className="absolute top-0 left-0 right-0 z-50 pointer-events-none">
-        <div className="h-[24rem] md:h-[64rem] bg-gradient-to-b from-black/60 via-black/30 via-black/20 to-transparent" />
+        <div className="h-[24rem] md:h-[64rem] bg-gradient-to-b from-black/60 via-black/60 via-black/60 to-transparent" />
         <div className="absolute top-0 left-0 right-0 h-8 md:h-12 bg-gradient-to-b from-black/80 to-black/40" />
         {/* Canopy edge effect */}
         <div className="absolute top-6 md:top-8 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
@@ -319,8 +319,8 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
           />
         </div>
         <h1
-          className="text-orange-500 font-display text-2xl md:text-4xl font-semibold tracking-wide text-center"
-          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
+          className="text-orange-500 text-2xl md:text-4xl font-semibold tracking-wide text-center"
+          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)', fontFamily: 'Poppins, sans-serif' }}
         >
           Galeri Huni
         </h1>
@@ -351,6 +351,13 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
             </button>
           )}
         </form>
+      </div>
+
+      {/* Floating arrow on left side */}
+      <div className="absolute left-8 top-1/2 -translate-y-1/2 z-40">
+        <div className="animate-bounce">
+          <ChevronLeft className="w-8 h-8 text-white/80 drop-shadow-lg" />
+        </div>
       </div>
 
       {/* Navigation arrows */}
