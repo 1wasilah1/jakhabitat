@@ -224,7 +224,7 @@ export const Tour360Modal = ({ isOpen, onClose, selectedTower, selectedArea, onB
             {/* Jakhabitat Logo */}
             <div className="bg-black/50 backdrop-blur rounded-lg p-2">
               <img 
-                src="/JAKHABITAT-LOGO putih-01.png" 
+                src="/JAKHABITAT-LOGO-putih-01.png" 
                 alt="Jakhabitat Logo" 
                 className="h-8 w-auto"
               />
