@@ -296,7 +296,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
     <div className="relative w-full h-full bg-gray-200 overflow-hidden rounded-b-3xl">
       {/* Canopy shadow overlay */}
       <div className="absolute top-0 left-0 right-0 z-50 pointer-events-none">
-        <div className="h-32 md:h-40 bg-gradient-to-b from-black/60 via-black/30 to-transparent" />
+        <div className="h-96 md:h-[32rem] bg-gradient-to-b from-black/60 via-black/30 via-black/20 to-transparent" />
         <div className="absolute top-0 left-0 right-0 h-8 md:h-12 bg-gradient-to-b from-black/80 to-black/40" />
         {/* Canopy edge effect */}
         <div className="absolute top-6 md:top-8 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
