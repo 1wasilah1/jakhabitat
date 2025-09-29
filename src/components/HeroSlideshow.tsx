@@ -299,7 +299,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
       <div className="pointer-events-none absolute top-0 left-0 right-0 z-[60] flex flex-col items-center justify-start pt-6 md:pt-8 px-4">
         <div className="absolute left-4 top-6 md:left-6 md:top-8 pointer-events-none">
           <img
-            src="/JAKHABITAT-LOGO putih-01.png"
+            src="/JAKHABITAT-LOGO-putih-01.png"
             alt="JAKHABITAT"
             className="h-16 md:h-24 lg:h-28 w-auto select-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
             draggable={false}

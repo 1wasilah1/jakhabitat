@@ -17,7 +17,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter basename="/jakhabitat">
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<SlideshowPage />} />
+          <Route path="/hub" element={<Index />} />
           <Route path="/cms" element={<CMS />} />
           <Route path="/slideshow" element={<SlideshowPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

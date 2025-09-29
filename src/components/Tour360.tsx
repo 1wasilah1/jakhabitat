@@ -260,7 +260,7 @@ export const Tour360 = ({ selectedTower, selectedArea, onUnitsLoaded }: { select
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 text-white text-center">
             <div className="flex items-center justify-center gap-3 mb-2">
               <img 
-                src="/JAKHABITAT-LOGO putih-01.png" 
+                src="/JAKHABITAT-LOGO-putih-01.png" 
                 alt="Jakhabitat Logo" 
                 className="h-10 w-auto"
               />
@@ -310,7 +310,7 @@ export const Tour360 = ({ selectedTower, selectedArea, onUnitsLoaded }: { select
           <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
             <div className="bg-black/50 backdrop-blur rounded-lg p-2">
               <img 
-                src="/JAKHABITAT-LOGO putih-01.png" 
+                src="/JAKHABITAT-LOGO-putih-01.png" 
                 alt="Jakhabitat Logo" 
                 className="h-6 w-auto"
               />
