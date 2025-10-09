@@ -14,7 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Playfair Display"', 'serif'],
+        sans: ['Chillax', 'system-ui', 'sans-serif'],
+        display: ['Chillax', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -1,0 +1,59 @@
+{
+  "layers": [
+    {
+      "id": 1,
+      "name": "Layer 1",
+      "type": "object360",
+      "frameCount": 1176,
+      "path": "/jakhabitat/layer/layer1/",
+      "hotspots": [
+        {
+          "x": "41.7%",
+          "y": "46.2%",
+          "label": "Layer 2",
+          "frame": 80,
+          "targetLayer": 2
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Layer 2",
+      "type": "object360",
+      "frameCount": 1176,
+      "path": "/jakhabitat/layer/layer2/",
+      "hotspots": [
+        {
+          "x": "42.1%",
+          "y": "48.0%",
+          "label": "Layer 3",
+          "frame": 59,
+          "targetLayer": 3
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Layer 3",
+      "type": "object360",
+      "frameCount": 1176,
+      "path": "/jakhabitat/layer/layer3/",
+      "hotspots": [
+        {
+          "x": "71.2%",
+          "y": "42.1%",
+          "label": "Layer 4",
+          "frame": 65,
+          "targetLayer": 4
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Layer 4",
+      "type": "panorama",
+      "imageUrl": "/jakhabitat/layer/layer4/samawa-mg.jpg",
+      "hotspots": []
+    }
+  ]
+}

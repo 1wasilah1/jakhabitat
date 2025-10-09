@@ -320,7 +320,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
         </div>
         <h1
           className="text-orange-500 text-2xl md:text-4xl font-semibold tracking-wide text-center"
-          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)', fontFamily: 'Poppins, sans-serif' }}
+          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
         >
           Galeri Huni
         </h1>
