@@ -71,7 +71,6 @@ const HERO_PIECES: PieceConfig[] = [
 
 const NAV_LINKS = [
   { label: 'Home', href: '#hero' },
-  { label: 'Galeri', href: '#galeri' },
   { label: 'Program HTM', href: '#program-htm' },
   { label: 'Syarat', href: '#syarat' },
   { label: 'Download', href: '#download' },
@@ -89,6 +88,7 @@ const Landing: React.FC = () => {
   const [showRecommendationModal, setShowRecommendationModal] = useState(false);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [formData, setFormData] = useState({ salary: '', location: '', tenor: '' });
+  const [isPanoramaMode, setIsPanoramaMode] = useState(false);
   const navRef = useRef<HTMLElement | null>(null);
   const panoramaRef = useRef<HTMLElement | null>(null);
   const mapsRef = useRef<HTMLElement | null>(null);
@@ -191,7 +191,9 @@ const Landing: React.FC = () => {
       {/* Navigation */}
       <nav
         ref={navRef}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 text-white ${
+        className={`fixed left-0 right-0 z-50 transition-all duration-500 ease-in-out text-white ${
+          isPanoramaMode ? '-top-24 opacity-0' : 'top-0 opacity-100'
+        } ${
           navState === 'transparent' ? 'bg-transparent shadow-none' :
           navState === 'semi-transparent' ? 'bg-gray-800/50 shadow-md' :
           'bg-gray-900 shadow-lg'
@@ -263,7 +265,7 @@ const Landing: React.FC = () => {
         id="panorama"
         className="relative min-h-screen"
       >
-        <LayerViewer />
+        <LayerViewer onModeChange={setIsPanoramaMode} />
       </section>
 
       {/* Unit Search Section */}
@@ -781,68 +783,7 @@ const Landing: React.FC = () => {
           </div>
         </section>
 
-        {/* Gallery Section */}
-        <section id="galeri" className="py-20 bg-white">
-          <div className="mx-auto max-w-6xl px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Galeri HTM Jakhabitat</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">Lihat berbagai sudut pandang unit dan fasilitas HTM Jakhabitat melalui koleksi foto dan video kami.</p>
-            </div>
-            
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <div className="relative group cursor-pointer overflow-hidden rounded-lg">
-                <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop" alt="Unit Studio" className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <span className="text-white font-medium">Unit Studio</span>
-                </div>
-              </div>
-              
-              <div className="relative group cursor-pointer overflow-hidden rounded-lg">
-                <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop" alt="Unit 1BR" className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <span className="text-white font-medium">Unit 1BR</span>
-                </div>
-              </div>
-              
-              <div className="relative group cursor-pointer overflow-hidden rounded-lg">
-                <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop" alt="Unit 2BR" className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <span className="text-white font-medium">Unit 2BR</span>
-                </div>
-              </div>
-              
-              <div className="relative group cursor-pointer overflow-hidden rounded-lg">
-                <img src="https://images.unsplash.com/photo-1571624436279-b272aff752b5?w=400&h=300&fit=crop" alt="Fasilitas Umum" className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <span className="text-white font-medium">Fasilitas Umum</span>
-                </div>
-              </div>
-              
-              <div className="relative group cursor-pointer overflow-hidden rounded-lg">
-                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop" alt="Area Parkir" className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <span className="text-white font-medium">Area Parkir</span>
-                </div>
-              </div>
-              
-              <div className="relative group cursor-pointer overflow-hidden rounded-lg">
-                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop" alt="Lobby" className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <span className="text-white font-medium">Lobby</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="text-center mt-12">
-              <button 
-                onClick={() => setShowGalleryModal(true)}
-                className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 rounded-md font-medium transition-colors"
-              >
-                Show All Photos
-              </button>
-            </div>
-          </div>
-        </section>
+
       </main>
 
       {/* Footer */}

@@ -1,0 +1,74 @@
+{
+  "hotspots": [
+    {
+      "id": 4,
+      "mediaId": 2,
+      "x": 49.75,
+      "y": 56.375,
+      "type": "link",
+      "hotspotType": "door",
+      "title": "Masuk",
+      "description": "",
+      "active": true,
+      "targetMediaId": 3,
+      "targetLayerId": 5,
+      "targetUnitId": 1
+    },
+    {
+      "id": 5,
+      "mediaId": 3,
+      "x": 18.375,
+      "y": 79.125,
+      "type": "link",
+      "hotspotType": "info",
+      "title": "view 2",
+      "description": "",
+      "active": true,
+      "targetMediaId": 4,
+      "targetLayerId": 5,
+      "targetUnitId": 1
+    },
+    {
+      "id": 6,
+      "mediaId": 4,
+      "x": 45.625,
+      "y": 80.125,
+      "type": "link",
+      "hotspotType": "navigation",
+      "title": "view 3",
+      "description": "",
+      "active": true,
+      "targetMediaId": 5,
+      "targetLayerId": 5,
+      "targetUnitId": 1
+    },
+    {
+      "id": 7,
+      "mediaId": 1,
+      "x": 50.74999999999999,
+      "y": 53.125,
+      "type": "link",
+      "hotspotType": "room",
+      "title": "Studio",
+      "description": "",
+      "active": true,
+      "targetMediaId": 6,
+      "targetLayerId": 5,
+      "targetUnitId": 1
+    },
+    {
+      "id": 8,
+      "mediaId": 6,
+      "x": 51.24999999999999,
+      "y": 59.375,
+      "type": "link",
+      "hotspotType": "room",
+      "title": "Masuk",
+      "description": "",
+      "active": true,
+      "targetMediaId": 3,
+      "targetLayerId": 5,
+      "targetUnitId": 1
+    }
+  ]
+}

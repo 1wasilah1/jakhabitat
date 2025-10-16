@@ -1,0 +1,30 @@
+{
+  "hotspots": [
+    {
+      "id": 1,
+      "layerId": 1,
+      "layerName": "Living Room",
+      "x": 300,
+      "y": 200,
+      "type": "icon",
+      "mediaId": 1,
+      "iconUrl": "/jakhabitat/icons/info.png",
+      "title": "Living Room Info",
+      "description": "Spacious living room with modern furniture",
+      "active": true
+    },
+    {
+      "id": 2,
+      "layerId": 1,
+      "layerName": "Living Room",
+      "x": 500,
+      "y": 150,
+      "type": "link",
+      "mediaId": 2,
+      "mediaName": "bedroom_360.jpg",
+      "title": "Go to Bedroom",
+      "description": "Navigate to bedroom view",
+      "active": true
+    }
+  ]
+}

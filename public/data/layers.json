@@ -13,24 +13,22 @@
           "label": "Layer 2",
           "frame": 80,
           "targetLayer": 2
+        },
+        {
+          "x": "64.2%",
+          "y": "47.2%",
+          "label": "Layer 3",
+          "frame": 115,
+          "targetLayer": 3
         }
       ]
     },
     {
       "id": 2,
       "name": "Layer 2",
-      "type": "object360",
-      "frameCount": 1176,
-      "path": "/jakhabitat/layer/layer2/",
-      "hotspots": [
-        {
-          "x": "42.1%",
-          "y": "48.0%",
-          "label": "Layer 3",
-          "frame": 59,
-          "targetLayer": 3
-        }
-      ]
+      "type": "iframe",
+      "iframeUrl": "http://localhost:6500/jakhabitat/cms",
+      "hotspots": []
     },
     {
       "id": 3,
@@ -45,6 +43,13 @@
           "label": "Layer 4",
           "frame": 65,
           "targetLayer": 4
+        },
+        {
+          "x": "45.0%",
+          "y": "55.0%",
+          "label": "Layer 5",
+          "frame": 100,
+          "targetLayer": 5
         }
       ]
     },
@@ -53,6 +58,13 @@
       "name": "Layer 4",
       "type": "panorama",
       "imageUrl": "/jakhabitat/layer/layer4/samawa-mg.jpg",
+      "hotspots": []
+    },
+    {
+      "id": 5,
+      "name": "Layer 5",
+      "type": "panorama",
+      "imageUrl": "/jakhabitat/layer/layer5/samawa-panorama.jpg",
       "hotspots": []
     }
   ]

@@ -12,6 +12,7 @@ import Home from "./pages/Home";
 import MapsPage from "./pages/MapsPage";
 import Admin from "./pages/Admin";
 import { VideoFramePage } from "./pages/VideoFramePage";
+import MarzipanoTools from "./pages/MarzipanoTools";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/maps" element={<MapsPage />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/video-frame" element={<VideoFramePage />} />
+          <Route path="/marzipano" element={<MarzipanoTools />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,0 +1,92 @@
+{
+  "layers": [
+    {
+      "id": 1,
+      "name": "Layer 1",
+      "type": "object360",
+      "frameCount": 1176,
+      "path": "/jakhabitat/layer/layer1/",
+      "hotspots": [
+        {
+          "x": "41.7%",
+          "y": "46.2%",
+          "label": "CAP & CIP",
+          "frame": 80,
+          "targetLayer": 2
+        },
+        {
+          "x": "64.2%",
+          "y": "47.2%",
+          "label": "HTM",
+          "frame": 115,
+          "targetLayer": 3
+        },
+        {
+          "x": "20.7%",
+          "y": "36.8%",
+          "label": "KTV",
+          "frame": 88,
+          "targetLayer": 6
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "CAP & CIP",
+      "type": "iframe",
+      "iframeUrl": "https://dprkp.jakarta.go.id/sigapkumuh/peta/",
+      "hotspots": []
+    },
+    {
+      "id": 3,
+      "name": "Layer 3",
+      "type": "object360",
+      "frameCount": 1176,
+      "path": "/jakhabitat/layer/layer3/",
+      "hotspots": [
+        {
+          "x": "63.6%",
+          "y": "42.7%",
+          "label": "Tower Kanaya",
+          "frame": 1,
+          "targetLayer": 4
+        },
+        {
+          "x": "14.6%",
+          "y": "25.9%",
+          "label": "Tower Samawa",
+          "frame": 60,
+          "targetLayer": 7
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Layer 4",
+      "type": "panorama",
+      "imageUrl": "/jakhabitat/layer/layer4/samawa-mg.jpg",
+      "hotspots": []
+    },
+    {
+      "id": 5,
+      "name": "Layer 5",
+      "type": "panorama",
+      "imageUrl": "/jakhabitat/layer/layer5/samawa-panorama.jpg",
+      "hotspots": []
+    },
+    {
+      "id": 6,
+      "name": "KTV - SIGAP KUMUH",
+      "type": "iframe",
+      "iframeUrl": "https://dprkp.jakarta.go.id/sigapkumuh/home-page",
+      "hotspots": []
+    },
+    {
+      "id": 7,
+      "name": "Tower Samawa",
+      "type": "panorama",
+      "marzipanoPath": "/marzipano/tower-samawa/",
+      "hotspots": []
+    }
+  ]
+}

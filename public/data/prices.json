@@ -1,0 +1,30 @@
+{
+  "prices": [
+    {
+      "id": 1,
+      "unitId": 1,
+      "unitName": "Studio TB Simatupang",
+      "priceType": "Reguler",
+      "basePrice": 450000000,
+      "downPayment": 45000000,
+      "installment": 2600000,
+      "tenor": 15,
+      "subsidy": 135000000,
+      "finalPrice": 315000000,
+      "active": true
+    },
+    {
+      "id": 2,
+      "unitId": 2,
+      "unitName": "1BR Kemang Residence",
+      "priceType": "Promo",
+      "basePrice": 650000000,
+      "downPayment": 65000000,
+      "installment": 3800000,
+      "tenor": 15,
+      "subsidy": 195000000,
+      "finalPrice": 455000000,
+      "active": true
+    }
+  ]
+}

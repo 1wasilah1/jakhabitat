@@ -1,0 +1,42 @@
+{
+  "units": [
+    {
+      "id": 1,
+      "name": "Tower Kanaya",
+      "types": [
+        {
+          "id": 1760021287081,
+          "name": "Studio",
+          "size": 21,
+          "price": 121231330
+        },
+        {
+          "id": 1760021309107,
+          "name": "1BR",
+          "size": 35,
+          "price": 89718277
+        }
+      ],
+      "location": "Jakarta Timur",
+      "description": "",
+      "image": "",
+      "available": true
+    },
+    {
+      "id": 2,
+      "name": "Tower Samawa",
+      "types": [
+        {
+          "id": 1760021336749,
+          "name": "Studio",
+          "size": 21,
+          "price": 212122330
+        }
+      ],
+      "location": "Jakarta Timur",
+      "description": "",
+      "image": "",
+      "available": true
+    }
+  ]
+}

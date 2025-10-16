@@ -78,7 +78,8 @@ const Object360Viewer: React.FC<Object360ViewerProps> = ({
         ref={containerRef}
         className="relative w-full h-full bg-black rounded-lg overflow-hidden cursor-grab"
         style={{
-          cursor: isDragging ? 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'64\' height=\'64\' viewBox=\'0 0 32 32\'%3E%3Cpath d=\'M16 4 L20 8 L18 8 L18 12 L14 12 L14 8 L12 8 Z M28 16 L24 12 L24 14 L20 14 L20 18 L24 18 L24 20 Z M16 28 L12 24 L14 24 L14 20 L18 20 L18 24 L20 24 Z M4 16 L8 20 L8 18 L12 18 L12 14 L8 14 L8 12 Z\' fill=\'white\' stroke=\'black\' stroke-width=\'1\'/%3E%3C/svg%3E") 32 32, auto' : 'grab'
+          cursor: isDragging ? 'grabbing' : 'grab',
+          touchAction: 'none'
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
