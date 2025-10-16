@@ -140,7 +140,7 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Large media files
-*.mp4
+#*.mp4
 *.avi
 *.mov
 *.mkv
