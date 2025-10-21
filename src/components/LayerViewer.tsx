@@ -3,6 +3,7 @@ import Object360Viewer from './Object360Viewer';
 import PanoramaLayer from './PanoramaLayer';
 import Layer5Viewer from './Layer5Viewer';
 import MarzipanoViewer from './MarzipanoViewer';
+import VideoObjectViewer from './VideoObjectViewer';
 
 interface LayerViewerProps {
   onModeChange?: (isPanoramaMode: boolean) => void;
@@ -23,7 +24,7 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
   const [targetMediaId, setTargetMediaId] = useState<number | null>(null);
 
   useEffect(() => {
-    // Load layers data from backend
+    // Load layers data from backend or fallback to static file
     const loadLayers = async () => {
       try {
         const response = await fetch('http://localhost:3001/api/data/layers');
@@ -31,9 +32,21 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
           const data = await response.json();
           setLayersData(data.layers || []);
           setAvailableLayers((data.layers || []).map((layer: any) => layer.id));
+        } else {
+          throw new Error('Backend not available');
         }
       } catch (error) {
-        console.error('Failed to load layers:', error);
+        console.error('Failed to load layers from backend, trying static file:', error);
+        try {
+          const staticResponse = await fetch('/data/layers.json');
+          if (staticResponse.ok) {
+            const staticData = await staticResponse.json();
+            setLayersData(staticData.layers || []);
+            setAvailableLayers((staticData.layers || []).map((layer: any) => layer.id));
+          }
+        } catch (staticError) {
+          console.error('Failed to load layers from static file:', staticError);
+        }
       }
     };
     
@@ -71,13 +84,7 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
   }, []);
 
   const getLayerData = (layer: number) => {
-    const baseLayer = Math.floor(layer); // Get base layer (5.1234 -> 5)
-    const frameCount = baseLayer === 1 ? 1176 : baseLayer === 2 ? 1176 : baseLayer === 3 ? 1176 : baseLayer === 4 ? 0 : 0;
-    
     return {
-      images: Array.from({length: frameCount}, (_, i) => 
-        `/jakhabitat/layer/layer${baseLayer}/frame_${String(i + 1).padStart(3, '0')}.jpg`
-      ),
       hotspots: getHotspotsForLayer(layer)
     };
   };
@@ -222,23 +229,71 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
         }
       }
     } else {
-      // For other layers, use layers data hotspots
-      const layerData = layersData.find(l => l.id === layer);
-      
-      if (layerData?.hotspots) {
-        layerData.hotspots.forEach((hotspot: any) => {
-          layerHotspots.push({
-            x: hotspot.x,
-            y: hotspot.y,
-            label: hotspot.label,
-            frame: hotspot.frame,
-            targetLayer: hotspot.targetLayer,
-            onClick: () => {
-              setSelectedUnit(hotspot.label);
-              switchToLayer(hotspot.targetLayer);
-            }
-          });
+      // For layer 1, add hardcoded hotspot
+      if (layer === 1) {
+        layerHotspots.push({
+          x: '50.6%',
+          y: '56.4%',
+          label: 'Cap & Cip',
+          timeStart: 0,
+          timeEnd: 10,
+          onClick: () => {
+            setSelectedUnit('Layer 2');
+            switchToLayer(2);
+          }
         });
+        layerHotspots.push({
+          x: '52.5%',
+          y: '47.9%',
+          label: 'KTV',
+          timeStart: 13,
+          timeEnd: 18,
+          onClick: () => {
+            setSelectedUnit('KTV');
+            switchToLayer(3);
+          }
+        });
+        layerHotspots.push({
+          x: '68.2%',
+          y: '48.3%',
+          label: 'HTM',
+          timeStart: 19,
+          timeEnd: 33,
+          onClick: () => {
+            setSelectedUnit('HTM');
+            switchToLayer(3);
+          }
+        });
+        layerHotspots.push({
+          x: '75.7%',
+          y: '65.3%',
+          label: 'Cap & Cip',
+          timeStart: 44,
+          timeEnd: 54,
+          onClick: () => {
+            setSelectedUnit('HTM');
+            switchToLayer(3);
+          }
+        });
+      } else {
+        // For other layers, use layers data hotspots
+        const layerData = layersData.find(l => l.id === layer);
+        
+        if (layerData?.hotspots) {
+          layerData.hotspots.forEach((hotspot: any) => {
+            layerHotspots.push({
+              x: hotspot.x,
+              y: hotspot.y,
+              label: hotspot.label,
+              frame: hotspot.frame,
+              targetLayer: hotspot.targetLayer,
+              onClick: () => {
+                setSelectedUnit(hotspot.label);
+                switchToLayer(hotspot.targetLayer);
+              }
+            });
+          });
+        }
       }
     }
     
@@ -249,10 +304,11 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
       if (layer === 3) backLayer = 1;
       
       layerHotspots.push({
-        x: '3%',
+        x: '8%',
         y: '90%',
-        label: `← Layer ${backLayer}`,
+        label: `← Kembali`,
         frame: 1,
+        isBackButton: true,
         onClick: () => switchToLayer(backLayer)
       });
     }
@@ -267,7 +323,7 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
   useEffect(() => {
     const baseLayer = Math.floor(currentLayer);
     const currentLayerData = layersData.find(layer => layer.id === currentLayer);
-    const isPanoramaMode = baseLayer === 4 || baseLayer === 5;
+    const isPanoramaMode = baseLayer === 4 || baseLayer === 5 || baseLayer === 7;
     const isIframeMode = currentLayerData?.type === 'iframe';
     onModeChange?.(isPanoramaMode || isIframeMode);
   }, [currentLayer, onModeChange, layersData]);
@@ -310,6 +366,20 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
     );
   }
 
+  // Show video for layer 1, 3 (direct fallback) or layers with type 'video'
+  if (currentLayer === 1 || currentLayer === 3 || (currentLayerData?.type === 'video' && currentLayerData?.videoUrl)) {
+    const videoUrl = currentLayer === 1 ? '/jakhabitat/layer/layer1/dprkp.mp4' : 
+                     currentLayer === 3 ? '/jakhabitat/layer/layer3/layer3.mp4' : 
+                     currentLayerData.videoUrl;
+    return (
+      <VideoObjectViewer
+        videoUrl={videoUrl}
+        className="w-full h-screen"
+        hotspots={currentData.hotspots}
+      />
+    );
+  }
+
   // Show Marzipano for layer 4, 5, and 7
   const baseLayer = Math.floor(currentLayer);
   if (baseLayer === 4 || baseLayer === 5 || baseLayer === 7) {
@@ -344,13 +414,24 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
     );
   }
 
-  return (
-    <Object360Viewer 
-      images={currentData.images}
-      className="w-full h-screen"
-      hotspots={currentData.hotspots}
-    />
-  );
+  // Fallback for object360 layers (layer 2, 3, etc.)
+  if (baseLayer === 2 || baseLayer === 3) {
+    const frameCount = 1176;
+    const images = Array.from({length: frameCount}, (_, i) => 
+      `/jakhabitat/layer/layer${baseLayer}/frame_${String(i + 1).padStart(3, '0')}.jpg`
+    );
+    
+    return (
+      <Object360Viewer 
+        images={images}
+        className="w-full h-screen"
+        hotspots={currentData.hotspots}
+      />
+    );
+  }
+  
+  // Default fallback
+  return <div className="w-full h-screen bg-black flex items-center justify-center text-white">Layer {currentLayer} not configured</div>;
 };
 
 export default LayerViewer;

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import whiteLogo from '/JAKHABITAT-LOGO-putih-01.png';
+import whiteLogo from '/JAKHABITAT-LOGO putih-01.png';
 import LayerViewer from '../components/LayerViewer';
 import ProgramHTMSection from '../components/ProgramHTMSection';
 import SyaratSection from '../components/SyaratSection';

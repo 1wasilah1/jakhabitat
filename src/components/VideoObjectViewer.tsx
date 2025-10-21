@@ -7,8 +7,9 @@ interface VideoObjectViewerProps {
     x: string;
     y: string;
     label: string;
-    timeStart: number;
-    timeEnd: number;
+    frame?: number;
+    timeStart?: number;
+    timeEnd?: number;
     onClick?: () => void;
   }>;
 }
@@ -38,8 +39,10 @@ const VideoObjectViewer: React.FC<VideoObjectViewerProps> = ({
   }, []);
 
   // Filter visible hotspots based on current time
-  const visibleHotspots = hotspots.filter(hotspot => 
-    currentTime >= hotspot.timeStart && currentTime <= hotspot.timeEnd
+  const visibleHotspots = hotspots.filter(hotspot =>
+    (hotspot.timeStart !== undefined && hotspot.timeEnd !== undefined)
+      ? (currentTime >= hotspot.timeStart && currentTime <= hotspot.timeEnd)
+      : true // Show always if no time defined
   );
 
   const togglePlay = () => {
@@ -65,7 +68,7 @@ const VideoObjectViewer: React.FC<VideoObjectViewerProps> = ({
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging || !videoRef.current) return;
     
-    const deltaX = e.clientX - lastX;
+    const deltaX = lastX - e.clientX;
     const newVelocity = deltaX * 0.2;
     setVelocity(newVelocity);
     
@@ -165,13 +168,22 @@ const VideoObjectViewer: React.FC<VideoObjectViewerProps> = ({
         
         {/* Hotspots */}
         {visibleHotspots.map((hotspot, index) => (
-          <div
-            key={index}
-            className="absolute bg-black/70 text-white text-xs px-2 py-1 rounded cursor-pointer hover:bg-black/90 transition-colors border border-white/50 whitespace-nowrap"
-            style={{ left: hotspot.x, top: hotspot.y, transform: 'translate(-50%, -50%)' }}
-            onClick={hotspot.onClick}
-          >
-            {hotspot.label}
+          <div key={index}>
+            <div
+              className="absolute bg-black/70 text-white text-lg px-4 py-2 rounded cursor-pointer hover:bg-black/90 transition-colors border border-white/50 whitespace-nowrap font-bold"
+              style={{ left: hotspot.x, top: hotspot.y, transform: 'translate(-50%, -50%)' }}
+              onClick={hotspot.onClick}
+            >
+              {hotspot.label}
+            </div>
+            {!hotspot.isBackButton && (
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Coat_of_arms_of_Jakarta.svg"
+                alt="Jakarta Logo"
+                className="absolute w-12 h-12"
+                style={{ left: hotspot.x, top: hotspot.y, transform: 'translate(-50%, 20px)' }}
+              />
+            )}
           </div>
         ))}
 

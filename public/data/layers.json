@@ -3,9 +3,8 @@
     {
       "id": 1,
       "name": "Layer 1",
-      "type": "object360",
-      "frameCount": 1176,
-      "path": "/jakhabitat/layer/layer1/",
+      "type": "video",
+      "videoUrl": "/jakhabitat/layer/layer1/dprkp.mp4",
       "hotspots": [
         {
           "x": "41.7%",
