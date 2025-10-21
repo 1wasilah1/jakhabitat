@@ -24,10 +24,17 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
   const [targetMediaId, setTargetMediaId] = useState<number | null>(null);
 
   useEffect(() => {
+    // Detect environment and set API base URL
+    const getApiBaseUrl = () => {
+      return window.location.hostname === 'localhost' 
+        ? 'http://localhost:3001/api' 
+        : 'https://dprkp.jakarta.go.id/jakhabitat/api';
+    };
+    
     // Load layers data from backend or fallback to static file
     const loadLayers = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/data/layers');
+        const response = await fetch(`${getApiBaseUrl()}/data/layers`);
         if (response.ok) {
           const data = await response.json();
           setLayersData(data.layers || []);
@@ -55,7 +62,7 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
     // Load hotspots from backend
     const loadHotspots = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/data/hotspots');
+        const response = await fetch(`${getApiBaseUrl()}/data/hotspots`);
         if (response.ok) {
           const data = await response.json();
           setHotspots(data.hotspots || []);
@@ -70,7 +77,7 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
     // Load media files from backend
     const loadMedia = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/data/media');
+        const response = await fetch(`${getApiBaseUrl()}/data/media`);
         if (response.ok) {
           const data = await response.json();
           setMediaFiles(data.media || []);
