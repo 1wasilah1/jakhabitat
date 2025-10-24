@@ -12,6 +12,17 @@
       "targetLayer": 4,
       "targetScene": "project-1761243873126",
       "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
+    },
+    {
+      "id": "new-1761285406184-lujlkf95m",
+      "x": 20.2,
+      "y": 23,
+      "type": "layer",
+      "title": "Tower Kanaya",
+      "timeStart": 4,
+      "timeEnd": 9,
+      "targetLayer": 4,
+      "targetScene": "project-1761284517089"
     }
   ]
 }

@@ -3,7 +3,22 @@
     {
       "id": "1761241752534",
       "title": "KTV",
-      "url": "https://dprkp.jakarta.go.id/sigapkumuh/"
+      "url": "http://10.15.38.162:3001/ktv"
+    },
+    {
+      "id": "1761284287690",
+      "title": "Rusunawa",
+      "url": "http://10.15.38.162:3001/rusunawa"
+    },
+    {
+      "id": "1761284315597",
+      "title": "CAP & CIP",
+      "url": "http://10.15.38.162:3001/capcip"
+    },
+    {
+      "id": "1761284336961",
+      "title": "RTLH",
+      "url": "http://10.15.38.162:3001/dashboard-rtlh"
     }
   ]
 }

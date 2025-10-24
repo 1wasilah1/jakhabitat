@@ -11,6 +11,17 @@
       "name": "Tower Samawa Studio",
       "scenes": [],
       "defaultSceneId": "scene-1761262992328"
+    },
+    {
+      "id": "project-1761284517089",
+      "name": "Tower Kanaya",
+      "scenes": [],
+      "defaultSceneId": "scene-1761285271367"
+    },
+    {
+      "id": "project-1761284744909",
+      "name": "Tower Kanaya Studio",
+      "scenes": []
     }
   ]
 }

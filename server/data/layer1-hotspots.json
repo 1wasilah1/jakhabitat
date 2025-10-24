@@ -10,7 +10,7 @@
       "timeStart": 0,
       "timeEnd": 5,
       "targetLayer": 3,
-      "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
+      "targetAsset": "/media/uploads/compressed-1761296117294.jpg"
     },
     {
       "id": "new-1761243213503-5p5evjijm",
@@ -22,6 +22,42 @@
       "timeEnd": 19,
       "targetLayer": 2,
       "targetLinkId": "1761241752534",
+      "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
+    },
+    {
+      "id": "new-1761284389701-dpanvsvf4",
+      "x": 62.8,
+      "y": 53.2,
+      "type": "layer",
+      "title": "RTLH",
+      "timeStart": 25,
+      "timeEnd": 30,
+      "targetLayer": 2,
+      "targetLinkId": "1761284336961",
+      "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
+    },
+    {
+      "id": "new-1761284420197-qilkxbzkt",
+      "x": 61.3,
+      "y": 48.7,
+      "type": "layer",
+      "title": "Rusunawa",
+      "timeStart": 36,
+      "timeEnd": 41,
+      "targetLayer": 2,
+      "targetLinkId": "1761284287690",
+      "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
+    },
+    {
+      "id": "new-1761284453801-e2orsa8ij",
+      "x": 54,
+      "y": 33.3,
+      "type": "layer",
+      "title": "CAP & CIP",
+      "timeStart": 30,
+      "timeEnd": 35,
+      "targetLayer": 2,
+      "targetLinkId": "1761284315597",
       "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
     }
   ]

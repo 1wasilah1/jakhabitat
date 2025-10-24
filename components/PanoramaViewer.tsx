@@ -128,6 +128,35 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
     }
   };
 
+  const loadProjectDynamically = async (targetProjectId: string, targetSceneId?: string) => {
+    try {
+      const targetProject = projects.find(p => p.id === targetProjectId);
+      if (!targetProject) return;
+
+      const response = await fetch(`/api/panorama/scenes?projectId=${targetProjectId}`);
+      const data = await response.json();
+      const projectScenes = data.scenes || {};
+      
+      setCurrentProject(targetProject);
+      setScenes(projectScenes);
+      
+      const sceneIds = Object.keys(projectScenes);
+      let sceneToLoad = targetSceneId;
+      
+      if (!sceneToLoad || !projectScenes[sceneToLoad]) {
+        sceneToLoad = targetProject.defaultSceneId && projectScenes[targetProject.defaultSceneId] 
+          ? targetProject.defaultSceneId 
+          : sceneIds[0];
+      }
+      
+      if (sceneToLoad) {
+        setCurrentSceneId(sceneToLoad);
+      }
+    } catch (error) {
+      console.error('Failed to load target project:', error);
+    }
+  };
+
   const initPannellum = () => {
     if (!viewerRef.current || !scenes[currentSceneId] || !(window as any).pannellum) return;
 
@@ -155,8 +184,13 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
             // Save current state to history
             setNavigationHistory(prev => [...prev, { projectId, sceneId: currentSceneId }]);
             
-            // Always navigate to layer, regardless of project
-            onNavigate(hotspot.targetLayer, hotspot.targetProject, hotspot.targetScene);
+            if (hotspot.targetLayer === 4 && hotspot.targetProject) {
+              // Switch to different panorama project dynamically
+              loadProjectDynamically(hotspot.targetProject, hotspot.targetScene);
+            } else {
+              // Navigate to other layers
+              onNavigate(hotspot.targetLayer);
+            }
           } else if (hotspot.targetScene) {
             // Save current state to history for scene navigation
             setNavigationHistory(prev => [...prev, { projectId, sceneId: currentSceneId }]);

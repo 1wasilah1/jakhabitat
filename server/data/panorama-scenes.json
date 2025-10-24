@@ -11,8 +11,8 @@
             "type": "asset",
             "title": "mba nana siap melayani",
             "targetAsset": "/media/uploads/compressed-1761259947570.png",
-            "assetWidth": 230,
-            "assetHeight": 303
+            "assetWidth": 200,
+            "assetHeight": 703
           },
           {
             "id": "hotspot-1761260307813",
@@ -33,6 +33,16 @@
             "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png",
             "targetProject": "project-1761262951055",
             "targetScene": "default-scene"
+          },
+          {
+            "id": "hotspot-1761285792546",
+            "x": 42.465753424657535,
+            "y": 59.895833333333336,
+            "type": "asset",
+            "title": "Hallo, Bisa Saya Bantu?",
+            "targetAsset": "/media/uploads/compressed-1761285769790.png",
+            "assetWidth": 200,
+            "assetHeight": 310
           }
         ],
         "name": "view 1"
@@ -108,14 +118,14 @@
         "scene": "/uploads/panorama-project-1761262951055-1761262990888.JPG",
         "hotspots": [
           {
-            "id": "hotspot-1761263042592",
-            "x": 47.94520547945205,
-            "y": 60.9375,
+            "id": "hotspot-1761296156349",
+            "x": 48.8013698630137,
+            "y": 53.645833333333336,
             "type": "scene",
-            "title": "masuk",
-            "targetProject": "project-1761262951055",
+            "title": "Masuk",
             "targetScene": "scene-1761263019442",
-            "targetAsset": ""
+            "targetAsset": "/media/uploads/compressed-1761296117294.jpg",
+            "targetProject": "project-1761262951055"
           }
         ],
         "name": "view 1"
@@ -155,6 +165,74 @@
             "title": "view 2",
             "targetProject": "project-1761262951055",
             "targetScene": "scene-1761263019442"
+          }
+        ],
+        "name": "view 3"
+      }
+    }
+  },
+  "project-1761284517089": {
+    "scenes": {
+      "scene-1761285271367": {
+        "scene": "/uploads/panorama-project-1761284517089-1761285268802.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1761285339052",
+            "x": 38.013698630136986,
+            "y": 64.58333333333334,
+            "type": "scene",
+            "title": "view 2",
+            "targetProject": "project-1761284517089",
+            "targetScene": "scene-1761285282042"
+          },
+          {
+            "id": "hotspot-1761285544159",
+            "x": 61.986301369863014,
+            "y": 53.125,
+            "type": "layer",
+            "title": "Studio",
+            "targetProject": "project-1761284744909",
+            "targetScene": "default-scene",
+            "targetLayer": 4,
+            "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
+          },
+          {
+            "id": "hotspot-1761285626569",
+            "x": 92.2945205479452,
+            "y": 82.8125,
+            "type": "scene",
+            "title": "View 3",
+            "targetProject": "project-1761284517089",
+            "targetScene": "scene-1761285622091"
+          }
+        ],
+        "name": "view 1"
+      },
+      "scene-1761285282042": {
+        "scene": "/uploads/panorama-project-1761284517089-1761285279244.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1761285310053",
+            "x": 95.54794520547945,
+            "y": 92.70833333333334,
+            "type": "scene",
+            "title": "view 1",
+            "targetProject": "project-1761284744909"
+          }
+        ],
+        "name": "view 2"
+      },
+      "scene-1761285622091": {
+        "scene": "/uploads/panorama-project-1761284517089-1761285619137.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1761285647594",
+            "x": 82.53424657534246,
+            "y": 66.14583333333334,
+            "type": "scene",
+            "title": "View 1",
+            "targetProject": "project-1761284517089",
+            "targetScene": "scene-1761285271367"
           }
         ],
         "name": "view 3"
