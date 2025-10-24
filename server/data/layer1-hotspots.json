@@ -1,0 +1,28 @@
+{
+  "video": "/layer/layer1/dprkp.mp4",
+  "hotspots": [
+    {
+      "id": "new-1761238620021-po4y0y516",
+      "x": 48.2,
+      "y": 51.1,
+      "type": "layer",
+      "title": "HTM",
+      "timeStart": 0,
+      "timeEnd": 5,
+      "targetLayer": 3,
+      "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
+    },
+    {
+      "id": "new-1761243213503-5p5evjijm",
+      "x": 53.7,
+      "y": 46.7,
+      "type": "layer",
+      "title": "KTV",
+      "timeStart": 14,
+      "timeEnd": 19,
+      "targetLayer": 2,
+      "targetLinkId": "1761241752534",
+      "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
+    }
+  ]
+}

@@ -34,7 +34,7 @@
       "id": 2,
       "name": "CAP & CIP",
       "type": "iframe",
-      "iframeUrl": "https://dprkp.jakarta.go.id/sigapkumuh/peta/",
+      "iframeUrl": "http://10.15.38.162:3001/capcip",
       "hotspots": []
     },
     {
@@ -78,7 +78,7 @@
       "id": 6,
       "name": "KTV - SIGAP KUMUH",
       "type": "iframe",
-      "iframeUrl": "https://dprkp.jakarta.go.id/sigapkumuh/home-page",
+      "iframeUrl": "http://10.15.38.162:3001/ktv",
       "hotspots": []
     },
     {

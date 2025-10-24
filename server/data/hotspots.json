@@ -69,6 +69,19 @@
       "targetMediaId": 3,
       "targetLayerId": 5,
       "targetUnitId": 1
+    },
+    {
+      "id": 1761171725949,
+      "mediaId": 3,
+      "x": 63.148788927335644,
+      "y": 50.520833333333336,
+      "type": "asset",
+      "hotspotType": "asset",
+      "title": "studio",
+      "description": "",
+      "active": true,
+      "assetUrl": "http://localhost:6500/jakhabitat/media/panorama360/layer_unit_type_room_1761162546182.png",
+      "assetType": "image"
     }
   ]
 }

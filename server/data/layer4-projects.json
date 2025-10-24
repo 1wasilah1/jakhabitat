@@ -1,0 +1,16 @@
+{
+  "projects": [
+    {
+      "id": "project-1761243873126",
+      "name": "Tower Samawa",
+      "scenes": [],
+      "defaultSceneId": "scene-1761260058953"
+    },
+    {
+      "id": "project-1761262951055",
+      "name": "Tower Samawa Studio",
+      "scenes": [],
+      "defaultSceneId": "scene-1761262992328"
+    }
+  ]
+}

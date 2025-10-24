@@ -1,0 +1,17 @@
+{
+  "video": "/layer/layer3/layer3.mp4",
+  "hotspots": [
+    {
+      "id": "new-1761255125707-awwugh7o1",
+      "x": 66.2,
+      "y": 45.3,
+      "type": "layer",
+      "title": "Tower Samawa",
+      "timeStart": 0,
+      "timeEnd": 5,
+      "targetLayer": 4,
+      "targetScene": "project-1761243873126",
+      "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
+    }
+  ]
+}
