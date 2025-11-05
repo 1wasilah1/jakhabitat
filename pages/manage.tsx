@@ -34,6 +34,8 @@ interface PanoramaProject {
   name: string;
   scenes: PanoramaScene[];
   defaultSceneId?: string;
+  price?: number;
+  interest?: number;
 }
 
 interface PanoramaScene {
@@ -721,9 +723,14 @@ const Manage: React.FC = () => {
                                     }}
                                     className="border border-gray-300 rounded-md px-3 py-2"
                                   >
-                                    <option value="contain">Contain</option>
-                                    <option value="cover">Cover</option>
-                                    <option value="100% 100%">Stretch</option>
+                                    <option value="contain">Contain (fit within bounds)</option>
+                                    <option value="cover">Cover (fill entire area)</option>
+                                    <option value="100% 100%">Stretch (100% x 100%)</option>
+                                    <option value="auto">Auto (original size)</option>
+                                    <option value="50% 50%">Small (50% x 50%)</option>
+                                    <option value="75% 75%">Medium (75% x 75%)</option>
+                                    <option value="125% 125%">Large (125% x 125%)</option>
+                                    <option value="150% 150%">Extra Large (150% x 150%)</option>
                                   </select>
                                   <input
                                     type="number"
@@ -769,9 +776,14 @@ const Manage: React.FC = () => {
                                 }}
                                 className="border border-gray-300 rounded-md px-3 py-2"
                               >
-                                <option value="contain">Contain (No Crop)</option>
-                                <option value="cover">Cover (Crop to Fill)</option>
-                                <option value="100% 100%">Stretch (Fill Exact)</option>
+                                <option value="contain">Contain (fit within bounds)</option>
+                                <option value="cover">Cover (fill entire area)</option>
+                                <option value="100% 100%">Stretch (100% x 100%)</option>
+                                <option value="auto">Auto (original size)</option>
+                                <option value="50% 50%">Small (50% x 50%)</option>
+                                <option value="75% 75%">Medium (75% x 75%)</option>
+                                <option value="125% 125%">Large (125% x 125%)</option>
+                                <option value="150% 150%">Extra Large (150% x 150%)</option>
                               </select>
                               <input
                                 type="number"
@@ -1120,9 +1132,14 @@ const Manage: React.FC = () => {
                                     }}
                                     className="border border-gray-300 rounded-md px-3 py-2"
                                   >
-                                    <option value="contain">Contain</option>
-                                    <option value="cover">Cover</option>
-                                    <option value="100% 100%">Stretch</option>
+                                    <option value="contain">Contain (fit within bounds)</option>
+                                    <option value="cover">Cover (fill entire area)</option>
+                                    <option value="100% 100%">Stretch (100% x 100%)</option>
+                                    <option value="auto">Auto (original size)</option>
+                                    <option value="50% 50%">Small (50% x 50%)</option>
+                                    <option value="75% 75%">Medium (75% x 75%)</option>
+                                    <option value="125% 125%">Large (125% x 125%)</option>
+                                    <option value="150% 150%">Extra Large (150% x 150%)</option>
                                   </select>
                                   <input
                                     type="number"
@@ -1168,9 +1185,14 @@ const Manage: React.FC = () => {
                                 }}
                                 className="border border-gray-300 rounded-md px-3 py-2"
                               >
-                                <option value="contain">Contain (No Crop)</option>
-                                <option value="cover">Cover (Crop to Fill)</option>
-                                <option value="100% 100%">Stretch (Fill Exact)</option>
+                                <option value="contain">Contain (fit within bounds)</option>
+                                <option value="cover">Cover (fill entire area)</option>
+                                <option value="100% 100%">Stretch (100% x 100%)</option>
+                                <option value="auto">Auto (original size)</option>
+                                <option value="50% 50%">Small (50% x 50%)</option>
+                                <option value="75% 75%">Medium (75% x 75%)</option>
+                                <option value="125% 125%">Large (125% x 125%)</option>
+                                <option value="150% 150%">Extra Large (150% x 150%)</option>
                               </select>
                               <input
                                 type="number"
@@ -1301,7 +1323,7 @@ const Manage: React.FC = () => {
                   <div className="space-y-4">
                     {panoramaProjects.map((project) => (
                       <div key={project.id} className="border border-gray-200 rounded-lg p-4">
-                        <div className="flex justify-between items-center mb-2">
+                        <div className="space-y-2 mb-2">
                           <input
                             type="text"
                             value={project.name}
@@ -1311,9 +1333,38 @@ const Manage: React.FC = () => {
                               );
                               setPanoramaProjects(updated);
                             }}
-                            className="flex-1 border border-gray-300 rounded-md px-3 py-2 mr-4"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2"
                             placeholder="Project Name"
                           />
+                          <div className="grid grid-cols-2 gap-2">
+                            <input
+                              type="number"
+                              value={project.price || ''}
+                              onChange={(e) => {
+                                const updated = panoramaProjects.map(p => 
+                                  p.id === project.id ? { ...p, price: e.target.value ? Number(e.target.value) : undefined } : p
+                                );
+                                setPanoramaProjects(updated);
+                              }}
+                              className="border border-gray-300 rounded-md px-3 py-2"
+                              placeholder="Harga Unit (Rp)"
+                            />
+                            <input
+                              type="number"
+                              value={project.interest || ''}
+                              onChange={(e) => {
+                                const updated = panoramaProjects.map(p => 
+                                  p.id === project.id ? { ...p, interest: e.target.value ? Number(e.target.value) : undefined } : p
+                                );
+                                setPanoramaProjects(updated);
+                              }}
+                              className="border border-gray-300 rounded-md px-3 py-2"
+                              placeholder="Bunga (%)"
+                              step="0.1"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex justify-end">
                           <div className="flex gap-2">
                             <button
                               onClick={() => editProject(project)}
@@ -1329,9 +1380,16 @@ const Manage: React.FC = () => {
                             </button>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-600">
-                          Scenes: {project.scenes?.length || 0} {project.defaultSceneId && '• Default Scene Set'}
-                        </p>
+                        <div className="text-sm text-gray-600 space-y-1">
+                          <p>Scenes: {project.scenes?.length || 0} {project.defaultSceneId && '• Default Scene Set'}</p>
+                          {(project.price || project.interest) && (
+                            <p>
+                              {project.price && `Harga: Rp ${project.price.toLocaleString('id-ID')}`}
+                              {project.price && project.interest && ' • '}
+                              {project.interest && `Bunga: ${project.interest}%`}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>

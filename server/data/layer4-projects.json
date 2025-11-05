@@ -21,7 +21,8 @@
     {
       "id": "project-1761284744909",
       "name": "Tower Kanaya Studio",
-      "scenes": []
+      "scenes": [],
+      "defaultSceneId": "scene-1761816471028"
     }
   ]
 }

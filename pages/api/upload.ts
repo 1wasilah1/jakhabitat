@@ -37,11 +37,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // Compress image if it's an image file
+    // Compress image if it's an image file (except GIF)
     const isImage = file.mimetype?.startsWith('image/');
+    const isGif = file.mimetype === 'image/gif';
     const originalPath = file.filepath;
     
-    if (isImage) {
+    if (isImage && !isGif) {
       const isPng = file.mimetype === 'image/png';
       const extension = isPng ? '.png' : '.jpg';
       const compressedPath = path.join(uploadDir, `compressed-${Date.now()}${extension}`);
@@ -65,6 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       file.filepath = compressedPath;
       file.size = fs.statSync(compressedPath).size;
     }
+    // GIF files are kept as-is without compression
 
     // Read existing media data
     let mediaData = { media: [] };

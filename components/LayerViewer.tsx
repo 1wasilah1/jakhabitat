@@ -26,6 +26,8 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
   const [layer2Links, setLayer2Links] = useState<any[]>([]);
   const [selectedLinkId, setSelectedLinkId] = useState<string | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [gameData, setGameData] = useState<any>(null);
+
 
   useEffect(() => {
     if (currentLayer === 2) {
@@ -36,6 +38,14 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
           setLayer2Links(data.links || []);
         })
         .catch(err => console.error('Failed to load layer2 links:', err));
+    } else if (currentLayer === 8) {
+      fetch('/api/layers/game')
+        .then(res => res.json())
+        .then(data => {
+          console.log('Game data:', data);
+          setGameData(data);
+        })
+        .catch(err => console.error('Failed to load game data:', err));
     }
   }, [currentLayer]);
 
@@ -89,6 +99,27 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
           src="/panorama/tes-1761226329843/app-files/index.html" 
           className="w-full h-full border-0"
           title="Panorama Viewer"
+        />
+        
+        <button
+          className="absolute bg-black/70 text-white px-4 py-2 rounded-lg hover:bg-black/90 transition-colors z-10"
+          style={{ left: '8%', top: '90%', transform: 'translate(-50%, -50%)' }}
+          onClick={() => switchToLayer(1)}
+        >
+          ← Kembali
+        </button>
+      </div>
+    );
+  }
+
+  if (currentLayer === 8) {
+    return (
+      <div className="w-full h-screen relative">
+        <iframe 
+          src="/game/game-selector.html"
+          className="w-full h-full border-0"
+          title="Game Center"
+          allow="fullscreen; gamepad; microphone; camera"
         />
         
         <button

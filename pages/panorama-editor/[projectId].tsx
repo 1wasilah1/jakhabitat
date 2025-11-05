@@ -493,6 +493,23 @@ const PanoramaEditor: React.FC = () => {
                           max="200"
                         />
                       </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Background Size</label>
+                        <select
+                          value={editingHotspot?.backgroundSize || 'contain'}
+                          onChange={(e) => setEditingHotspot(prev => prev ? {...prev, backgroundSize: e.target.value} : null)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="contain">Contain (fit within bounds)</option>
+                          <option value="cover">Cover (fill entire area)</option>
+                          <option value="100% 100%">Stretch (100% x 100%)</option>
+                          <option value="auto">Auto (original size)</option>
+                          <option value="50% 50%">Small (50% x 50%)</option>
+                          <option value="75% 75%">Medium (75% x 75%)</option>
+                          <option value="125% 125%">Large (125% x 125%)</option>
+                          <option value="150% 150%">Extra Large (150% x 150%)</option>
+                        </select>
+                      </div>
                     </>
                   )}
                 </>
@@ -536,7 +553,23 @@ const PanoramaEditor: React.FC = () => {
                       max="200"
                     />
                   </div>
-
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Background Size</label>
+                    <select
+                      value={editingHotspot?.backgroundSize || 'contain'}
+                      onChange={(e) => setEditingHotspot(prev => prev ? {...prev, backgroundSize: e.target.value} : null)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="contain">Contain (fit within bounds)</option>
+                      <option value="cover">Cover (fill entire area)</option>
+                      <option value="100% 100%">Stretch (100% x 100%)</option>
+                      <option value="auto">Auto (original size)</option>
+                      <option value="50% 50%">Small (50% x 50%)</option>
+                      <option value="75% 75%">Medium (75% x 75%)</option>
+                      <option value="125% 125%">Large (125% x 125%)</option>
+                      <option value="150% 150%">Extra Large (150% x 150%)</option>
+                    </select>
+                  </div>
                 </>
               )}
             </div>

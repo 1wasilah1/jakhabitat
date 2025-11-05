@@ -230,7 +230,7 @@ const Video360Viewer: React.FC<Video360ViewerProps> = ({
           >
             <div className="relative group">
               {hotspot.targetAsset ? (
-                <div className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:scale-110 transition-transform overflow-hidden">
+                <div className="w-12 h-12 rounded-full shadow-lg hover:scale-110 transition-transform overflow-hidden">
                   <img 
                     src={hotspot.targetAsset} 
                     alt={hotspot.label}

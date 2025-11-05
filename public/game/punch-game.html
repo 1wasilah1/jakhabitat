@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punch Game - Jakhabitat</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 50%;
+            height: 100vh;
+            background: url('/gambar2.png') center/cover no-repeat;
+            z-index: -1;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 50%;
+            height: 100vh;
+            background: url('/gambar1.png') center/cover no-repeat;
+            z-index: -1;
+        }
+        
+        #gameContainer {
+            text-align: center;
+            position: relative;
+        }
+        
+        #title {
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        #photoSection {
+            margin-bottom: 20px;
+        }
+        
+        #video {
+            width: 600px;
+            height: 450px;
+            border: 3px solid white;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        #canvas {
+            border: 3px solid white;
+            border-radius: 10px;
+            cursor: crosshair;
+            position: relative;
+        }
+        
+        #captureBtn, #startGameBtn, #resetBtn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        
+        #captureBtn:hover, #startGameBtn:hover, #resetBtn:hover {
+            background: #27ae60;
+            transform: scale(1.05);
+        }
+        
+        #captureBtn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        #instructions {
+            color: white;
+            font-size: 18px;
+            margin: 15px 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        #score {
+            color: #f1c40f;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        
+        .punch-effect {
+            position: absolute;
+            pointer-events: none;
+            font-size: 48px;
+            font-weight: bold;
+            color: #e74c3c;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            animation: punchAnimation 0.8s ease-out forwards;
+        }
+        
+        @keyframes punchAnimation {
+            0% {
+                transform: scale(0.5) rotate(-10deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2) rotate(5deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(0.8) rotate(0deg);
+                opacity: 0;
+            }
+        }
+        
+        .crack-effect {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            pointer-events: none;
+            background: radial-gradient(circle, transparent 30%, rgba(255,255,255,0.3) 40%, transparent 50%);
+            border-radius: 50%;
+            animation: crackAnimation 0.5s ease-out forwards;
+        }
+        
+        @keyframes crackAnimation {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+        
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-1deg); }
+            75% { transform: translateX(5px) rotate(1deg); }
+        }
+        
+        @keyframes scoreFloat {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-30px) scale(1.2);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-60px) scale(0.8);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes levelUpAnimation {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="title">🥊 PUNCH GAME 🥊</div>
+        
+        <div id="photoSection">
+            <video id="video" autoplay></video>
+            <canvas id="canvas" width="800" height="600"></canvas>
+            <br>
+            <button id="captureBtn">📸 Ambil Foto</button>
+            <button id="startGameBtn" style="display: none;">🎮 Mulai Game</button>
+            <button id="resetBtn" style="display: none;">🔄 Foto Ulang</button>
+        </div>
+        
+        <div id="instructions">Ambil foto wajah Anda terlebih dahulu!</div>
+        <div id="score" style="display: none; position: absolute; top: 10px; right: 10px; color: #f1c40f; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); background: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 8px; z-index: 100;">
+            Level: <span id="levelValue">1</span><br>
+            Skor: <span id="scoreValue">0</span>
+        </div>
+        <button id="backToSelector" style="display: none; margin-top: 15px; background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px;">← Kembali ke Game Center</button>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const captureBtn = document.getElementById('captureBtn');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const instructions = document.getElementById('instructions');
+        const scoreElement = document.getElementById('score');
+        const scoreValue = document.getElementById('scoreValue');
+        const levelValue = document.getElementById('levelValue');
+        
+        let photoTaken = false;
+        let gameStarted = false;
+        let score = 0;
+        let level = 1;
+        let photoImageData = null;
+        let bruises = [];
+        let faceDetected = false;
+        let faceBox = null;
+        let adCounter = 0;
+        
+        // Inisialisasi kamera
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: 800, height: 600 } 
+                });
+                video.srcObject = stream;
+                video.style.display = 'block';
+                canvas.style.display = 'none';
+                captureBtn.disabled = true;
+                instructions.textContent = 'Posisikan wajah Anda di tengah kamera...';
+                
+                // Mulai deteksi wajah
+                video.addEventListener('loadedmetadata', () => {
+                    detectFace();
+                });
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                instructions.textContent = 'Tidak dapat mengakses kamera. Pastikan izin kamera diberikan.';
+                captureBtn.disabled = true;
+            }
+        }
+        
+        // Deteksi wajah sederhana
+        function detectFace() {
+            if (!video.videoWidth || !video.videoHeight) {
+                setTimeout(detectFace, 100);
+                return;
+            }
+            
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = video.videoWidth;
+            tempCanvas.height = video.videoHeight;
+            
+            function checkFace() {
+                if (video.paused || video.ended) return;
+                
+                tempCtx.drawImage(video, 0, 0);
+                const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                
+                // Deteksi wajah sederhana berdasarkan area terang di tengah
+                const centerX = tempCanvas.width / 2;
+                const centerY = tempCanvas.height / 2;
+                const faceArea = 150;
+                
+                let skinPixels = 0;
+                let totalPixels = 0;
+                
+                for (let y = centerY - faceArea/2; y < centerY + faceArea/2; y += 5) {
+                    for (let x = centerX - faceArea/2; x < centerX + faceArea/2; x += 5) {
+                        if (x >= 0 && x < tempCanvas.width && y >= 0 && y < tempCanvas.height) {
+                            const i = (Math.floor(y) * tempCanvas.width + Math.floor(x)) * 4;
+                            const r = imageData.data[i];
+                            const g = imageData.data[i + 1];
+                            const b = imageData.data[i + 2];
+                            
+                            // Deteksi warna kulit sederhana
+                            if (r > 95 && g > 40 && b > 20 && 
+                                r > g && r > b && 
+                                Math.abs(r - g) > 15) {
+                                skinPixels++;
+                            }
+                            totalPixels++;
+                        }
+                    }
+                }
+                
+                const skinRatio = skinPixels / totalPixels;
+                
+                if (skinRatio > 0.3) {
+                    faceDetected = true;
+                    faceBox = {
+                        x: centerX - faceArea/2,
+                        y: centerY - faceArea/2,
+                        width: faceArea,
+                        height: faceArea
+                    };
+                    captureBtn.disabled = false;
+                    instructions.textContent = '✅ Wajah terdeteksi! Klik "Ambil Foto"';
+                    captureBtn.style.background = '#2ecc71';
+                } else {
+                    faceDetected = false;
+                    captureBtn.disabled = true;
+                    instructions.textContent = '❌ Posisikan wajah di tengah kamera';
+                    captureBtn.style.background = '#95a5a6';
+                }
+                
+                setTimeout(checkFace, 200);
+            }
+            
+            checkFace();
+        }
+        
+        // Ambil foto
+        function capturePhoto() {
+            if (!faceDetected) {
+                instructions.textContent = '❌ Wajah belum terdeteksi! Posisikan wajah di tengah kamera.';
+                return;
+            }
+            
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            photoImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            
+            // Hentikan kamera
+            const stream = video.srcObject;
+            const tracks = stream.getTracks();
+            tracks.forEach(track => track.stop());
+            
+            video.style.display = 'none';
+            canvas.style.display = 'block';
+            captureBtn.style.display = 'none';
+            startGameBtn.style.display = 'inline-block';
+            resetBtn.style.display = 'inline-block';
+            
+            photoTaken = true;
+            instructions.textContent = '✅ Foto berhasil diambil! Klik "Mulai Game" untuk bermain.';
+        }
+        
+        // Mulai game
+        function startGame() {
+            gameStarted = true;
+            startGameBtn.style.display = 'none';
+            instructions.textContent = 'Klik pada foto untuk memukulnya! 👊';
+            scoreElement.style.display = 'block';
+            scoreElement.style.visibility = 'visible';
+            document.getElementById('backToSelector').style.display = 'inline-block';
+            
+            // Preload dan set cursor tinju
+            const cursorImg = new Image();
+            cursorImg.onload = () => {
+                canvas.style.cursor = 'url("./tinju.png") 16 16, crosshair';
+            };
+            cursorImg.onerror = () => {
+                canvas.style.cursor = 'crosshair';
+            };
+            cursorImg.src = './tinju.png';
+        }
+        
+        // Cek level up
+        function checkLevelUp() {
+            const newLevel = Math.floor(score / 100) + 1;
+            if (newLevel > level) {
+                level = newLevel;
+                levelValue.textContent = level;
+                
+                // Pop up iklan setiap kelipatan 5 level
+                if (level % 5 === 0) {
+                    showLevelUpEffect();
+                }
+            }
+        }
+        
+        // Efek level up
+        function showLevelUpEffect() {
+            // Tentukan gambar yang akan ditampilkan
+            const currentAd = adCounter % 2 === 0 ? 'gambar1.png' : 'gambar2.png';
+            adCounter++;
+            
+            // Modal iklan dengan gambar
+            const adModal = document.createElement('div');
+            adModal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 40px; border-radius: 20px; text-align: center; max-width: 600px; position: relative;">
+                        <h1 style="color: #f1c40f; font-size: 36px; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">🎉 LEVEL UP! 🎉</h1>
+                        <h2 style="color: white; font-size: 28px; margin-bottom: 30px;">Level ${level} Tercapai!</h2>
+                        
+                        <div style="background: white; padding: 20px; border-radius: 15px; margin: 20px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                            <img src="/${currentAd}" style="width: 100%; max-width: 400px; height: auto; border-radius: 10px; margin-bottom: 15px;" alt="Iklan">
+                        </div>
+                        
+                        <button onclick="this.parentElement.parentElement.remove()" style="background: #e74c3c; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 10px; cursor: pointer; margin-top: 20px; font-weight: bold;">Lanjut Bermain</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(adModal);
+        }
+        
+        // Reset game
+        function resetGame() {
+            photoTaken = false;
+            gameStarted = false;
+            score = 0;
+            level = 1;
+            scoreValue.textContent = '0';
+            levelValue.textContent = '1';
+            bruises = [];
+            faceDetected = false;
+            faceBox = null;
+            adCounter = 0;
+            
+            captureBtn.style.display = 'inline-block';
+            startGameBtn.style.display = 'none';
+            resetBtn.style.display = 'none';
+            scoreElement.style.display = 'none';
+            canvas.style.display = 'none';
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            initCamera();
+        }
+        
+        // Efek pukulan
+        function createPunchEffect(x, y) {
+            // Efek teks "POW!"
+            const punchTexts = ['POW!', 'BAM!', 'WHAM!', 'BOOM!', 'SMACK!', 'HTM!', 'RUSUNAWA!'];
+            const randomText = punchTexts[Math.floor(Math.random() * punchTexts.length)];
+            
+            const punchEffect = document.createElement('div');
+            punchEffect.className = 'punch-effect';
+            punchEffect.textContent = randomText;
+            punchEffect.style.left = (x - 30) + 'px';
+            punchEffect.style.top = (y - 30) + 'px';
+            
+            document.getElementById('gameContainer').appendChild(punchEffect);
+            
+            // Efek retak
+            const crackEffect = document.createElement('div');
+            crackEffect.className = 'crack-effect';
+            crackEffect.style.left = (x - 50) + 'px';
+            crackEffect.style.top = (y - 50) + 'px';
+            
+            document.getElementById('gameContainer').appendChild(crackEffect);
+            
+            // Hapus efek setelah animasi selesai
+            setTimeout(() => {
+                punchEffect.remove();
+                crackEffect.remove();
+            }, 800);
+            
+            // Efek goyang pada canvas
+            canvas.classList.add('shake');
+            setTimeout(() => {
+                canvas.classList.remove('shake');
+            }, 300);
+        }
+        
+        // Efek distorsi dan bonyok pada foto
+        function distortPhoto(x, y) {
+            if (!photoImageData) return;
+            
+            // Simpan posisi bonyok baru
+            bruises.push({x: x, y: y, size: Math.random() * 10 + 20});
+            
+            // Efek bengkak sederhana pada area pukulan
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            const bulgeRadius = 25;
+            
+            // Buat efek bengkak dengan menggeser pixel ke luar
+            for (let dy = -bulgeRadius; dy <= bulgeRadius; dy++) {
+                for (let dx = -bulgeRadius; dx <= bulgeRadius; dx++) {
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < bulgeRadius) {
+                        const sourceX = Math.floor(x + dx);
+                        const sourceY = Math.floor(y + dy);
+                        
+                        if (sourceX >= 0 && sourceX < canvas.width && sourceY >= 0 && sourceY < canvas.height) {
+                            const factor = (bulgeRadius - distance) / bulgeRadius * 0.3;
+                            const angle = Math.atan2(dy, dx);
+                            
+                            const newX = Math.floor(sourceX + Math.cos(angle) * factor * 8);
+                            const newY = Math.floor(sourceY + Math.sin(angle) * factor * 8);
+                            
+                            if (newX >= 0 && newX < canvas.width && newY >= 0 && newY < canvas.height) {
+                                const sourceIndex = (sourceY * canvas.width + sourceX) * 4;
+                                const targetIndex = (newY * canvas.width + newX) * 4;
+                                
+                                data[targetIndex] = photoImageData.data[sourceIndex];
+                                data[targetIndex + 1] = photoImageData.data[sourceIndex + 1];
+                                data[targetIndex + 2] = photoImageData.data[sourceIndex + 2];
+                                data[targetIndex + 3] = photoImageData.data[sourceIndex + 3];
+                            }
+                        }
+                    }
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+            
+            // Gambar semua bonyok dan retak
+            bruises.forEach(bruise => {
+                addBruiseEffect(bruise.x, bruise.y, bruise.size);
+                addCrackEffect(bruise.x, bruise.y);
+            });
+        }
+        
+        // Efek bonyok/memar (transparan)
+        function addBruiseEffect(x, y, size = 25) {
+            // Efek bonyok dibuat transparan/tidak terlihat
+            // Fungsi tetap ada tapi tidak menggambar apa-apa
+        }
+        
+        // Efek retak pada foto
+        function addCrackEffect(x, y) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            
+            // Buat 3-5 retak acak dari titik pukulan
+            const numCracks = Math.floor(Math.random() * 3) + 3;
+            
+            for (let i = 0; i < numCracks; i++) {
+                const angle = (Math.PI * 2 * i) / numCracks + (Math.random() - 0.5) * 0.8;
+                const length = Math.random() * 30 + 20;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                
+                // Buat retak dengan segmen zigzag
+                let currentX = x;
+                let currentY = y;
+                const segments = 3;
+                
+                for (let j = 0; j < segments; j++) {
+                    const segmentLength = length / segments;
+                    const deviation = (Math.random() - 0.5) * 10;
+                    
+                    currentX += Math.cos(angle) * segmentLength + deviation;
+                    currentY += Math.sin(angle) * segmentLength + deviation;
+                    
+                    ctx.lineTo(currentX, currentY);
+                }
+                
+                ctx.stroke();
+            }
+            
+            // Retak tipis tambahan
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+            
+            for (let i = 0; i < 2; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const length = Math.random() * 15 + 10;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + Math.cos(angle) * length, y + Math.sin(angle) * length);
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
+        
+        // Handle klik pada canvas
+        canvas.addEventListener('click', (e) => {
+            if (!gameStarted) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Cek apakah klik di area wajah (tengah canvas)
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const faceRadius = 150;
+            
+            const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+            
+            if (distance > faceRadius) {
+                // Klik di luar area wajah - tidak ada efek
+                return;
+            }
+            
+            // Update skor
+            score += 10;
+            scoreValue.textContent = score;
+            
+            // Cek level up
+            checkLevelUp();
+            
+            // Tampilkan skor yang diperoleh
+            showScorePopup(e.clientX, e.clientY, 10);
+            
+            // Buat efek pukulan
+            createPunchEffect(e.clientX - rect.left + rect.left, e.clientY - rect.top + rect.top);
+            
+            // Distorsi foto
+            distortPhoto(x, y);
+            
+            // Suara pukulan
+            playPunchSound();
+        });
+        
+        // Tampilkan popup skor
+        function showScorePopup(x, y, points) {
+            const scorePopup = document.createElement('div');
+            scorePopup.textContent = '+' + points;
+            scorePopup.style.cssText = `
+                position: fixed;
+                left: ${x}px;
+                top: ${y}px;
+                color: #f1c40f;
+                font-size: 24px;
+                font-weight: bold;
+                pointer-events: none;
+                z-index: 1000;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+                animation: scoreFloat 1s ease-out forwards;
+            `;
+            
+            document.body.appendChild(scorePopup);
+            
+            setTimeout(() => {
+                scorePopup.remove();
+            }, 1000);
+        }
+        
+        // Suara pukulan
+        function playPunchSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Buat suara "thud" untuk pukulan
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                const filter = audioContext.createBiquadFilter();
+                
+                oscillator.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(80, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(40, audioContext.currentTime + 0.1);
+                
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(200, audioContext.currentTime);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+        
+        // Event listeners
+        captureBtn.addEventListener('click', capturePhoto);
+        startGameBtn.addEventListener('click', startGame);
+        resetBtn.addEventListener('click', resetGame);
+        
+        // Back to game selector
+        document.getElementById('backToSelector').addEventListener('click', () => {
+            if (window.parent !== window) {
+                window.location.href = '/game/game-selector.html';
+            } else {
+                window.location.href = '/game/game-selector.html';
+            }
+        });
+        
+        // Inisialisasi
+        initCamera();
+    </script>
+</body>
+</html>

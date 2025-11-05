@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Center - Jakhabitat</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 50%;
+            height: 100vh;
+            background: url('/gambar2.png') center/cover no-repeat;
+            z-index: -1;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 50%;
+            height: 100vh;
+            background: url('/gambar1.png') center/cover no-repeat;
+            z-index: -1;
+        }
+        
+        .container {
+            text-align: center;
+            color: white;
+            max-width: 800px;
+            padding: 20px;
+        }
+        
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #ddd;
+            color: #333;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-10px);
+            background: #f8f9fa;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .game-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .game-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .game-description {
+            font-size: 16px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        
+        .play-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">🎮 GAME CENTER 🎮</div>
+        <div class="subtitle">Pilih game yang ingin Anda mainkan!</div>
+        
+        <div class="games-grid">
+            <div class="game-card" onclick="playGame('car-parking')">
+                <div class="game-icon">🚗</div>
+                <div class="game-title">Car Parking Puzzle</div>
+                <div class="game-description">Keluarkan semua mobil dari area parkir!</div>
+                <button class="play-button">Mainkan Sekarang</button>
+            </div>
+            
+            <div class="game-card" onclick="playGame('punch-game')">
+                <div class="game-icon">🥊</div>
+                <div class="game-title">Punch Game</div>
+                <div class="game-description">Ambil foto dan pukul wajah teman Anda!</div>
+                <button class="play-button">Mainkan Sekarang</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function playGame(gameId) {
+            // Check if we're in an iframe (layer viewer context)
+            if (window.parent !== window) {
+                // We're in an iframe, open game in same iframe
+                if (gameId === 'car-parking') {
+                    window.location.href = '/game/index.html';
+                } else if (gameId === 'punch-game') {
+                    window.location.href = '/game/punch-game.html';
+                }
+            } else {
+                // We're in standalone mode, open in new tab
+                if (gameId === 'car-parking') {
+                    window.open('/game/index.html', '_blank');
+                } else if (gameId === 'punch-game') {
+                    window.open('/game/punch-game.html', '_blank');
+                }
+            }
+        }
+        
+        // Add some interactive effects
+        document.querySelectorAll('.game-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

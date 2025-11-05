@@ -87,6 +87,13 @@
       "type": "panorama",
       "marzipanoPath": "/marzipano/tower-samawa/",
       "hotspots": []
+    },
+    {
+      "id": 8,
+      "name": "Game Layer",
+      "type": "game",
+      "gameUrl": "/game/index.html",
+      "hotspots": []
     }
   ]
 }

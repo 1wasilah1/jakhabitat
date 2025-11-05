@@ -2,63 +2,46 @@
   "video": "/layer/layer1/dprkp.mp4",
   "hotspots": [
     {
-      "id": "new-1761238620021-po4y0y516",
-      "x": 48.2,
-      "y": 51.1,
+      "id": "new-1761802449531-hz3co816k",
+      "x": 28.7,
+      "y": 42.4,
       "type": "layer",
       "title": "HTM",
       "timeStart": 0,
-      "timeEnd": 5,
-      "targetLayer": 3,
-      "targetAsset": "/media/uploads/compressed-1761296117294.jpg"
+      "timeEnd": 7,
+      "targetLayer": 3
     },
     {
-      "id": "new-1761243213503-5p5evjijm",
-      "x": 53.7,
-      "y": 46.7,
-      "type": "layer",
-      "title": "KTV",
-      "timeStart": 14,
-      "timeEnd": 19,
-      "targetLayer": 2,
-      "targetLinkId": "1761241752534",
-      "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
-    },
-    {
-      "id": "new-1761284389701-dpanvsvf4",
-      "x": 62.8,
-      "y": 53.2,
-      "type": "layer",
-      "title": "RTLH",
-      "timeStart": 25,
-      "timeEnd": 30,
-      "targetLayer": 2,
-      "targetLinkId": "1761284336961",
-      "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
-    },
-    {
-      "id": "new-1761284420197-qilkxbzkt",
-      "x": 61.3,
-      "y": 48.7,
+      "id": "new-1761811894252-h3hykqeo0",
+      "x": 57.3,
+      "y": 45,
       "type": "layer",
       "title": "Rusunawa",
-      "timeStart": 36,
-      "timeEnd": 41,
+      "timeStart": 0,
+      "timeEnd": 5,
       "targetLayer": 2,
-      "targetLinkId": "1761284287690",
-      "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
+      "targetLinkId": "1761241752534"
     },
     {
-      "id": "new-1761284453801-e2orsa8ij",
-      "x": 54,
-      "y": 33.3,
+      "id": "new-1761812915535-1xm4bvfwl",
+      "x": 68.4,
+      "y": 47.7,
       "type": "layer",
-      "title": "CAP & CIP",
-      "timeStart": 30,
-      "timeEnd": 35,
+      "title": "CAP CIP",
+      "timeStart": 23,
+      "timeEnd": 28,
       "targetLayer": 2,
-      "targetLinkId": "1761284315597",
-      "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
+      "targetLinkId": "1761284315597"
+    },
+    {
+      "id": "new-game-hotspot",
+      "x": 15.5,
+      "y": 55.2,
+      "type": "layer",
+      "title": "Game",
+      "timeStart": 0,
+      "timeEnd": 30,
+      "targetLayer": 8
     }
   ]
 }

@@ -1,0 +1,20 @@
+{
+  "games": [
+    {
+      "id": "car-parking",
+      "name": "Car Parking Puzzle",
+      "url": "/game/index.html",
+      "description": "Keluarkan semua mobil dari area parkir!",
+      "icon": "🚗"
+    },
+    {
+      "id": "punch-game",
+      "name": "Punch Game",
+      "url": "/game/punch-game.html",
+      "description": "Ambil foto dan pukul wajah Anda sendiri!",
+      "icon": "🥊"
+    }
+  ],
+  "gameUrl": "/game/index.html",
+  "hotspots": []
+}

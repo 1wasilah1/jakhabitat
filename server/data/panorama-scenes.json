@@ -9,10 +9,10 @@
             "x": 36.81506849315068,
             "y": 68.22916666666666,
             "type": "asset",
-            "title": "mba nana siap melayani",
+            "title": "Halo, ada yang bisa saya bantu?",
             "targetAsset": "/media/uploads/compressed-1761259947570.png",
-            "assetWidth": 200,
-            "assetHeight": 703
+            "assetWidth": 1000,
+            "assetHeight": 1000
           },
           {
             "id": "hotspot-1761260307813",
@@ -194,7 +194,7 @@
             "targetProject": "project-1761284744909",
             "targetScene": "default-scene",
             "targetLayer": 4,
-            "targetAsset": "/media/uploads/otv9kzhr6a5aeiwtufcru063t.png"
+            "targetAsset": "/media/uploads/compressed-1761816137294.jpg"
           },
           {
             "id": "hotspot-1761285626569",
@@ -204,6 +204,13 @@
             "title": "View 3",
             "targetProject": "project-1761284517089",
             "targetScene": "scene-1761285622091"
+          },
+          {
+            "id": "hotspot-1761816164243",
+            "x": 67.2945205479452,
+            "y": 56.25,
+            "type": "scene",
+            "title": ""
           }
         ],
         "name": "view 1"
@@ -235,6 +242,54 @@
             "targetScene": "scene-1761285271367"
           }
         ],
+        "name": "view 3"
+      }
+    }
+  },
+  "project-1761284744909": {
+    "scenes": {
+      "scene-1761816471028": {
+        "scene": "/uploads/panorama-project-1761284744909-1761816470317.webp",
+        "hotspots": [
+          {
+            "id": "hotspot-1761816521796",
+            "x": 51.1986301369863,
+            "y": 83.33333333333334,
+            "type": "scene",
+            "title": "New Hotspot",
+            "targetProject": "project-1761284744909",
+            "targetScene": "scene-1761816494875"
+          }
+        ],
+        "name": "view 1"
+      },
+      "scene-1761816494875": {
+        "scene": "/uploads/panorama-project-1761284744909-1761816494052.JPG",
+        "hotspots": [
+          {
+            "id": "hotspot-1761816542427",
+            "x": 75.51369863013699,
+            "y": 89.0625,
+            "type": "scene",
+            "title": "New Hotspot",
+            "targetProject": "project-1761284744909",
+            "targetScene": "scene-1761816471028"
+          },
+          {
+            "id": "hotspot-1761816558158",
+            "x": 27.56849315068493,
+            "y": 93.75,
+            "type": "scene",
+            "title": "New Hotspot",
+            "targetProject": "project-1761284744909",
+            "targetScene": "scene-1761816516265"
+          }
+        ],
+        "name": "view 2"
+      },
+      "scene-1761816516265": {
+        "scene": "/uploads/panorama-project-1761284744909-1761816515372.JPG",
+        "hotspots": [],
         "name": "view 3"
       }
     }
