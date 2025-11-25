@@ -8,9 +8,11 @@
     },
     {
       "id": "project-1761262951055",
-      "name": "Tower Samawa Studio",
+      "name": "Samawa Studio",
       "scenes": [],
-      "defaultSceneId": "scene-1761262992328"
+      "defaultSceneId": "scene-1761262992328",
+      "unitType": "Studio",
+      "location": "Jakarta Timur"
     },
     {
       "id": "project-1761284517089",
@@ -20,9 +22,19 @@
     },
     {
       "id": "project-1761284744909",
-      "name": "Tower Kanaya Studio",
+      "name": "Kanaya Studio",
       "scenes": [],
-      "defaultSceneId": "scene-1761816471028"
+      "defaultSceneId": "scene-1761816471028",
+      "location": "Jakarta Timur",
+      "unitType": "Studio"
+    },
+    {
+      "id": "project-1763361074977",
+      "name": "Samawa Studio 2 BR",
+      "scenes": [],
+      "defaultSceneId": "scene-1763361172836",
+      "location": "Jakarta Timur",
+      "unitType": "2BR"
     }
   ]
 }

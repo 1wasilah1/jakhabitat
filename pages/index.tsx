@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import LayerViewer from '../components/LayerViewer';
+import KPRSimulator from '../components/KPRSimulator';
 
 const NAV_LINKS = [
   { label: 'Home', href: '#hero' },
@@ -15,6 +16,7 @@ const Home: React.FC = () => {
   const [navState, setNavState] = useState('semi-transparent');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPanoramaMode, setIsPanoramaMode] = useState(false);
+  const [targetPanoramaId, setTargetPanoramaId] = useState<string | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -24,8 +26,16 @@ const Home: React.FC = () => {
       }
     };
 
+    const handleRenderPanorama = (event: CustomEvent) => {
+      setTargetPanoramaId(event.detail.projectId);
+    };
+
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('renderPanorama', handleRenderPanorama as EventListener);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('renderPanorama', handleRenderPanorama as EventListener);
+    };
   }, []);
 
   return (
@@ -106,7 +116,7 @@ const Home: React.FC = () => {
         id="panorama"
         className="relative min-h-screen"
       >
-        <LayerViewer onModeChange={setIsPanoramaMode} />
+        <LayerViewer onModeChange={setIsPanoramaMode} targetPanoramaId={targetPanoramaId} />
       </section>
 
       {/* Program HTM Section */}
@@ -131,6 +141,17 @@ const Home: React.FC = () => {
               <p className="text-gray-600">Dekat dengan transportasi umum dan fasilitas kota Jakarta</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* KPR Simulator Section */}
+      <section id="kpr-simulator" className="py-20 bg-gray-100">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Simulasi Cicilan KPR</h2>
+            <p className="text-gray-600">Hitung cicilan KPR Anda dengan mudah dan akurat</p>
+          </div>
+          <KPRSimulator />
         </div>
       </section>
 

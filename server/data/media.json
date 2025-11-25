@@ -53,6 +53,42 @@
       "url": "/media/uploads/compressed-1761816137294.jpg",
       "size": 190796,
       "uploadDate": "2025-10-30"
+    },
+    {
+      "id": 1763447775892,
+      "name": "Salam 2 done.png",
+      "type": "image",
+      "category": "Upload",
+      "url": "/media/uploads/compressed-1763447775180.png",
+      "size": 79002,
+      "uploadDate": "2025-11-18"
+    },
+    {
+      "id": 1763449469579,
+      "name": "compressed-1761816137294.png",
+      "type": "image",
+      "category": "Upload",
+      "url": "/media/uploads/compressed-1763449469063.png",
+      "size": 274310,
+      "uploadDate": "2025-11-18"
+    },
+    {
+      "id": 1763449475664,
+      "name": "png-clipart-gif-map-desktop-logo-map-angle-text.png",
+      "type": "image",
+      "category": "Upload",
+      "url": "/media/uploads/compressed-1763449475596.png",
+      "size": 10117,
+      "uploadDate": "2025-11-18"
+    },
+    {
+      "id": 1763449730907,
+      "name": "istockphoto-1065306310-170667a.jpg",
+      "type": "image",
+      "category": "Upload",
+      "url": "/media/uploads/compressed-1763449730772.jpg",
+      "size": 17582,
+      "uploadDate": "2025-11-18"
     }
   ]
 }

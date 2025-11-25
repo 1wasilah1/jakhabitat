@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Tebak Bendera</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .score {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .timer {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #007bff;
+        }
+        
+        .timer.warning {
+            color: #dc3545;
+        }
+        
+        .flag-container {
+            margin: 2rem 0;
+        }
+        
+        .flag {
+            width: 200px;
+            height: 133px;
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .option-btn {
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .option-btn:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .option-btn.correct {
+            background: #28a745;
+            color: white;
+        }
+        
+        .option-btn.wrong {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .next-btn {
+            padding: 1rem 2rem;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .loading {
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .level-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .level-btn {
+            padding: 1.5rem 1rem;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            background: #f8f9fa;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .level-btn:hover {
+            background: #e9ecef;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .level-btn.easy {
+            border-color: #28a745;
+        }
+        
+        .level-btn.medium {
+            border-color: #ffc107;
+        }
+        
+        .level-btn.hard {
+            border-color: #dc3545;
+        }
+        
+        .level-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .level-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div id="timer" class="timer" style="display: none;">
+            ⏰ <span id="time-left">7</span>
+        </div>
+        
+        <h1>🏁 Tebak Bendera</h1>
+        <div class="score">
+            Soal <span id="current-question">0</span> dari <span id="total-questions">0</span><br>
+            <small>Skor: <span id="score">0</span> | Level: <span id="level-name"></span></small>
+        </div>
+        
+        <div id="loading" class="loading">Memuat bendera...</div>
+        
+        <div id="level-selector" style="display: none;">
+            <h2>Pilih Level Kesulitan</h2>
+            <div class="level-selector">
+                <div class="level-btn easy" onclick="startGame('easy')">
+                    <div class="level-title">😊 MUDAH</div>
+                    <div class="level-desc">5 Bendera</div>
+                </div>
+                <div class="level-btn medium" onclick="startGame('medium')">
+                    <div class="level-title">🤔 SEDANG</div>
+                    <div class="level-desc">10 Bendera</div>
+                </div>
+                <div class="level-btn hard" onclick="startGame('hard')">
+                    <div class="level-title">😤 SULIT</div>
+                    <div class="level-desc">15 Bendera</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="game-content" style="display: none;">
+            <div class="flag-container">
+                <img id="flag" class="flag" alt="Bendera negara">
+            </div>
+            
+            <div class="options" id="options">
+                <!-- Options akan diisi oleh JavaScript -->
+            </div>
+            
+            <button id="next-btn" class="next-btn">Soal Berikutnya</button>
+        </div>
+    </div>
+
+    <script>
+        class FlagGame {
+            constructor() {
+                this.score = 0;
+                this.currentQuestion = 0;
+                this.totalQuestions = 0;
+                this.currentCountry = null;
+                this.countries = [];
+                this.usedCountries = [];
+                this.level = null;
+                this.maxQuestions = 0;
+                this.timeLeft = 7;
+                this.timer = null;
+                this.init();
+            }
+
+            async init() {
+                await this.loadCountries();
+                this.showLevelSelector();
+            }
+            
+            showLevelSelector() {
+                document.getElementById('level-selector').style.display = 'block';
+            }
+
+            async loadCountries() {
+                try {
+                    const response = await fetch('https://restcountries.com/v3.1/all?fields=name,flags');
+                    const data = await response.json();
+                    
+                    // Filter negara yang punya bendera
+                    this.countries = data.filter(country => 
+                        country.flags && country.flags.png && country.name.common
+                    );
+                    
+                    document.getElementById('loading').style.display = 'none';
+                } catch (error) {
+                    console.error('Error loading countries:', error);
+                    document.getElementById('loading').textContent = 'Gagal memuat data. Refresh halaman.';
+                }
+            }
+
+            getRandomCountries(correct, count = 4) {
+                const options = [correct];
+                const available = this.countries.filter(c => c.name.common !== correct.name.common);
+                
+                while (options.length < count && available.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * available.length);
+                    const country = available.splice(randomIndex, 1)[0];
+                    options.push(country);
+                }
+                
+                return this.shuffleArray(options);
+            }
+
+            shuffleArray(array) {
+                const shuffled = [...array];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                return shuffled;
+            }
+
+            nextQuestion() {
+                // Cek apakah sudah mencapai batas soal
+                if (this.currentQuestion >= this.maxQuestions) {
+                    this.gameOver();
+                    return;
+                }
+                
+                // Reset UI
+                document.getElementById('next-btn').style.display = 'none';
+                const options = document.getElementById('options');
+                options.innerHTML = '';
+
+                // Pilih negara random yang belum dipakai
+                const available = this.countries.filter(c => 
+                    !this.usedCountries.includes(c.name.common)
+                );
+                
+                if (available.length === 0) {
+                    this.gameOver();
+                    return;
+                }
+
+                const randomIndex = Math.floor(Math.random() * available.length);
+                this.currentCountry = available[randomIndex];
+                this.usedCountries.push(this.currentCountry.name.common);
+
+                // Set bendera
+                document.getElementById('flag').src = this.currentCountry.flags.png;
+
+                // Buat opsi jawaban
+                const optionCountries = this.getRandomCountries(this.currentCountry);
+                
+                optionCountries.forEach(country => {
+                    const button = document.createElement('button');
+                    button.className = 'option-btn';
+                    button.textContent = country.name.common;
+                    button.onclick = () => this.selectAnswer(button, country);
+                    options.appendChild(button);
+                });
+
+                this.currentQuestion++;
+                this.updateScore();
+                this.startTimer();
+            }
+
+            selectAnswer(button, selectedCountry) {
+                this.stopTimer();
+                const isCorrect = selectedCountry.name.common === this.currentCountry.name.common;
+                
+                // Disable semua tombol
+                const allButtons = document.querySelectorAll('.option-btn');
+                allButtons.forEach(btn => {
+                    btn.disabled = true;
+                    if (btn.textContent === this.currentCountry.name.common) {
+                        btn.classList.add('correct');
+                    } else if (btn === button && !isCorrect) {
+                        btn.classList.add('wrong');
+                    }
+                });
+
+                if (isCorrect) {
+                    this.score++;
+                    this.updateScore();
+                }
+
+                // Tampilkan tombol next
+                document.getElementById('next-btn').style.display = 'inline-block';
+                document.getElementById('next-btn').onclick = () => this.nextQuestion();
+            }
+
+            updateScore() {
+                document.getElementById('current-question').textContent = this.currentQuestion;
+                document.getElementById('total-questions').textContent = this.totalQuestions;
+                document.getElementById('score').textContent = this.score;
+            }
+            
+            startTimer() {
+                this.timeLeft = 7;
+                document.getElementById('timer').style.display = 'block';
+                this.updateTimer();
+                
+                this.timer = setInterval(() => {
+                    this.timeLeft--;
+                    this.updateTimer();
+                    
+                    if (this.timeLeft <= 0) {
+                        this.timeUp();
+                    }
+                }, 1000);
+            }
+            
+            updateTimer() {
+                const timerElement = document.getElementById('timer');
+                document.getElementById('time-left').textContent = this.timeLeft;
+                
+                if (this.timeLeft <= 3) {
+                    timerElement.classList.add('warning');
+                } else {
+                    timerElement.classList.remove('warning');
+                }
+            }
+            
+            stopTimer() {
+                if (this.timer) {
+                    clearInterval(this.timer);
+                    this.timer = null;
+                }
+            }
+            
+            timeUp() {
+                this.stopTimer();
+                
+                // Disable semua tombol dan highlight jawaban benar
+                const allButtons = document.querySelectorAll('.option-btn');
+                allButtons.forEach(btn => {
+                    btn.disabled = true;
+                    if (btn.textContent === this.currentCountry.name.common) {
+                        btn.classList.add('correct');
+                    }
+                });
+                
+                // Tampilkan tombol next
+                document.getElementById('next-btn').style.display = 'inline-block';
+                document.getElementById('next-btn').onclick = () => this.nextQuestion();
+            }
+
+            gameOver() {
+                this.stopTimer();
+                const levelNames = { easy: 'MUDAH', medium: 'SEDANG', hard: 'SULIT' };
+                const percentage = Math.round((this.score/this.totalQuestions) * 100);
+                let medal = '';
+                
+                if (percentage >= 90) medal = '🥇';
+                else if (percentage >= 70) medal = '🥈';
+                else if (percentage >= 50) medal = '🥉';
+                else medal = '😢';
+                
+                const container = document.querySelector('.game-container');
+                container.innerHTML = `
+                    <h1>${medal} Game Selesai!</h1>
+                    <div style="font-size: 1.5rem; margin: 1rem 0; color: #666;">
+                        Level: ${levelNames[this.level]}
+                    </div>
+                    <div style="font-size: 2.5rem; margin: 2rem 0; font-weight: bold;">
+                        ${this.score}/${this.totalQuestions}
+                    </div>
+                    <div style="font-size: 1.2rem; margin-bottom: 2rem; color: #666;">
+                        Akurasi: ${percentage}%
+                    </div>
+                    <button onclick="location.reload()" style="padding: 1rem 2rem; background: #007bff; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 1rem; margin-right: 1rem;">
+                        Main Lagi
+                    </button>
+                    <button onclick="window.history.back()" style="padding: 1rem 2rem; background: #6c757d; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 1rem;">
+                        Kembali
+                    </button>
+                `;
+            }
+        }
+
+        // Global functions
+        let game;
+        
+        function startGame(level) {
+            const maxQuestions = { easy: 5, medium: 10, hard: 15 };
+            const levelNames = { easy: 'MUDAH', medium: 'SEDANG', hard: 'SULIT' };
+            
+            game.level = level;
+            game.maxQuestions = maxQuestions[level];
+            game.totalQuestions = maxQuestions[level];
+            
+            document.getElementById('level-name').textContent = levelNames[level];
+            document.getElementById('level-selector').style.display = 'none';
+            document.getElementById('game-content').style.display = 'block';
+            
+            game.nextQuestion();
+        }
+        
+        // Start game
+        game = new FlagGame();
+    </script>
+</body>
+</html>

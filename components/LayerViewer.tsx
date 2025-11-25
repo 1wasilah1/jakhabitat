@@ -19,9 +19,10 @@ interface Hotspot {
 
 interface LayerViewerProps {
   onModeChange?: (isPanoramaMode: boolean) => void;
+  targetPanoramaId?: string | null;
 }
 
-const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
+const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange, targetPanoramaId }) => {
   const [currentLayer, setCurrentLayer] = useState(1);
   const [layer2Links, setLayer2Links] = useState<any[]>([]);
   const [selectedLinkId, setSelectedLinkId] = useState<string | null>(null);
@@ -48,6 +49,13 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange }) => {
         .catch(err => console.error('Failed to load game data:', err));
     }
   }, [currentLayer]);
+
+  useEffect(() => {
+    if (targetPanoramaId) {
+      setSelectedProjectId(targetPanoramaId);
+      switchToLayer(4);
+    }
+  }, [targetPanoramaId]);
 
   const switchToLayer = (layer: number) => {
     setCurrentLayer(layer);

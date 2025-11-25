@@ -36,6 +36,8 @@ interface PanoramaProject {
   defaultSceneId?: string;
   price?: number;
   interest?: number;
+  location?: string;
+  unitType?: string;
 }
 
 interface PanoramaScene {
@@ -69,6 +71,8 @@ const Manage: React.FC = () => {
   const [activeSceneId, setActiveSceneId] = useState<string>('');
   const [newSceneName, setNewSceneName] = useState<string>('');
   const [editorViewer, setEditorViewer] = useState<any>(null);
+  const [searchLocation, setSearchLocation] = useState('');
+  const [searchUnitType, setSearchUnitType] = useState('');
 
   useEffect(() => {
     loadData();
@@ -1319,9 +1323,51 @@ const Manage: React.FC = () => {
                   </div>
                 </div>
                 
-                {panoramaProjects.length > 0 ? (
+                {/* Search Filters */}
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                  <h4 className="text-sm font-medium mb-3">Filter Pencarian</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input
+                      type="text"
+                      value={searchLocation}
+                      onChange={(e) => setSearchLocation(e.target.value)}
+                      className="border border-gray-300 rounded-md px-3 py-2"
+                      placeholder="Cari berdasarkan lokasi..."
+                    />
+                    <select
+                      value={searchUnitType}
+                      onChange={(e) => setSearchUnitType(e.target.value)}
+                      className="border border-gray-300 rounded-md px-3 py-2"
+                    >
+                      <option value="">Semua Tipe Unit</option>
+                      <option value="Studio">Studio</option>
+                      <option value="1BR">1 Bedroom</option>
+                      <option value="2BR">2 Bedroom</option>
+                      <option value="3BR">3 Bedroom</option>
+                    </select>
+                    <button
+                      onClick={() => {
+                        setSearchLocation('');
+                        setSearchUnitType('');
+                      }}
+                      className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md"
+                    >
+                      Reset Filter
+                    </button>
+                  </div>
+                </div>
+                
+                {panoramaProjects.filter(project => {
+                  const matchLocation = !searchLocation || (project.location && project.location.toLowerCase().includes(searchLocation.toLowerCase()));
+                  const matchUnitType = !searchUnitType || project.unitType === searchUnitType;
+                  return matchLocation && matchUnitType;
+                }).length > 0 ? (
                   <div className="space-y-4">
-                    {panoramaProjects.map((project) => (
+                    {panoramaProjects.filter(project => {
+                      const matchLocation = !searchLocation || (project.location && project.location.toLowerCase().includes(searchLocation.toLowerCase()));
+                      const matchUnitType = !searchUnitType || project.unitType === searchUnitType;
+                      return matchLocation && matchUnitType;
+                    }).map((project) => (
                       <div key={project.id} className="border border-gray-200 rounded-lg p-4">
                         <div className="space-y-2 mb-2">
                           <input
@@ -1336,6 +1382,51 @@ const Manage: React.FC = () => {
                             className="w-full border border-gray-300 rounded-md px-3 py-2"
                             placeholder="Project Name"
                           />
+                          <div className="grid grid-cols-2 gap-2">
+                            <select
+                              value={project.location || ''}
+                              onChange={(e) => {
+                                const updated = panoramaProjects.map(p => 
+                                  p.id === project.id ? { ...p, location: e.target.value || undefined } : p
+                                );
+                                setPanoramaProjects(updated);
+                              }}
+                              className="border border-gray-300 rounded-md px-3 py-2"
+                            >
+                              <option value="">Pilih Lokasi</option>
+                              <option value="Jakarta Timur">Jakarta Timur</option>
+                              <option value="Jakarta Pusat">Jakarta Pusat</option>
+                              <option value="Jakarta Utara">Jakarta Utara</option>
+                              <option value="Jakarta Selatan">Jakarta Selatan</option>
+                              <option value="Jakarta Barat">Jakarta Barat</option>
+                              <option value="Bogor">Bogor</option>
+                              <option value="Depok">Depok</option>
+                              <option value="Tangerang">Tangerang</option>
+                              <option value="Tangerang Selatan">Tangerang Selatan</option>
+                              <option value="Bekasi">Bekasi</option>
+                              <option value="Bandung">Bandung</option>
+                              <option value="Surabaya">Surabaya</option>
+                              <option value="Medan">Medan</option>
+                              <option value="Semarang">Semarang</option>
+                              <option value="Yogyakarta">Yogyakarta</option>
+                            </select>
+                            <select
+                              value={project.unitType || ''}
+                              onChange={(e) => {
+                                const updated = panoramaProjects.map(p => 
+                                  p.id === project.id ? { ...p, unitType: e.target.value || undefined } : p
+                                );
+                                setPanoramaProjects(updated);
+                              }}
+                              className="border border-gray-300 rounded-md px-3 py-2"
+                            >
+                              <option value="">Pilih Tipe Unit</option>
+                              <option value="Studio">Studio</option>
+                              <option value="1BR">1 Bedroom</option>
+                              <option value="2BR">2 Bedroom</option>
+                              <option value="3BR">3 Bedroom</option>
+                            </select>
+                          </div>
                           <div className="grid grid-cols-2 gap-2">
                             <input
                               type="number"
@@ -1382,6 +1473,13 @@ const Manage: React.FC = () => {
                         </div>
                         <div className="text-sm text-gray-600 space-y-1">
                           <p>Scenes: {project.scenes?.length || 0} {project.defaultSceneId && '• Default Scene Set'}</p>
+                          {(project.location || project.unitType) && (
+                            <p>
+                              {project.location && `Lokasi: ${project.location}`}
+                              {project.location && project.unitType && ' • '}
+                              {project.unitType && `Tipe: ${project.unitType}`}
+                            </p>
+                          )}
                           {(project.price || project.interest) && (
                             <p>
                               {project.price && `Harga: Rp ${project.price.toLocaleString('id-ID')}`}
@@ -1395,7 +1493,7 @@ const Manage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    No panorama projects found
+                    {searchLocation || searchUnitType ? 'Tidak ada proyek yang sesuai dengan filter pencarian' : 'No panorama projects found'}
                   </div>
                 )}
               </div>

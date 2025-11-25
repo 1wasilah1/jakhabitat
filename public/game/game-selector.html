@@ -136,6 +136,13 @@
                 <div class="game-description">Ambil foto dan pukul wajah teman Anda!</div>
                 <button class="play-button">Mainkan Sekarang</button>
             </div>
+            
+            <div class="game-card" onclick="playGame('flag-game')">
+                <div class="game-icon">🏁</div>
+                <div class="game-title">Tebak Bendera</div>
+                <div class="game-description">Tebak nama negara dari bendera yang ditampilkan!</div>
+                <button class="play-button">Mainkan Sekarang</button>
+            </div>
         </div>
     </div>
 
@@ -148,6 +155,8 @@
                     window.location.href = '/game/index.html';
                 } else if (gameId === 'punch-game') {
                     window.location.href = '/game/punch-game.html';
+                } else if (gameId === 'flag-game') {
+                    window.location.href = '/game/flag-game.html';
                 }
             } else {
                 // We're in standalone mode, open in new tab
@@ -155,6 +164,8 @@
                     window.open('/game/index.html', '_blank');
                 } else if (gameId === 'punch-game') {
                     window.open('/game/punch-game.html', '_blank');
+                } else if (gameId === 'flag-game') {
+                    window.open('/game/flag-game.html', '_blank');
                 }
             }
         }
