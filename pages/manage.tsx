@@ -73,6 +73,14 @@ const Manage: React.FC = () => {
   const [editorViewer, setEditorViewer] = useState<any>(null);
   const [searchLocation, setSearchLocation] = useState('');
   const [searchUnitType, setSearchUnitType] = useState('');
+  const [landingIcons, setLandingIcons] = useState([
+    { id: 'htm', name: 'HTM', src: '/landing/HTM.png', x: 0, y: 25, link: '/home#program-htm', width: 16, height: 16 },
+    { id: 'rusun', name: 'RUSUN', src: '/landing/RUSUN.png', x: 50, y: 0, link: '', width: 16, height: 16 },
+    { id: 'ktv', name: 'KTV', src: '/landing/KTV.png', x: 100, y: 25, link: '', width: 16, height: 16 },
+    { id: 'capcip', name: 'CAP CIP', src: '/landing/CAP CIP PNG.png', x: 0, y: 60, link: '', width: 16, height: 16 },
+    { id: 'rtlh', name: 'RTLH', src: '/landing/RTLH.png', x: 100, y: 60, link: '', width: 16, height: 16 },
+    { id: 'minigame', name: 'MINI GAME', src: '/landing/MINI GAME.png', x: 50, y: 100, link: '/flag-game', width: 16, height: 16 }
+  ]);
 
   useEffect(() => {
     loadData();
@@ -148,6 +156,18 @@ const Manage: React.FC = () => {
         const res = await fetch('/api/assets');
         const data = await res.json();
         setAssets(data.assets || []);
+      } else if (activeTab === 'landing') {
+        try {
+          const res = await fetch('/api/landing-icons');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.icons) {
+              setLandingIcons(data.icons);
+            }
+          }
+        } catch (error) {
+          console.log('No saved landing icons found, using defaults');
+        }
       }
     } catch (error) {
       console.error('Failed to load data:', error);
@@ -191,6 +211,7 @@ const Manage: React.FC = () => {
   };
 
   const tabs = [
+    { id: 'landing', label: 'Landing Page' },
     { id: 'layer1', label: 'Layer 1' },
     { id: 'layer2', label: 'Layer 2' },
     { id: 'layer3', label: 'Layer 3' },
@@ -517,6 +538,205 @@ const Manage: React.FC = () => {
           </div>
 
           <div className="p-6">
+            {activeTab === 'landing' && (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium">Landing Page Icon Editor</h3>
+                  <button 
+                    onClick={async () => {
+                      try {
+                        await fetch('/api/landing-icons', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ icons: landingIcons })
+                        });
+                        alert('Landing page icons saved!');
+                      } catch (error) {
+                        console.error('Failed to save icons:', error);
+                      }
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div>
+                    <div className="flex justify-between items-center mb-4">
+                      <h4 className="font-medium">Preview</h4>
+                      <button
+                        onClick={() => {
+                          const previewElement = document.getElementById('landing-preview');
+                          if (previewElement?.requestFullscreen) {
+                            previewElement.requestFullscreen();
+                          }
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm"
+                      >
+                        Fullscreen
+                      </button>
+                    </div>
+                    <div id="landing-preview" className="relative bg-gray-900 rounded-lg overflow-hidden" style={{ aspectRatio: '4/3', minHeight: '400px' }}>
+                      <img 
+                        src="/landing/Screen 2.jpg" 
+                        alt="Landing Background" 
+                        className="w-full h-full object-cover"
+                      />
+                      
+                      {landingIcons.map((icon) => (
+                        <div
+                          key={icon.id}
+                          className="absolute cursor-move transform -translate-x-1/2 -translate-y-1/2 group"
+                          style={{
+                            left: `${icon.x}%`,
+                            top: `${icon.y}%`,
+                          }}
+                          draggable
+                          onDragEnd={(e) => {
+                            const rect = e.currentTarget.parentElement!.getBoundingClientRect();
+                            const x = ((e.clientX - rect.left) / rect.width) * 100;
+                            const y = ((e.clientY - rect.top) / rect.height) * 100;
+                            
+                            const updated = landingIcons.map(i => 
+                              i.id === icon.id ? { 
+                                ...i, 
+                                x: Math.max(0, Math.min(100, x)), 
+                                y: Math.max(0, Math.min(100, y)) 
+                              } : i
+                            );
+                            setLandingIcons(updated);
+                          }}
+                        >
+                          <img 
+                            src={icon.src} 
+                            alt={icon.name}
+                            className="hover:scale-110 transition-transform"
+                            style={{ 
+                              width: `${icon.width * 4}px`, 
+                              height: `${icon.height * 4}px`,
+                              border: '2px solid rgba(255,255,255,0.5)',
+                              borderRadius: '4px',
+                              objectFit: 'cover',
+                              padding: 0,
+                              margin: 0
+                            }}
+                            draggable={false}
+                          />
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                            {icon.name} - Drag to move
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-sm text-gray-600 mt-2">
+                      Drag icons to reposition them on the landing page
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium mb-4">Icon Settings</h4>
+                    <div className="space-y-4 max-h-96 overflow-y-auto">
+                      {landingIcons.map((icon) => (
+                        <div key={icon.id} className="border border-gray-200 rounded-lg p-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <img src={icon.src} alt={icon.name} className="w-8 h-8" />
+                            <h5 className="font-medium">{icon.name}</h5>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">X Position (%)</label>
+                              <input
+                                type="number"
+                                value={Math.round(icon.x)}
+                                onChange={(e) => {
+                                  const updated = landingIcons.map(i => 
+                                    i.id === icon.id ? { ...i, x: Number(e.target.value) } : i
+                                  );
+                                  setLandingIcons(updated);
+                                }}
+                                className="w-full border border-gray-300 rounded-md px-3 py-2"
+                                min="0"
+                                max="100"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Y Position (%)</label>
+                              <input
+                                type="number"
+                                value={Math.round(icon.y)}
+                                onChange={(e) => {
+                                  const updated = landingIcons.map(i => 
+                                    i.id === icon.id ? { ...i, y: Number(e.target.value) } : i
+                                  );
+                                  setLandingIcons(updated);
+                                }}
+                                className="w-full border border-gray-300 rounded-md px-3 py-2"
+                                min="0"
+                                max="100"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-3 mt-3">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Width</label>
+                              <input
+                                type="number"
+                                value={icon.width}
+                                onChange={(e) => {
+                                  const updated = landingIcons.map(i => 
+                                    i.id === icon.id ? { ...i, width: Number(e.target.value) } : i
+                                  );
+                                  setLandingIcons(updated);
+                                }}
+                                className="w-full border border-gray-300 rounded-md px-3 py-2"
+                                min="8"
+                                max="32"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Height</label>
+                              <input
+                                type="number"
+                                value={icon.height}
+                                onChange={(e) => {
+                                  const updated = landingIcons.map(i => 
+                                    i.id === icon.id ? { ...i, height: Number(e.target.value) } : i
+                                  );
+                                  setLandingIcons(updated);
+                                }}
+                                className="w-full border border-gray-300 rounded-md px-3 py-2"
+                                min="8"
+                                max="32"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="mt-3">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Link URL</label>
+                            <input
+                              type="text"
+                              value={icon.link}
+                              onChange={(e) => {
+                                const updated = landingIcons.map(i => 
+                                  i.id === icon.id ? { ...i, link: e.target.value } : i
+                                );
+                                setLandingIcons(updated);
+                              }}
+                              className="w-full border border-gray-300 rounded-md px-3 py-2"
+                              placeholder="e.g., /home#program-htm"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {activeTab === 'layer1' && (
               <div className="space-y-6">
                 <div>
@@ -1427,7 +1647,7 @@ const Manage: React.FC = () => {
                               <option value="3BR">3 Bedroom</option>
                             </select>
                           </div>
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className="grid grid-cols-3 gap-2">
                             <input
                               type="number"
                               value={project.price || ''}
@@ -1451,6 +1671,19 @@ const Manage: React.FC = () => {
                               }}
                               className="border border-gray-300 rounded-md px-3 py-2"
                               placeholder="Bunga (%)"
+                              step="0.1"
+                            />
+                            <input
+                              type="number"
+                              value={(project as any).area || ''}
+                              onChange={(e) => {
+                                const updated = panoramaProjects.map(p => 
+                                  p.id === project.id ? { ...p, area: e.target.value ? Number(e.target.value) : undefined } : p
+                                );
+                                setPanoramaProjects(updated);
+                              }}
+                              className="border border-gray-300 rounded-md px-3 py-2"
+                              placeholder="Luas (m²)"
                               step="0.1"
                             />
                           </div>
@@ -1480,11 +1713,13 @@ const Manage: React.FC = () => {
                               {project.unitType && `Tipe: ${project.unitType}`}
                             </p>
                           )}
-                          {(project.price || project.interest) && (
+                          {(project.price || project.interest || (project as any).area) && (
                             <p>
                               {project.price && `Harga: Rp ${project.price.toLocaleString('id-ID')}`}
-                              {project.price && project.interest && ' • '}
+                              {project.price && (project.interest || (project as any).area) && ' • '}
                               {project.interest && `Bunga: ${project.interest}%`}
+                              {project.interest && (project as any).area && ' • '}
+                              {(project as any).area && `Luas: ${(project as any).area}m²`}
                             </p>
                           )}
                         </div>

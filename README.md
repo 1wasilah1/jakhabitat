@@ -4,6 +4,22 @@
 
 **URL**: https://dprkp.go.id/projects/f29288cf-55e4-4b88-9092-d6d1d359a046
 
+## Syarat-syarat Penerima Manfaat Program FPPR Hunian Terjangkau Milik
+
+1. **Memiliki e-KTP DKI Jakarta dan Kartu Keluarga DKI Jakarta**
+
+2. **Belum memiliki rumah** - dibuktikan dengan surat keterangan yang diketahui oleh Lurah setempat
+
+3. **Tidak sedang menerima subsidi perumahan** dari Pemerintah Pusat atau Pemerintah Daerah
+
+4. **Bagi yang telah menikah** - wajib memiliki surat nikah/akta nikah yang dikeluarkan oleh instansi yang berwenang
+
+5. **Memiliki Nomor Pokok Wajib Pajak (NPWP)**
+
+6. **Memiliki penghasilan tidak melebihi Rp14,8 juta** (lajang atau gabungan untuk pasangan suami istri yang berpenghasilan)
+
+7. **Memenuhi syarat kredit** sesuai aturan perbankan
+
 ## How can I edit this code?
 
 There are several ways of editing your application.

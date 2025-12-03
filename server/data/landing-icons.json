@@ -1,0 +1,62 @@
+[
+  {
+    "id": "htm",
+    "name": "HTM",
+    "src": "/landing/HTM.png",
+    "x": 0,
+    "y": 5,
+    "link": "/home#program-htm",
+    "width": 5504,
+    "height": 3072
+  },
+  {
+    "id": "rusun",
+    "name": "RUSUN",
+    "src": "/landing/RUSUN.png",
+    "x": 0,
+    "y": 0,
+    "link": "",
+    "width": 5504,
+    "height": 3072
+  },
+  {
+    "id": "ktv",
+    "name": "KTV",
+    "src": "/landing/KTV.png",
+    "x": 0,
+    "y": 0,
+    "link": "",
+    "width": 5504,
+    "height": 3072
+  },
+  {
+    "id": "capcip",
+    "name": "CAP CIP",
+    "src": "/landing/CAP CIP PNG.png",
+    "x": 0,
+    "y": 0,
+    "link": "",
+    "width": 5504,
+    "height": 3072
+  },
+  {
+    "id": "rtlh",
+    "name": "RTLH",
+    "src": "/landing/RTLH.png",
+    "x": 0,
+    "y": 0,
+    "link": "",
+    "width": 5504,
+    "height": 3072
+  },
+  {
+    "id": "minigame",
+    "name": "MINI GAME",
+    "src": "/landing/MINI GAME.png",
+    "x": 0,
+    "y": 0,
+    "link": "/flag-game",
+    "width": 5504,
+    "height": 3072
+  }
+]

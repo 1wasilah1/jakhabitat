@@ -8,11 +8,13 @@
     },
     {
       "id": "project-1761262951055",
-      "name": "Samawa Studio",
+      "name": "Samawa ST 21",
       "scenes": [],
       "defaultSceneId": "scene-1761262992328",
       "unitType": "Studio",
-      "location": "Jakarta Timur"
+      "location": "Jakarta Timur",
+      "area": 21,
+      "price": 184800000
     },
     {
       "id": "project-1761284517089",
@@ -22,19 +24,121 @@
     },
     {
       "id": "project-1761284744909",
-      "name": "Kanaya Studio",
+      "name": "Samawa 22.25 ST.C",
       "scenes": [],
       "defaultSceneId": "scene-1761816471028",
       "location": "Jakarta Timur",
-      "unitType": "Studio"
+      "unitType": "Studio",
+      "area": 22.25,
+      "price": 195800000
     },
     {
-      "id": "project-1763361074977",
-      "name": "Samawa Studio 2 BR",
+      "id": "project-1764659629822",
+      "name": "Kanaya 23.40 ST",
       "scenes": [],
-      "defaultSceneId": "scene-1763361172836",
+      "unitType": "Studio",
       "location": "Jakarta Timur",
-      "unitType": "2BR"
+      "area": 23.4,
+      "price": 238680000
+    },
+    {
+      "id": "project-1764659629991",
+      "name": "Kanaya 24.20 ST.A",
+      "scenes": [],
+      "location": "Jakarta Timur",
+      "unitType": "Studio",
+      "area": 24.2,
+      "price": 246840000
+    },
+    {
+      "id": "project-1764659995201",
+      "name": "Kanaya 22.60 ST.B",
+      "scenes": [],
+      "location": "Jakarta Timur",
+      "unitType": "Studio",
+      "area": 22.1,
+      "price": 230520000
+    },
+    {
+      "id": "project-1764659998474",
+      "name": "Kanaya 22.10 ST.C",
+      "scenes": [],
+      "unitType": "Studio",
+      "location": "Jakarta Timur",
+      "area": 21.8,
+      "price": 225420000
+    },
+    {
+      "id": "project-1764659998641",
+      "name": "Kanaya 27.00 ST.D",
+      "scenes": [],
+      "unitType": "Studio",
+      "location": "Jakarta Timur",
+      "area": 27,
+      "price": 305694000
+    },
+    {
+      "id": "project-1764659998791",
+      "name": "Kanaya 24.50 ST.E",
+      "scenes": [],
+      "unitType": "Studio",
+      "location": "Jakarta Timur",
+      "area": 24.2,
+      "price": 249900000
+    },
+    {
+      "id": "project-1764659998962",
+      "name": "Kanaya 2BR 35.60",
+      "scenes": [],
+      "area": 35.6,
+      "unitType": "2BR",
+      "location": "Jakarta Timur",
+      "price": 411954300
+    },
+    {
+      "id": "project-1764659999166",
+      "name": "Kanaya 36.00 2B.A",
+      "scenes": [],
+      "area": 36,
+      "unitType": "2BR",
+      "location": "Jakarta Timur",
+      "price": 416583000
+    },
+    {
+      "id": "project-1764659999320",
+      "name": "Kanaya 34.20 2B.B",
+      "scenes": [],
+      "location": "Jakarta Timur",
+      "unitType": "2BR",
+      "area": 34.2,
+      "price": 395753850
+    },
+    {
+      "id": "project-1764660541853",
+      "name": "Samawa 22.25 ST.C",
+      "scenes": [],
+      "location": "Jakarta Timur",
+      "unitType": "Studio",
+      "area": 22.25,
+      "price": 195800000
+    },
+    {
+      "id": "project-1764660543914",
+      "name": "Samawa 34.65 2B.A",
+      "scenes": [],
+      "price": 335412000,
+      "location": "Jakarta Timur",
+      "unitType": "2BR",
+      "area": 34.65
+    },
+    {
+      "id": "project-1764660544537",
+      "name": "Samawa 35.30 2B.C",
+      "scenes": [],
+      "unitType": "2BR",
+      "location": "Jakarta Timur",
+      "area": 35.3,
+      "price": 341704000
     }
   ]
 }
