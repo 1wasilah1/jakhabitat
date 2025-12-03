@@ -109,7 +109,7 @@ const KPRSimulator = () => {
 
     if (typeof window !== 'undefined' && (window as any).pannellum) {
       try {
-        const sceneConfig = {};
+        const sceneConfig: any = {};
         Object.keys(scenes).forEach(sceneId => {
           sceneConfig[sceneId] = {
             type: 'equirectangular',
