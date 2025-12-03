@@ -88,7 +88,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       uploadDate: new Date().toISOString().split('T')[0],
     };
 
-    mediaData.media.push(newMedia);
+    (mediaData.media as any).push(newMedia);
 
     // Save updated data
     fs.writeFileSync(dataPath, JSON.stringify(mediaData, null, 2));
