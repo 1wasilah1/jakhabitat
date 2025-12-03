@@ -59,7 +59,7 @@ const KPRSimulator = () => {
     try {
       const res = await fetch('/api/panorama/projects');
       const data = await res.json();
-      const units = (data.projects || []).filter(p => p.unitType && p.price);
+      const units = (data.projects || []).filter((p: any) => p.unitType && p.price);
       setProjectUnits(units);
     } catch (error) {
       console.error('Failed to load project units:', error);
