@@ -27,8 +27,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       const mediaItem = mediaData.media[mediaIndex];
       
       // Delete physical file if it's an uploaded file
-      if (mediaItem.url.includes('/media/uploads/')) {
-        const filePath = path.join(process.cwd(), 'public', mediaItem.url);
+      if ((mediaItem as any).url.includes('/media/uploads/')) {
+        const filePath = path.join(process.cwd(), 'public', (mediaItem as any).url);
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
         }
