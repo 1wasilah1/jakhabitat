@@ -115,7 +115,7 @@ const KPRSimulator = () => {
             type: 'equirectangular',
             panorama: scenes[sceneId].scene,
             autoLoad: true,
-            hotSpots: (scenes[sceneId].hotspots || []).map((hotspot) => ({
+            hotSpots: (scenes[sceneId].hotspots || []).map((hotspot: any) => ({
               id: hotspot.id,
               pitch: (50 - hotspot.y) * 1.8,
               yaw: (hotspot.x - 50) * 3.6,
