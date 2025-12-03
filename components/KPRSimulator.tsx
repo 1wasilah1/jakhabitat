@@ -71,7 +71,7 @@ const KPRSimulator = () => {
     console.log('Project units:', projectUnits);
     console.log('Selected tower:', selectedTower);
     
-    return projectUnits.filter(unit => {
+    return projectUnits.filter((unit: any) => {
       if (selectedTower === 'kanaya') {
         return unit.name?.toLowerCase().includes('kanaya') || unit.location?.toLowerCase().includes('cilangkap');
       }
