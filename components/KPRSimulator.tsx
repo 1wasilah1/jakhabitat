@@ -308,7 +308,7 @@ const KPRSimulator = () => {
           <div className="bg-white rounded-lg p-6 w-[95vw] h-[95vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold">
-                Preview {selectedTower && getFilteredUnits()[selectedUnit]?.unitType}
+                Preview {selectedTower && (getFilteredUnits()[parseInt(selectedUnit)] as any)?.unitType}
               </h3>
               <button 
                 onClick={() => setShowModal(false)}
