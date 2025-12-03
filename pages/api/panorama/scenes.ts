@@ -54,7 +54,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       }
       
       // Delete associated image files
-      const projectData = data[projectId as string];
+      const projectData = (data as any)[projectId as string];
       if (projectData?.scenes) {
         Object.values(projectData.scenes).forEach((sceneData: any) => {
           if (sceneData.scene) {
