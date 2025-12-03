@@ -279,7 +279,7 @@ const KPRSimulator = () => {
                 Preview
               </button>
 
-              {selectedTower && selectedUnit !== '' && getFilteredUnits()[selectedUnit] && (
+              {selectedTower && selectedUnit !== '' && getFilteredUnits()[parseInt(selectedUnit)] && (
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                   <h4 className="font-semibold mb-3">Hasil Simulasi:</h4>
                   <div className="space-y-2 text-sm">
