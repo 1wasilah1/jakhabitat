@@ -2,6 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  basePath: '/jakhabitat',
+  assetPrefix: '/jakhabitat',
   async rewrites() {
     return [
       {

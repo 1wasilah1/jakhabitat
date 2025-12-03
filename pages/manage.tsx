@@ -911,7 +911,7 @@ const Manage: React.FC = () => {
                               <option value="">Select Link</option>
                               {layer2Links.map(link => (
                                 <option key={link.id} value={link.id}>
-                                  {link.title || link.name}
+                                  {link.title || (link as any).name}
                                 </option>
                               ))}
                             </select>
@@ -1925,7 +1925,7 @@ const Manage: React.FC = () => {
                                             )
                                           }
                                         };
-                                        setPanoramaScenes(updatedScenes);
+                                        setPanoramaScenes(updatedScenes as any);
                                       }}
                                       className="border rounded px-2 py-1 text-sm"
                                     >
