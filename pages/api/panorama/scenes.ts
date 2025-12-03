@@ -36,7 +36,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         data = JSON.parse(fs.readFileSync(scenesFile, 'utf8'));
       }
       
-      data[projectId] = { scenes };
+      (data as any)[projectId] = { scenes };
       
       fs.writeFileSync(scenesFile, JSON.stringify(data, null, 2));
       res.status(200).json({ success: true });
