@@ -20,7 +20,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const { projectId } = req.query;
       const data = JSON.parse(fs.readFileSync(scenesFile, 'utf8'));
-      const projectData = data[projectId as string] || { scenes: {} };
+      const projectData = (data as any)[projectId as string] || { scenes: {} };
       
       res.status(200).json(projectData);
     } catch (error) {
@@ -66,7 +66,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         });
       }
       
-      delete data[projectId as string];
+      delete (data as any)[projectId as string];
       
       fs.writeFileSync(scenesFile, JSON.stringify(data, null, 2));
       res.status(200).json({ success: true });
