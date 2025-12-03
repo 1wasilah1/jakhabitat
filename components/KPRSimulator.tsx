@@ -246,7 +246,7 @@ const KPRSimulator = () => {
                   disabled={!selectedTower}
                 >
                   <option value="">Pilih Tipe Unit</option>
-                  {selectedTower && getFilteredUnits().map((unit, index) => (
+                  {selectedTower && getFilteredUnits().map((unit: any, index) => (
                     <option key={index} value={index}>{unit.unitType} | {unit.area || '-'}</option>
                   ))}
                 </select>
