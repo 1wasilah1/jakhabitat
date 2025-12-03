@@ -38,7 +38,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       
       const asset = data.media.find((m: any) => m.id.toString() === assetId);
       if (asset) {
-        const filePath = path.join(process.cwd(), 'public', asset.url);
+        const filePath = path.join(process.cwd(), 'public', (asset as any).url);
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
         }
