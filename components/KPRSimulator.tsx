@@ -97,7 +97,7 @@ const KPRSimulator = () => {
     }
   };
 
-  const initPanorama = (scenes) => {
+  const initPanorama = (scenes: any) => {
     const sceneIds = Object.keys(scenes);
     if (sceneIds.length === 0) return;
     
