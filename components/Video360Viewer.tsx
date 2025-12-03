@@ -245,7 +245,7 @@ const Video360Viewer: React.FC<Video360ViewerProps> = ({
                 </div>
               )}
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-                {hotspot.label || hotspot.title}
+                {hotspot.label || (hotspot as any).title}
               </div>
             </div>
           </div>
