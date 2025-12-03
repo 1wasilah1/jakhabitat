@@ -204,7 +204,7 @@ const KPRSimulator = () => {
                   <div>Luas</div>
                   <div>Harga</div>
                 </div>
-                {getFilteredUnits().map((unit, index) => (
+                {getFilteredUnits().map((unit: any, index) => (
                   <div key={index} className="grid grid-cols-3 gap-4 py-2 text-sm">
                     <div>{unit.unitType}</div>
                     <div>{unit.area || '-'}</div>
