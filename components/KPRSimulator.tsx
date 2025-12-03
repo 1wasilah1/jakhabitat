@@ -286,7 +286,7 @@ const KPRSimulator = () => {
                     <div className="flex justify-between">
                       <span>Harga Unit:</span>
                       <span className="font-medium">
-                        {formatRupiah(getFilteredUnits()[selectedUnit].price)}
+                        {formatRupiah(getFilteredUnits()[parseInt(selectedUnit)].price)}
                       </span>
                     </div>
                     <div className="flex justify-between">
