@@ -292,7 +292,7 @@ const KPRSimulator = () => {
                     <div className="flex justify-between">
                       <span>Cicilan/bulan:</span>
                       <span className="font-medium text-green-600">
-                        {formatRupiah(calculateInstallment(getFilteredUnits()[selectedUnit].price, parseInt(selectedTenor)))}
+                        {formatRupiah(calculateInstallment((getFilteredUnits()[parseInt(selectedUnit)] as any).price, parseInt(selectedTenor)))}
                       </span>
                     </div>
                   </div>
