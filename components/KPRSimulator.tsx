@@ -151,7 +151,7 @@ const KPRSimulator = () => {
     }
   };
 
-  const calculateInstallment = (price, years) => {
+  const calculateInstallment = (price: number, years: number) => {
     const monthlyRate = 0.05 / 12; // 5% annual rate
     const numPayments = years * 12;
     const principal = price * 0.8; // 80% financing
