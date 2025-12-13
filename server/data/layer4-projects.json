@@ -39,7 +39,8 @@
       "unitType": "Studio",
       "location": "Jakarta Timur",
       "area": 23.4,
-      "price": 238680000
+      "price": 238680000,
+      "defaultSceneId": "scene-1764749745841"
     },
     {
       "id": "project-1764659629991",

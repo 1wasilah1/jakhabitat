@@ -84,7 +84,12 @@ const KPRSimulator = () => {
 
   const loadPanoramaData = async () => {
     try {
-      const projectId = 'project-1761262951055';
+      const selectedUnitData = getFilteredUnits()[parseInt(selectedUnit)];
+      if (!selectedUnitData) return;
+      
+      const projectId = (selectedUnitData as any).id;
+      if (!projectId) return;
+      
       const scenesRes = await fetch(`/api/panorama/scenes?projectId=${projectId}`);
       const scenesData = await scenesRes.json();
       setPanoramaScenes(scenesData.scenes || {});
@@ -267,17 +272,7 @@ const KPRSimulator = () => {
                 <div className="text-sm text-gray-500 mt-1">Bunga Fix 5,00%</div>
               </div>
 
-              <button 
-                className={`w-full py-3 rounded-lg font-medium ${
-                  selectedTower && selectedUnit !== '' 
-                    ? 'bg-gray-900 text-white hover:bg-gray-800' 
-                    : 'bg-gray-300 text-gray-600'
-                }`}
-                disabled={!selectedTower || selectedUnit === ''}
-                onClick={() => setShowModal(true)}
-              >
-                Preview
-              </button>
+
 
               {selectedTower && selectedUnit !== '' && getFilteredUnits()[parseInt(selectedUnit)] && (
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg">

@@ -947,7 +947,7 @@ app.get('/api/layer2/link', (req, res) => {
       res.json(data);
     } else {
       // Return default link if file doesn't exist
-      const defaultLink = { url: 'http://localhost:6500/jakhabitat/cms' };
+      const defaultLink = { url: '/jakhabitat/cms' };
       res.json(defaultLink);
     }
   } catch (error) {

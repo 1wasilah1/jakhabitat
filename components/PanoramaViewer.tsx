@@ -86,20 +86,29 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
 
   const loadProjects = async () => {
     try {
+      console.log('Loading projects, projectId:', projectId);
       const response = await fetch('/api/panorama/projects');
       const data = await response.json();
       const projectList = data.projects || [];
+      console.log('Available projects:', projectList);
       setProjects(projectList);
       
       let targetProject: PanoramaProject | undefined;
       if (projectId) {
         targetProject = projectList.find((p: PanoramaProject) => p.id === projectId);
-      } else {
+        console.log('Found target project for ID', projectId, ':', targetProject);
+      }
+      
+      // Only use fallback if no projectId was provided
+      if (!targetProject && !projectId) {
         targetProject = projectList.find((p: PanoramaProject) => p.defaultSceneId) || projectList[0];
+        console.log('Using fallback project:', targetProject);
       }
       
       if (targetProject) {
         loadProject(targetProject);
+      } else {
+        console.error('No target project found for projectId:', projectId);
       }
     } catch (error) {
       console.error('Failed to load projects:', error);
@@ -108,18 +117,26 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
 
   const loadProject = async (project: PanoramaProject) => {
     try {
+      console.log('Loading project:', project.id);
       const response = await fetch(`/api/panorama/scenes?projectId=${project.id}`);
       const data = await response.json();
       const projectScenes = data.scenes || {};
+      console.log('Loaded scenes for project', project.id, ':', projectScenes);
       
       setCurrentProject(project);
       setScenes(projectScenes);
       
       const sceneIds = Object.keys(projectScenes);
+      if (sceneIds.length === 0) {
+        console.warn('No scenes found for project:', project.id);
+        return;
+      }
+      
       const initialScene = project.defaultSceneId && projectScenes[project.defaultSceneId] 
         ? project.defaultSceneId 
         : sceneIds[0];
       
+      console.log('Initial scene:', initialScene);
       if (initialScene) {
         setCurrentSceneId(initialScene);
       }
@@ -184,8 +201,8 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
             // Save current state to history
             setNavigationHistory(prev => [...prev, { projectId, sceneId: currentSceneId }]);
             
-            if (hotspot.targetLayer === 4 && hotspot.targetProject) {
-              // Switch to different panorama project dynamically
+            if (hotspot.targetLayer === 4 && hotspot.targetProject && hotspot.targetProject !== projectId) {
+              // Switch to different panorama project only if it's actually different
               loadProjectDynamically(hotspot.targetProject, hotspot.targetScene);
             } else {
               // Navigate to other layers
@@ -348,7 +365,12 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
           <div className="flex items-center justify-center h-full text-white">
             <div className="text-center">
               <div className="text-xl mb-2">No Panorama Available</div>
-              <div className="text-sm opacity-75">Please create a panorama project first</div>
+              <div className="text-sm opacity-75">
+                {currentProject ? 
+                  `No scenes found for project: ${currentProject.name}` : 
+                  'Please create a panorama project first'
+                }
+              </div>
             </div>
           </div>
         )}

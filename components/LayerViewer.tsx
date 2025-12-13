@@ -63,11 +63,13 @@ const LayerViewer: React.FC<LayerViewerProps> = ({ onModeChange, targetPanoramaI
   };
 
   const handleHotspotClick = (hotspot: Hotspot) => {
+    console.log('Hotspot clicked:', hotspot);
     if (hotspot.targetLayer === 2 && hotspot.targetLinkId) {
       setSelectedLinkId(hotspot.targetLinkId);
       switchToLayer(2);
     } else if (hotspot.targetLayer === 4 && hotspot.targetScene) {
       // Navigate to specific panorama project
+      console.log('Setting project ID to:', hotspot.targetScene);
       setSelectedProjectId(hotspot.targetScene);
       switchToLayer(4);
     } else if (hotspot.targetLayer) {

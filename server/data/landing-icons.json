@@ -3,60 +3,60 @@
     "id": "htm",
     "name": "HTM",
     "src": "/landing/HTM.png",
-    "x": 0,
-    "y": 5,
+    "x": 20,
+    "y": 61.224489795918366,
     "link": "/home#program-htm",
-    "width": 5504,
-    "height": 3072
+    "width": 55,
+    "height": 75
   },
   {
     "id": "rusun",
     "name": "RUSUN",
     "src": "/landing/RUSUN.png",
-    "x": 0,
-    "y": 0,
+    "x": 76,
+    "y": 41,
     "link": "",
-    "width": 5504,
-    "height": 3072
+    "width": 55,
+    "height": 75
   },
   {
     "id": "ktv",
     "name": "KTV",
     "src": "/landing/KTV.png",
-    "x": 0,
-    "y": 0,
-    "link": "",
-    "width": 5504,
-    "height": 3072
+    "x": 35,
+    "y": 54,
+    "link": "http://10.15.38.162:3001/ktv",
+    "width": 39,
+    "height": 125
   },
   {
     "id": "capcip",
     "name": "CAP CIP",
     "src": "/landing/CAP CIP PNG.png",
-    "x": 0,
-    "y": 0,
+    "x": 82,
+    "y": 54,
     "link": "",
-    "width": 5504,
-    "height": 3072
+    "width": 43,
+    "height": 110
   },
   {
     "id": "rtlh",
     "name": "RTLH",
     "src": "/landing/RTLH.png",
-    "x": 0,
-    "y": 0,
+    "x": 23,
+    "y": 27,
     "link": "",
-    "width": 5504,
-    "height": 3072
+    "width": 40,
+    "height": 75
   },
   {
     "id": "minigame",
     "name": "MINI GAME",
     "src": "/landing/MINI GAME.png",
-    "x": 0,
-    "y": 0,
+    "x": 63,
+    "y": 60,
     "link": "/flag-game",
-    "width": 5504,
-    "height": 3072
+    "width": 49,
+    "height": 110
   }
 ]

@@ -3,14 +3,18 @@ import Link from 'next/link';
 import LayerViewer from '../components/LayerViewer';
 import KPRSimulator from '../components/KPRSimulator';
 import SyaratFPPR from '../components/SyaratFPPR';
+import JakartaMap from '../components/JakartaMap';
+import JakartaLocationMap from '../components/JakartaLocationMap';
+import JakartaAdminMap from '../components/JakartaAdminMap';
+
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 
 const NAV_LINKS = [
-  { label: 'Landing', href: '/' },
-  { label: 'Latar Belakang', href: '#latar-belakang' },
+  { label: 'Home', href: '/' },
+  { label: 'Program HTM', href: '#program-htm' },
+  { label: 'Peta Jakarta', href: '#peta-jakarta' },
   { label: 'Perbandingan Harga', href: '#perbandingan-harga' },
   { label: 'Syarat', href: '#syarat' },
-  { label: 'Program HTM', href: '#program-htm' },
   { label: 'Simulasi KPR', href: '#kpr-simulator' },
   { label: 'Kontak', href: '#kontak' },
 ] as const;
@@ -53,20 +57,20 @@ const Home: React.FC = () => {
         <div className="flex w-full relative">
           <div className="bg-white flex items-center px-4 py-0" style={{clipPath: 'polygon(0 0, 100% 0, calc(100% - 20px) 100%, 0 100%)'}}>
             <Link href="/home" className="flex items-center py-0" aria-label="Beranda Jakhabitat">
-              <img src="/JAKHABITAT-LOGO-01.png" alt="Jakhabitat" className="h-16 w-auto md:h-24" />
+              <img src="/logo-updp.png" alt="UPDP" className="h-10 w-auto md:h-12 p-2" />
             </Link>
             <div className="w-1 h-12 bg-gray-900 ml-4 md:h-16 transform rotate-12"></div>
           </div>
-          <div className="bg-transparent flex-1 flex items-center justify-end px-4 py-0 text-white">
+          <div className="bg-gray-500 flex-1 flex items-center justify-end px-4 py-0 text-white" style={{clipPath: 'polygon(20px 0, 100% 0, 100% 100%, 0 100%)'}}>
             <ul className={`hidden items-center space-x-6 list-none text-[11px] font-bold uppercase tracking-[0.35em] md:flex`}>
               {NAV_LINKS.map(({ label, href }) => (
                 <li key={label}>
                   {href.startsWith('/') ? (
-                    <Link href={href} className="transition duration-200 hover:font-bold hover:text-gray-100">
+                    <Link href={href} className="transition duration-200 hover:font-bold hover:text-gray-100 hover:scale-110">
                       {label}
                     </Link>
                   ) : (
-                    <a href={href} className="transition duration-200 hover:font-bold hover:text-gray-100">
+                    <a href={href} className="transition duration-200 hover:font-bold hover:text-gray-100 hover:scale-110">
                       {label}
                     </a>
                   )}
@@ -110,7 +114,7 @@ const Home: React.FC = () => {
                   {href.startsWith('/') ? (
                     <Link
                       href={href}
-                      className="block w-full border-b border-white/10 pb-3 transition duration-200 hover:font-bold hover:text-gray-100"
+                      className="block w-full border-b border-white/10 pb-3 transition duration-200 hover:font-bold hover:text-gray-100 hover:scale-110"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {label}
@@ -118,7 +122,7 @@ const Home: React.FC = () => {
                   ) : (
                     <a
                       href={href}
-                      className="block w-full border-b border-white/10 pb-3 transition duration-200 hover:font-bold hover:text-gray-100"
+                      className="block w-full border-b border-white/10 pb-3 transition duration-200 hover:font-bold hover:text-gray-100 hover:scale-110"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {label}
@@ -139,48 +143,52 @@ const Home: React.FC = () => {
         <LayerViewer onModeChange={setIsPanoramaMode} targetPanoramaId={targetPanoramaId} />
       </section>
 
-      {/* Latar Belakang Section */}
-      <div className="w-full h-16 md:h-24 relative">
+      {/* Program HTM Section */}
+      <div className="w-full h-8 md:h-12 relative mt-24">
         <div className="absolute inset-0 bg-white" style={{clipPath: 'polygon(0 0, 30% 0, calc(30% - 20px) 100%, 0 100%)'}}></div>
         <div className="absolute inset-0 bg-gray-900"></div>
       </div>
-      <section id="latar-belakang" className="pt-32 pb-20 bg-white">
+      <section id="program-htm" className="py-20 bg-gray-50">
+        <div className="py-20">
         <div className="mx-auto max-w-6xl px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-gray-900 mb-8">LATAR BELAKANG</h2>
-            <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
-              Masalah penyediaan hunian layak menyangkut hak asasi manusia, kualitas hidup, stabilitas sosial, pertumbuhan ekonomi, ketahanan bencana, dan keadilan sosial.
-            </p>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Program HTM Jakhabitat</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">Hunian Terjangkau Milik dengan subsidi hingga 100% untuk masyarakat Jakarta</p>
           </div>
           
-          <div className="mb-12">
-            <h3 className="text-2xl font-semibold text-gray-900 text-center mb-12">
-              Faktor-faktor yang menyebabkan masalah ini antara lain
-            </h3>
-            
-            <div className="grid gap-8 md:grid-cols-3">
-              <div className="text-center">
-                <h4 className="text-xl font-semibold text-gray-900 mb-4">Pertumbuhan penduduk:</h4>
-                <p className="text-gray-700 leading-relaxed">
-                  Peningkatan jumlah penduduk menyebabkan permintaan akan hunian semakin tinggi.
-                </p>
+          <div className="grid gap-8 md:grid-cols-4">
+            <div className="bg-white rounded-lg p-6 shadow-lg">
+              <div className="flex justify-center mb-4">
+                <img src="https://img.icons8.com/?size=96&id=85038&format=png" alt="" className="w-16 h-16" />
               </div>
-              
-              <div className="text-center">
-                <h4 className="text-xl font-semibold text-gray-900 mb-4">Urbanisasi:</h4>
-                <p className="text-gray-700 leading-relaxed">
-                  Perpindahan penduduk dari luar daerah ke Kota Jakarta menyebabkan tekanan pada ketersediaan lahan.
-                </p>
+              <h3 className="text-xl font-semibold mb-4 text-center">Tanpa Uang Muka</h3>
+              <p className="text-gray-600 text-center">Pembiayaan hingga 100%</p>
+            </div>
+            <div className="bg-white rounded-lg p-6 shadow-lg">
+              <div className="flex justify-center mb-4">
+                <img src="https://img.icons8.com/?size=96&id=85044&format=png" alt="" className="w-16 h-16" />
               </div>
-              
-              <div className="text-center">
-                <h4 className="text-xl font-semibold text-gray-900 mb-4">Harga tanah yang mahal:</h4>
-                <p className="text-gray-700 leading-relaxed">
-                  Kenaikan harga tanah membuat hunian menjadi semakin sulit dijangkau oleh masyarakat berpenghasilan rendah.
-                </p>
+              <h3 className="text-xl font-semibold mb-4 text-center">Cicilan Tenor hingga 20 thn</h3>
+              <p className="text-gray-600 text-center">Mulai dari Rp 1,2jt per bulan dengan tenor hingga 20 tahun</p>
+            </div>
+            <div className="bg-white rounded-lg p-6 shadow-lg">
+              <div className="flex justify-center mb-4">
+                <img src="https://img.icons8.com/?size=96&id=85053&format=png" alt="" className="w-16 h-16" />
               </div>
+              <h3 className="text-xl font-semibold mb-4 text-center">Bunga Tetap</h3>
+              <p className="text-gray-600 text-center">Bunga 5%</p>
+            </div>
+            <div className="bg-white rounded-lg p-6 shadow-lg">
+              <div className="flex justify-center mb-4">
+                <img src="https://img.icons8.com/?size=96&id=85049&format=png" alt="" className="w-16 h-16" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4 text-center">Lokasi Strategis</h3>
+              <p className="text-gray-600 text-center">Dekat dengan transportasi umum dan fasilitas kota Jakarta</p>
             </div>
           </div>
+        </div>
+
+        <JakartaAdminMap />
         </div>
       </section>
 
@@ -201,7 +209,7 @@ const Home: React.FC = () => {
                 <div className="bg-gray-900 text-white p-4 text-center font-bold text-lg border-r border-gray-300">
                   KOMERSIL
                 </div>
-                <div className="bg-gray-900 text-white p-4 text-center font-bold text-lg border-r border-gray-300">
+                <div className="bg-gray-500 text-black p-4 text-center font-bold text-lg border-r border-gray-300">
                   HARGA 200 JUTAAN
                 </div>
                 <div className="bg-gray-900 text-white p-4 text-center font-bold text-lg">
@@ -215,8 +223,7 @@ const Home: React.FC = () => {
                   <h4 className="font-bold text-lg mb-2">DP 24-72 JUTA</h4>
                   <p className="text-sm">CICILAN TERMURAH TIAP BULAN 2 JUTA</p>
                 </div>
-                <div className="bg-gray-900 text-white p-6 border-r border-gray-300 flex flex-col justify-center items-center">
-                  <img src="/JAKHABITAT-LOGO putih-01.png" alt="Jakhabitat" className="h-12 w-auto mb-2" />
+                <div className="bg-gray-500 text-black p-6 border-r border-gray-300 flex flex-col justify-center items-center">
                   <div className="text-xl font-bold">ACCESSIBILITY</div>
                 </div>
                 <div className="p-6 text-center">
@@ -232,7 +239,7 @@ const Home: React.FC = () => {
                   <p className="text-sm mb-4">MENGIKUTI RATE BI</p>
                   <p className="text-sm font-medium">HANYA MENJANGKAU MASYARAKAT BERPENGHASILAN MULAI DARI 6 JUTA PER BULAN</p>
                 </div>
-                <div className="bg-gray-900 text-white p-6 border-r border-gray-300 flex flex-col justify-center items-center">
+                <div className="bg-gray-500 text-black p-6 border-r border-gray-300 flex flex-col justify-center items-center">
                   <div className="text-xl font-bold">AFFORDABILITY</div>
                 </div>
                 <div className="p-6 text-center">
@@ -250,31 +257,6 @@ const Home: React.FC = () => {
       <section id="syarat" className="py-20 bg-gray-900">
         <div className="mx-auto max-w-6xl px-4">
           <SyaratFPPR />
-        </div>
-      </section>
-
-      {/* Program HTM Section */}
-      <section id="program-htm" className="py-20 bg-gray-50">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Program HTM Jakhabitat</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">Hunian Terjangkau Milik dengan subsidi hingga 100% untuk masyarakat Jakarta</p>
-          </div>
-          
-          <div className="grid gap-8 md:grid-cols-3">
-            <div className="bg-white rounded-lg p-6 shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">Tanpa Uang Muka</h3>
-              <p className="text-gray-600">Pembiayaan hingga 100%</p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">Cicilan Tenor hingga 20 thn</h3>
-              <p className="text-gray-600">Mulai dari Rp 1,2jt per bulan dengan tenor hingga 20 tahun</p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">Lokasi Strategis</h3>
-              <p className="text-gray-600">Dekat dengan transportasi umum dan fasilitas kota Jakarta</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -299,8 +281,13 @@ const Home: React.FC = () => {
           
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             <div className="text-center">
-              <div className="text-xl font-bold text-gray-900 mb-2">Instagram:</div>
-              <div className="text-lg text-gray-700">@jakhabitat</div>
+              <div className="text-xl font-bold text-gray-900 mb-2">Sosial Media:</div>
+              <div className="text-sm text-gray-700 space-y-1">
+                <div><strong>Instagram:</strong> @jakhabitat @updp.jakarta</div>
+                <div><strong>Facebook:</strong> JakHabitat | Unit Pengelola Dana Perumahan</div>
+                <div><strong>X:</strong> UPDP_DPRKP</div>
+                <div><strong>Tiktok:</strong> updp.jakarta</div>
+              </div>
             </div>
             
             <div className="text-center">
@@ -335,15 +322,6 @@ const Home: React.FC = () => {
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6 lg:px-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-3 text-center lg:text-left">
             <p className="text-sm text-white/60">© {new Date().getFullYear()} Jakhabitat Living. Hak Cipta Dilindungi.</p>
-            <p className="text-xs uppercase tracking-[0.25em] text-white/50">
-              Menghubungkan manusia, ruang, dan pengalaman hidup.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 text-sm uppercase tracking-[0.25em] text-white/60">
-            <a href="#" className="transition hover:text-white">Instagram</a>
-            <a href="#" className="transition hover:text-white">Facebook</a>
-            <a href="#" className="transition hover:text-white">TikTok</a>
-            <a href="#" className="transition hover:text-white">YouTube</a>
           </div>
         </div>
       </footer>
