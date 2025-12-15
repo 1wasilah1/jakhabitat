@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 
 export default function JakartaAdminMap() {
   const [selectedTower, setSelectedTower] = useState<string | null>(null)
@@ -274,13 +275,12 @@ export default function JakartaAdminMap() {
                               }}
                               onClick={() => !tower.isFull && setSelectedTower(selectedTower === tower.name ? null : tower.name)}
                             >
-                              <img 
+                              <Image 
                                 src={tower.image} 
                                 alt={tower.name}
+                                width={96}
+                                height={96}
                                 className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  e.currentTarget.src = 'https://via.placeholder.com/96?text=Tower'
-                                }}
                               />
                             </motion.div>
                             <p className="text-xs text-center mt-2 font-semibold text-gray-800">{tower.name}</p>

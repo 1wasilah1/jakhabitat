@@ -104,13 +104,13 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
       
       let targetProject: PanoramaProject | undefined;
       if (projectId) {
-        targetProject = projectList.find((p: PanoramaProject) => p.id === projectId);
+        targetProject = projectList.find((p: any) => p.id === projectId);
         console.log('Found target project for ID', projectId, ':', targetProject);
       }
       
       // Only use fallback if no projectId was provided
       if (!targetProject && !projectId) {
-        targetProject = projectList.find((p: PanoramaProject) => p.defaultSceneId) || projectList[0];
+        targetProject = projectList.find((p: any) => p.defaultSceneId) || projectList[0];
         console.log('Using fallback project:', targetProject);
       }
       
@@ -120,7 +120,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
       } else {
         const errorMsg = `Project not found: ${projectId}`;
         console.error(errorMsg);
-        console.error('Available project IDs:', projectList.map(p => p.id));
+        console.error('Available project IDs:', projectList.map((p: any) => p.id));
         setError(errorMsg);
         setLoading(false);
       }
