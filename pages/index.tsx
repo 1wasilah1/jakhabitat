@@ -51,12 +51,7 @@ const Landing: React.FC = () => {
           className="w-full h-full object-cover"
         />
         
-        {/* Jakhabitat Description */}
-        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10 text-center max-w-2xl px-4">
-          <p className="text-lg text-black font-bold leading-relaxed drop-shadow-lg">
-            <strong>Jakhabitat</strong> adalah program hunian terjangkau dari Pemerintah Provinsi DKI Jakarta yang menyediakan berbagai solusi perumahan untuk masyarakat Jakarta, termasuk Hunian Terjangkau Milik (HTM), Rusunawa, dan program bantuan perumahan lainnya.
-          </p>
-        </div>
+
         
         {/* Logos */}
         <div className="absolute top-4 left-4 flex gap-2 items-center z-10">

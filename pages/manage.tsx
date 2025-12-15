@@ -1564,6 +1564,8 @@ const Manage: React.FC = () => {
                       <option value="1BR">1 Bedroom</option>
                       <option value="2BR">2 Bedroom</option>
                       <option value="3BR">3 Bedroom</option>
+                      <option value="AKSES MASUK & PARKIRAN">AKSES MASUK & PARKIRAN</option>
+                      <option value="FASUM">FASUM</option>
                     </select>
                     <button
                       onClick={() => {
@@ -1645,6 +1647,8 @@ const Manage: React.FC = () => {
                               <option value="1BR">1 Bedroom</option>
                               <option value="2BR">2 Bedroom</option>
                               <option value="3BR">3 Bedroom</option>
+                              <option value="AKSES MASUK & PARKIRAN">AKSES MASUK & PARKIRAN</option>
+                              <option value="FASUM">FASUM</option>
                             </select>
                           </div>
                           <div className="grid grid-cols-3 gap-2">

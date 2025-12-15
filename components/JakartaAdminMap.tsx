@@ -14,64 +14,129 @@ export default function JakartaAdminMap() {
 
   useEffect(() => {
     if (showModal && modalUnit) {
-      const projectId = modalUnit.towerName.includes('Samawa') ? '1761243873126' : 
-                       modalUnit.towerName.includes('Kanaya') ? '1761262951055' : null
+      // Map tower names and unit types to correct project IDs from the data
+      let projectId = null;
+      
+      if (modalUnit.type === 'AKSES MASUK & PARKIRAN') {
+        projectId = 'project-1765779191168'; // Samawa AREA MASUK & PARKIRAN
+      } else if (modalUnit.type === 'FASUM') {
+        projectId = 'project-1765779241506'; // Kanaya FASILITAS UMUM
+      } else if (modalUnit.towerName.includes('Samawa')) {
+        projectId = 'project-1764660544537';
+      } else if (modalUnit.towerName.includes('Kanaya')) {
+        projectId = 'project-1764659629822';
+      }
+      
+      console.log('Modal opened for:', modalUnit.towerName, 'Project ID:', projectId)
       
       if (projectId) {
-        setTimeout(async () => {
+        const loadPanorama = async () => {
           try {
             const res = await fetch(`/api/panorama/scenes?projectId=${projectId}`)
             const data = await res.json()
-            setPanoramaScenes(data.scenes || {})
+            console.log('Loaded panorama data:', data)
             
-            setTimeout(() => {
-              initPanorama(data.scenes || {})
-            }, 500)
+            if (data.scenes && Object.keys(data.scenes).length > 0) {
+              setPanoramaScenes(data.scenes)
+              setTimeout(() => {
+                initPanorama(data.scenes)
+              }, 1000)
+            } else {
+              console.log('No scenes found for project:', projectId)
+            }
           } catch (error) {
             console.error('Failed to load panorama:', error)
           }
-        }, 200)
+        }
+        
+        setTimeout(loadPanorama, 500)
       }
     }
   }, [showModal, modalUnit])
 
   const initPanorama = (scenes: any) => {
     const sceneIds = Object.keys(scenes)
-    if (sceneIds.length === 0) return
+    console.log('Initializing panorama with scenes:', sceneIds)
+    
+    if (sceneIds.length === 0) {
+      console.log('No scenes available')
+      return
+    }
     
     const container = document.getElementById('panorama-preview')
-    if (!container) return
+    if (!container) {
+      console.log('Container not found')
+      return
+    }
+
+    // Clear container first
+    container.innerHTML = ''
+    container.style.width = '100%'
+    container.style.height = '100%'
+    container.style.position = 'relative'
 
     if (typeof window !== 'undefined' && (window as any).pannellum) {
       try {
-        const sceneConfig: any = {}
-        Object.keys(scenes).forEach(sceneId => {
-          sceneConfig[sceneId] = {
-            type: 'equirectangular',
-            panorama: scenes[sceneId].scene,
-            autoLoad: true,
-            hotSpots: (scenes[sceneId].hotspots || []).map((hotspot: any) => ({
-              id: hotspot.id,
-              pitch: (50 - hotspot.y) * 1.8,
-              yaw: (hotspot.x - 50) * 3.6,
-              type: hotspot.type === 'scene' ? 'scene' : 'info',
-              text: hotspot.title,
-              sceneId: hotspot.targetScene
-            }))
+        const firstSceneId = sceneIds[0]
+        const firstScene = scenes[firstSceneId]
+        
+        console.log('Creating panorama viewer with first scene:', firstSceneId, firstScene)
+        
+        const hotspots = Array.isArray(firstScene.hotspots) ? firstScene.hotspots.map((hotspot: any) => ({
+          id: hotspot.id,
+          pitch: (50 - hotspot.y) * 1.8,
+          yaw: (hotspot.x - 50) * 3.6,
+          type: hotspot.type === 'scene' ? 'scene' : 'info',
+          text: hotspot.title,
+          sceneId: hotspot.targetScene,
+          clickHandlerFunc: () => {
+            if (hotspot.targetScene && scenes[hotspot.targetScene]) {
+              const targetScene = scenes[hotspot.targetScene]
+              const newHotspots = Array.isArray(targetScene.hotspots) ? targetScene.hotspots.map((h: any) => ({
+                id: h.id,
+                pitch: (50 - h.y) * 1.8,
+                yaw: (h.x - 50) * 3.6,
+                type: h.type === 'scene' ? 'scene' : 'info',
+                text: h.title,
+                sceneId: h.targetScene,
+                clickHandlerFunc: () => initPanorama(scenes)
+              })) : []
+              
+              container.innerHTML = ''
+              ;(window as any).pannellum.viewer(container, {
+                type: 'equirectangular',
+                panorama: targetScene.scene,
+                autoLoad: true,
+                hotSpots: newHotspots,
+                showControls: true,
+                showFullscreenCtrl: false
+              })
+            }
           }
+        })) : []
+        
+        const viewer = (window as any).pannellum.viewer(container, {
+          type: 'equirectangular',
+          panorama: firstScene.scene,
+          autoLoad: true,
+          hotSpots: hotspots,
+          showControls: true,
+          showFullscreenCtrl: false
         })
         
-        (window as any).pannellum.viewer(container, {
-          default: {
-            firstScene: sceneIds[0],
-            autoLoad: true
-          },
-          scenes: sceneConfig
-        })
+        // Force resize after creation
+        setTimeout(() => {
+          if (viewer && viewer.resize) {
+            viewer.resize()
+          }
+        }, 100)
+        
+        console.log('Panorama initialized successfully')
       } catch (error) {
         console.error('Error initializing panorama:', error)
       }
     } else {
+      console.log('Loading Pannellum library')
       const link = document.createElement('link')
       link.rel = 'stylesheet'
       link.href = 'https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css'
@@ -80,6 +145,7 @@ export default function JakartaAdminMap() {
       const script = document.createElement('script')
       script.src = 'https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js'
       script.onload = () => {
+        console.log('Pannellum loaded, initializing panorama')
         setTimeout(() => initPanorama(scenes), 100)
       }
       document.head.appendChild(script)
@@ -129,9 +195,11 @@ export default function JakartaAdminMap() {
           image: '/tower-unit/menara-samawa-proyek-sarana.jpg', 
           highlight: true,
           unitTypes: [
-            { type: 'Studio', luas: '21 m²', harga: 'Rp 245 juta' },
-            { type: '1 BR', luas: '24 m²', harga: 'Rp 275 juta' },
-            { type: '2 BR', luas: '35 m²', harga: 'Rp 380 juta' }
+            { type: 'Studio' },
+            { type: '1 BR' },
+            { type: '2 BR' },
+            { type: 'AKSES MASUK & PARKIRAN' },
+            { type: 'FASUM' }
           ]
         },
         { 
@@ -147,9 +215,11 @@ export default function JakartaAdminMap() {
           image: '/tower-unit/kanaya.jpg', 
           highlight: true,
           unitTypes: [
-            { type: 'Studio', luas: '23 m²', harga: 'Rp 265 juta' },
-            { type: '1 BR', luas: '25 m²', harga: 'Rp 290 juta' },
-            { type: '2 BR', luas: '36 m²', harga: 'Rp 395 juta' }
+            { type: 'Studio' },
+            { type: '1 BR' },
+            { type: '2 BR' },
+            { type: 'AKSES MASUK & PARKIRAN' },
+            { type: 'FASUM' }
           ]
         }
       ]
@@ -237,12 +307,10 @@ export default function JakartaAdminMap() {
                               {region.towers.find(t => t.name === selectedTower)?.unitTypes?.map((unit, i) => (
                                 <div 
                                   key={i} 
-                                  className="flex justify-between items-center bg-white p-2 rounded text-xs cursor-pointer hover:bg-gray-100 transition"
+                                  className="bg-white p-2 rounded text-xs cursor-pointer hover:bg-gray-100 transition text-center"
                                   onClick={() => handleUnitClick(unit, selectedTower)}
                                 >
                                   <span className="font-semibold">{unit.type}</span>
-                                  <span className="text-gray-600">{unit.luas}</span>
-                                  <span className="text-green-600 font-bold">{unit.harga}</span>
                                 </div>
                               ))}
                             </div>
@@ -278,7 +346,16 @@ export default function JakartaAdminMap() {
             </div>
             
             <div className="w-full h-[calc(100%-80px)] bg-gray-100 rounded-lg overflow-hidden">
-              <div id="panorama-preview" className="w-full h-full"></div>
+              {Object.keys(panoramaScenes).length > 0 ? (
+                <div id="panorama-preview" className="w-full h-full"></div>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-lg font-semibold mb-2">Loading Panorama...</div>
+                    <div className="text-sm text-gray-600">Preparing 360° view for {modalUnit.towerName}</div>
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>

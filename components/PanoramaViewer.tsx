@@ -34,13 +34,20 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
   const [currentProject, setCurrentProject] = useState<PanoramaProject | null>(null);
   const [pannellumLoaded, setPannellumLoaded] = useState(false);
   const [navigationHistory, setNavigationHistory] = useState<{layer?: number, projectId?: string, sceneId?: string}[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
   const viewerRef = useRef<HTMLDivElement>(null);
   const pannellumRef = useRef<any>(null);
 
   useEffect(() => {
-    loadProjects();
     loadPannellum();
   }, []);
+
+  useEffect(() => {
+    if (projectId !== undefined) {
+      loadProjects();
+    }
+  }, [projectId]);
 
 
 
@@ -86,6 +93,8 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
 
   const loadProjects = async () => {
     try {
+      setLoading(true);
+      setError('');
       console.log('Loading projects, projectId:', projectId);
       const response = await fetch('/api/panorama/projects');
       const data = await response.json();
@@ -106,22 +115,30 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
       }
       
       if (targetProject) {
-        loadProject(targetProject);
+        console.log('Loading project:', targetProject.name);
+        await loadProject(targetProject);
       } else {
-        console.error('No target project found for projectId:', projectId);
+        const errorMsg = `Project not found: ${projectId}`;
+        console.error(errorMsg);
+        console.error('Available project IDs:', projectList.map(p => p.id));
+        setError(errorMsg);
+        setLoading(false);
       }
     } catch (error) {
       console.error('Failed to load projects:', error);
+      setError('Failed to load projects');
+      setLoading(false);
     }
   };
 
   const loadProject = async (project: PanoramaProject) => {
     try {
-      console.log('Loading project:', project.id);
+      console.log('Loading project scenes for:', project.id);
       const response = await fetch(`/api/panorama/scenes?projectId=${project.id}`);
       const data = await response.json();
       const projectScenes = data.scenes || {};
-      console.log('Loaded scenes for project', project.id, ':', projectScenes);
+      console.log('Loaded scenes for project', project.id, ':', Object.keys(projectScenes));
+      console.log('Full scene data:', projectScenes);
       
       setCurrentProject(project);
       setScenes(projectScenes);
@@ -129,6 +146,8 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
       const sceneIds = Object.keys(projectScenes);
       if (sceneIds.length === 0) {
         console.warn('No scenes found for project:', project.id);
+        setError(`No scenes found for project: ${project.name}`);
+        setLoading(false);
         return;
       }
       
@@ -136,12 +155,18 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
         ? project.defaultSceneId 
         : sceneIds[0];
       
-      console.log('Initial scene:', initialScene);
+      console.log('Initial scene selected:', initialScene);
+      console.log('Default scene ID from project:', project.defaultSceneId);
+      console.log('Available scene IDs:', sceneIds);
+      
       if (initialScene) {
         setCurrentSceneId(initialScene);
+        setLoading(false);
       }
     } catch (error) {
       console.error('Failed to load project scenes:', error);
+      setError('Failed to load project scenes');
+      setLoading(false);
     }
   };
 
@@ -175,9 +200,20 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
   };
 
   const initPannellum = () => {
-    if (!viewerRef.current || !scenes[currentSceneId] || !(window as any).pannellum) return;
+    console.log('initPannellum called with:', {
+      viewerRef: !!viewerRef.current,
+      currentSceneId,
+      hasScene: !!scenes[currentSceneId],
+      pannellumLoaded: !!(window as any).pannellum
+    });
+    
+    if (!viewerRef.current || !scenes[currentSceneId] || !(window as any).pannellum) {
+      console.log('initPannellum early return - missing requirements');
+      return;
+    }
 
     const currentScene = scenes[currentSceneId];
+    console.log('Initializing scene:', currentScene);
     
     if (pannellumRef.current) {
       try {
@@ -296,6 +332,36 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ onNavigate, projectId }
   };
 
   const currentScene = scenes[currentSceneId];
+
+  if (loading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-center">
+          <div className="text-xl mb-2">Loading Panorama...</div>
+          <div className="text-sm opacity-75">
+            {projectId ? `Loading project: ${projectId}` : 'Initializing viewer'}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-center">
+          <div className="text-xl mb-2 text-red-400">Error</div>
+          <div className="text-sm opacity-75">{error}</div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-screen relative">

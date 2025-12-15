@@ -12,7 +12,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs'
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Program HTM', href: '#program-htm' },
-  { label: 'Peta Jakarta', href: '#peta-jakarta' },
   { label: 'Perbandingan Harga', href: '#perbandingan-harga' },
   { label: 'Syarat', href: '#syarat' },
   { label: 'Simulasi KPR', href: '#kpr-simulator' },
@@ -61,7 +60,7 @@ const Home: React.FC = () => {
             </Link>
             <div className="w-1 h-12 bg-gray-900 ml-4 md:h-16 transform rotate-12"></div>
           </div>
-          <div className="bg-gray-500 flex-1 flex items-center justify-end px-4 py-0 text-white" style={{clipPath: 'polygon(20px 0, 100% 0, 100% 100%, 0 100%)'}}>
+          <div className="flex-1 flex items-center justify-end px-4 py-0 text-white" style={{clipPath: 'polygon(20px 0, 100% 0, 100% 100%, 0 100%)', backgroundColor: '#f96f26'}}>
             <ul className={`hidden items-center space-x-6 list-none text-[11px] font-bold uppercase tracking-[0.35em] md:flex`}>
               {NAV_LINKS.map(({ label, href }) => (
                 <li key={label}>
@@ -206,13 +205,13 @@ const Home: React.FC = () => {
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               {/* Header Row */}
               <div className="grid grid-cols-3 gap-0">
-                <div className="bg-gray-900 text-white p-4 text-center font-bold text-lg border-r border-gray-300">
+                <div className="text-white p-4 text-center font-bold text-lg border-r border-gray-300" style={{backgroundColor: '#f96f26'}}>
                   KOMERSIL
                 </div>
-                <div className="bg-gray-500 text-black p-4 text-center font-bold text-lg border-r border-gray-300">
+                <div className="text-white p-4 text-center font-bold text-lg border-r border-gray-300" style={{backgroundColor: '#0f4c61'}}>
                   HARGA 200 JUTAAN
                 </div>
-                <div className="bg-gray-900 text-white p-4 text-center font-bold text-lg">
+                <div className="text-white p-4 text-center font-bold text-lg" style={{backgroundColor: '#f96f26'}}>
                   FPPR HUNIAN TERJANGKAU MILIK
                 </div>
               </div>
@@ -223,7 +222,7 @@ const Home: React.FC = () => {
                   <h4 className="font-bold text-lg mb-2">DP 24-72 JUTA</h4>
                   <p className="text-sm">CICILAN TERMURAH TIAP BULAN 2 JUTA</p>
                 </div>
-                <div className="bg-gray-500 text-black p-6 border-r border-gray-300 flex flex-col justify-center items-center">
+                <div className="text-white p-6 border-r border-gray-300 flex flex-col justify-center items-center" style={{backgroundColor: '#0f4c61'}}>
                   <div className="text-xl font-bold">ACCESSIBILITY</div>
                 </div>
                 <div className="p-6 text-center">
@@ -239,7 +238,7 @@ const Home: React.FC = () => {
                   <p className="text-sm mb-4">MENGIKUTI RATE BI</p>
                   <p className="text-sm font-medium">HANYA MENJANGKAU MASYARAKAT BERPENGHASILAN MULAI DARI 6 JUTA PER BULAN</p>
                 </div>
-                <div className="bg-gray-500 text-black p-6 border-r border-gray-300 flex flex-col justify-center items-center">
+                <div className="text-white p-6 border-r border-gray-300 flex flex-col justify-center items-center" style={{backgroundColor: '#0f4c61'}}>
                   <div className="text-xl font-bold">AFFORDABILITY</div>
                 </div>
                 <div className="p-6 text-center">

@@ -1,1 +1,359 @@
-{}
+{
+  "project-1764659629822": {
+    "scenes": {
+      "scene-1765766482366": {
+        "scene": "/uploads/panorama-project-1764659629822-1765766479762.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765766564575",
+            "x": 48.97260273972603,
+            "y": 49.47916666666667,
+            "type": "scene",
+            "title": "masuk",
+            "targetProject": "project-1764659629822",
+            "targetScene": "scene-1765766492262"
+          }
+        ],
+        "name": "depan"
+      },
+      "scene-1765766492262": {
+        "scene": "/uploads/panorama-project-1764659629822-1765766489898.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765766589295",
+            "x": 74.82876712328768,
+            "y": 50.520833333333336,
+            "type": "scene",
+            "title": "depan",
+            "targetProject": "project-1764659629822",
+            "targetScene": "scene-1765766482366"
+          },
+          {
+            "id": "hotspot-1765766601568",
+            "x": 22.773972602739725,
+            "y": 63.541666666666664,
+            "type": "scene",
+            "title": "view 2",
+            "targetProject": "project-1764659629822",
+            "targetScene": "scene-1765766503733"
+          }
+        ],
+        "name": "view 1"
+      },
+      "scene-1765766503733": {
+        "scene": "/uploads/panorama-project-1764659629822-1765766501087.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765766626161",
+            "x": 77.22602739726028,
+            "y": 58.854166666666664,
+            "type": "scene",
+            "title": "view 1",
+            "targetProject": "project-1764659629822",
+            "targetScene": "scene-1765766492262"
+          },
+          {
+            "id": "hotspot-1765766642001",
+            "x": 41.26712328767123,
+            "y": 82.29166666666666,
+            "type": "scene",
+            "title": "view 3",
+            "targetProject": "project-1764659629822",
+            "targetScene": "scene-1765766515431"
+          }
+        ],
+        "name": "view 2"
+      },
+      "scene-1765766515431": {
+        "scene": "/uploads/panorama-project-1764659629822-1765766512860.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765766673884",
+            "x": 9.76027397260274,
+            "y": 79.16666666666666,
+            "type": "scene",
+            "title": "view 2",
+            "targetProject": "project-1764659629822",
+            "targetScene": "scene-1765766503733"
+          },
+          {
+            "id": "hotspot-1765766699682",
+            "x": 40.41095890410959,
+            "y": 80.72916666666666,
+            "type": "scene",
+            "title": "view 4",
+            "targetProject": "project-1764659629822",
+            "targetScene": "scene-1765766527622"
+          }
+        ],
+        "name": "view 3"
+      },
+      "scene-1765766527622": {
+        "scene": "/uploads/panorama-project-1764659629822-1765766524694.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765766719988",
+            "x": 86.81506849315068,
+            "y": 75.52083333333334,
+            "type": "scene",
+            "title": "view 3",
+            "targetProject": "project-1764659629822",
+            "targetScene": "scene-1765766515431"
+          }
+        ],
+        "name": "view 4"
+      }
+    }
+  },
+  "project-1764660544537": {
+    "scenes": {
+      "scene-1765766945192": {
+        "scene": "/uploads/panorama-project-1764660544537-1765766942785.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765767080526",
+            "x": 48.8013698630137,
+            "y": 48.95833333333333,
+            "type": "scene",
+            "title": "masuk",
+            "targetProject": "project-1764660544537",
+            "targetScene": "scene-1765766964166"
+          }
+        ],
+        "name": "depan"
+      },
+      "scene-1765766964166": {
+        "scene": "/uploads/panorama-project-1764660544537-1765766961686.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765767384463",
+            "x": 48.45890410958904,
+            "y": 58.854166666666664,
+            "type": "scene",
+            "title": "view 2",
+            "targetProject": "project-1764660544537",
+            "targetScene": "scene-1765766975398"
+          }
+        ],
+        "name": "masuk"
+      },
+      "scene-1765766975398": {
+        "scene": "/uploads/panorama-project-1764660544537-1765766972756.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765767584719",
+            "x": 61.64383561643836,
+            "y": 64.58333333333334,
+            "type": "scene",
+            "title": "view 1",
+            "targetProject": "project-1764660544537",
+            "targetScene": "scene-1765766989038"
+          },
+          {
+            "id": "hotspot-1765767651868",
+            "x": 3.9383561643835616,
+            "y": 53.125,
+            "type": "scene",
+            "title": "masuk",
+            "targetProject": "project-1764660544537",
+            "targetScene": "scene-1765766964166"
+          }
+        ],
+        "name": "view 1"
+      },
+      "scene-1765766989038": {
+        "scene": "/uploads/panorama-project-1764660544537-1765766986588.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765767675145",
+            "x": 23.28767123287671,
+            "y": 67.1875,
+            "type": "scene",
+            "title": "view 1",
+            "targetProject": "project-1764660544537",
+            "targetScene": "scene-1765766975398"
+          },
+          {
+            "id": "hotspot-1765768743588",
+            "x": 48.8013698630137,
+            "y": 69.79166666666666,
+            "type": "scene",
+            "title": "view 3",
+            "targetProject": "project-1764660544537",
+            "targetScene": "scene-1765766998999"
+          }
+        ],
+        "name": "view 2"
+      },
+      "scene-1765766998999": {
+        "scene": "/uploads/panorama-project-1764660544537-1765766996450.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765768781175",
+            "x": 86.98630136986301,
+            "y": 63.541666666666664,
+            "type": "scene",
+            "title": "kamar 1",
+            "targetProject": "project-1764660544537",
+            "targetScene": "scene-1765767009979"
+          },
+          {
+            "id": "hotspot-1765768793291",
+            "x": 98.28767123287672,
+            "y": 53.125,
+            "type": "scene",
+            "title": "view 2",
+            "targetProject": "project-1764660544537",
+            "targetScene": "scene-1765766989038"
+          },
+          {
+            "id": "hotspot-1765768834580",
+            "x": 51.369863013698634,
+            "y": 64.58333333333334,
+            "type": "scene",
+            "title": "view 3",
+            "targetProject": "project-1764660544537",
+            "targetScene": "scene-1765767052022"
+          },
+          {
+            "id": "hotspot-1765768860320",
+            "x": 60.95890410958904,
+            "y": 59.375,
+            "type": "scene",
+            "title": "kamar 2",
+            "targetProject": "project-1764660544537",
+            "targetScene": "scene-1765767039014"
+          }
+        ],
+        "name": "view 3"
+      },
+      "scene-1765767009979": {
+        "scene": "/uploads/panorama-project-1764660544537-1765767007327.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765768887611",
+            "x": 7.02054794520548,
+            "y": 57.291666666666664,
+            "type": "scene",
+            "title": "view 3",
+            "targetProject": "project-1764660544537",
+            "targetScene": "scene-1765766998999"
+          }
+        ],
+        "name": "view 4"
+      },
+      "scene-1765767022247": {
+        "scene": "/uploads/panorama-project-1764660544537-1765767019681.jpg",
+        "hotspots": [],
+        "name": "view 5"
+      },
+      "scene-1765767039014": {
+        "scene": "/uploads/panorama-project-1764660544537-1765767036363.jpg",
+        "hotspots": [],
+        "name": "view 6"
+      },
+      "scene-1765767052022": {
+        "scene": "/uploads/panorama-project-1764660544537-1765767049408.jpg",
+        "hotspots": [],
+        "name": "view 7"
+      }
+    }
+  },
+  "project-1761262951055": {
+    "scenes": {
+      "scene-1765772153764": {
+        "scene": "/uploads/panorama-project-1761262951055-1765772151344.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765772195499",
+            "x": 50.68493150684932,
+            "y": 46.35416666666667,
+            "type": "scene",
+            "title": "view 1",
+            "targetProject": "project-1761262951055",
+            "targetScene": "scene-1765772167500"
+          }
+        ],
+        "name": "depan"
+      },
+      "scene-1765772167500": {
+        "scene": "/uploads/panorama-project-1761262951055-1765772164931.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765772334499",
+            "x": 36.13013698630137,
+            "y": 88.54166666666666,
+            "type": "scene",
+            "title": "view 1",
+            "targetProject": "project-1761262951055",
+            "targetScene": "scene-1765772179546"
+          }
+        ],
+        "name": "view 1"
+      },
+      "scene-1765772179546": {
+        "scene": "/uploads/panorama-project-1761262951055-1765772177146.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765772284629",
+            "x": 45.89041095890411,
+            "y": 57.291666666666664,
+            "type": "scene",
+            "title": "depan",
+            "targetProject": "project-1761262951055",
+            "targetScene": "scene-1765772153764"
+          },
+          {
+            "id": "hotspot-1765772302174",
+            "x": 9.417808219178083,
+            "y": 74.47916666666666,
+            "type": "scene",
+            "title": "view 1",
+            "targetProject": "project-1761262951055",
+            "targetScene": "scene-1765772167500"
+          }
+        ],
+        "name": "view 2"
+      }
+    }
+  },
+  "project-1765779241506": {
+    "scenes": {
+      "scene-1765779465390": {
+        "scene": "/uploads/panorama-project-1765779241506-1765779462754.jpg",
+        "hotspots": [],
+        "name": "parkiran 1"
+      },
+      "scene-1765779476085": {
+        "scene": "/uploads/panorama-project-1765779241506-1765779473200.jpg",
+        "hotspots": [],
+        "name": "parkiran 2"
+      },
+      "scene-1765779490094": {
+        "scene": "/uploads/panorama-project-1765779241506-1765779487231.jpg",
+        "hotspots": [],
+        "name": "parkiran 3"
+      },
+      "scene-1765779502905": {
+        "scene": "/uploads/panorama-project-1765779241506-1765779500152.jpg",
+        "hotspots": [],
+        "name": "parkiran 4"
+      },
+      "scene-1765779519231": {
+        "scene": "/uploads/panorama-project-1765779241506-1765779516191.jpg",
+        "hotspots": [
+          {
+            "id": "hotspot-1765779534695",
+            "x": 8.732876712328768,
+            "y": 53.645833333333336,
+            "type": "scene",
+            "title": "parkiran",
+            "targetProject": "project-1765779241506",
+            "targetScene": "scene-1765779465390"
+          }
+        ],
+        "name": "taman"
+      }
+    }
+  }
+}

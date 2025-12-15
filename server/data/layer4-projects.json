@@ -10,7 +10,7 @@
       "id": "project-1761262951055",
       "name": "Samawa ST 21",
       "scenes": [],
-      "defaultSceneId": "scene-1761262992328",
+      "defaultSceneId": "scene-1765772153764",
       "unitType": "Studio",
       "location": "Jakarta Timur",
       "area": 21,
@@ -40,7 +40,7 @@
       "location": "Jakarta Timur",
       "area": 23.4,
       "price": 238680000,
-      "defaultSceneId": "scene-1764749745841"
+      "defaultSceneId": "scene-1765766482366"
     },
     {
       "id": "project-1764659629991",
@@ -139,7 +139,23 @@
       "unitType": "2BR",
       "location": "Jakarta Timur",
       "area": 35.3,
-      "price": 341704000
+      "price": 341704000,
+      "defaultSceneId": "scene-1765766945192"
+    },
+    {
+      "id": "project-1765779191168",
+      "name": "samawa AREA MASUK & PARKIRAN ",
+      "scenes": [],
+      "location": "Jakarta Timur",
+      "unitType": "AKSES MASUK & PARKIRAN"
+    },
+    {
+      "id": "project-1765779241506",
+      "name": "Kanaya FASILITAS UMUM",
+      "scenes": [],
+      "location": "Jakarta Timur",
+      "unitType": "FASUM",
+      "defaultSceneId": "scene-1765779519231"
     }
   ]
 }
