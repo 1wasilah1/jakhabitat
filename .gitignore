@@ -37,4 +37,4 @@ Thumbs.db
 *.webm
 public/*.mp4
 public/*.mov
-public/*.avi
+public/*.avi.next/
