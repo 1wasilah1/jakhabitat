@@ -1,0 +1,13 @@
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/flag-game": "pages/flag-game.js",
+  "/tower-quiz": "pages/tower-quiz.js",
+  "/": "pages/index.js",
+  "/api/landing-icons": "pages/api/landing-icons.js",
+  "/home": "pages/home.js",
+  "/api/panorama/projects": "pages/api/panorama/projects.js",
+  "/api/assets": "pages/api/assets.js",
+  "/api/layers/layer1": "pages/api/layers/layer1.js"
+}
